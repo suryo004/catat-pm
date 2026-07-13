@@ -124,13 +124,6 @@
   .detail-value { flex: 1; color: var(--fg); font-size: 14px; font-weight: 500; }
   
   .pending-card { border-left: 3px solid var(--warning); }
-  
-  /* Custom Searchable Dropdown */
-  .cust-search-container { position: relative; }
-  .cust-dropdown { position: absolute; z-index: 20; width: 100%; margin-top: 4px; max-height: 250px; overflow-y: auto; background: var(--surface-solid); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: none; }
-  .cust-dropdown.show { display: block; }
-  .cust-option { padding: 12px 14px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); }
-  .cust-option:hover { background: rgba(16, 185, 129, 0.1); }
 </style>
 </head>
 <body>
@@ -145,7 +138,7 @@
     </div>
     <div>
       <h1 class="font-display font-bold text-lg leading-none">ServiceTrack</h1>
-      <p class="text-xs text-emerald-400 mt-0.5 font-medium">PM System v5.3</p>
+      <p class="text-xs text-emerald-400 mt-0.5 font-medium">PM System v5.2</p>
     </div>
   </div>
   
@@ -277,12 +270,10 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label class="label-field">Customer (Ketik untuk mencari)</label>
-                <div class="cust-search-container">
-                  <input type="text" id="customerSearch" class="input-field" placeholder="Pilih teknisi dahulu..." onfocus="showCustomerDropdown()" oninput="showCustomerDropdown()" onblur="hideCustomerDropdown()" disabled>
-                  <input type="hidden" id="customer" required>
-                  <div id="customerDropdownList" class="cust-dropdown"></div>
-                </div>
+                <label class="label-field">Customer (Sesuai Base Teknisi)</label>
+                <select id="customer" class="input-field" required>
+                  <option value="">Pilih teknisi dahulu...</option>
+                </select>
               </div>
               <div><label class="label-field">Lokasi / Base</label><input type="text" id="base" class="input-field" placeholder="Otomatis dari teknisi" readonly></div>
             </div>
@@ -323,4 +314,642 @@
     <!-- TEKNISI TAB -->
     <section id="tab-teknisi" class="tab-content">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <
+        <div class="glass p-6 lg:col-span-1">
+          <h3 class="font-display font-bold text-lg mb-4">Tambah Teknisi</h3>
+          <form id="techForm" class="space-y-4">
+            <div><label class="label-field">Nomor ID</label><input type="text" id="techId" class="input-field" placeholder="T001" required></div>
+            <div><label class="label-field">Nama Lengkap</label><input type="text" id="techName" class="input-field" placeholder="Nama teknisi" required></div>
+            <div><label class="label-field">Nomor HP</label><input type="text" id="techPhone" class="input-field" placeholder="08xxxxxxxxxx" required></div>
+            <div><label class="label-field">Alamat</label><textarea id="techAddress" class="input-field" placeholder="Alamat domisili teknisi"></textarea></div>
+            <div><label class="label-field">Base Wilayah</label><input type="text" id="techBase" class="input-field" placeholder="Jakarta Selatan" required></div>
+            <button type="submit" class="btn btn-primary w-full"><i data-lucide="user-plus" style="width:16px;height:16px;"></i> Tambah Teknisi</button>
+          </form>
+        </div>
+        <div class="glass p-6 lg:col-span-2"><h3 class="font-display font-bold text-lg mb-4">Daftar Teknisi</h3><div id="techList" class="space-y-3"></div></div>
+      </div>
+    </section>
+
+    <!-- CUSTOMER TAB -->
+    <section id="tab-customer" class="tab-content">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="glass p-6 lg:col-span-1">
+          <h3 class="font-display font-bold text-lg mb-4">Tambah Customer</h3>
+          <form id="custForm" class="space-y-4">
+            <div><label class="label-field">Nama Customer</label><input type="text" id="custName" class="input-field" placeholder="PT. Conton" required></div>
+            <div><label class="label-field">Base Wilayah</label><input type="text" id="custBase" class="input-field" placeholder="Jakarta Selatan" required></div>
+            <div><label class="label-field">Tanggal Mulai Jadwal PM</label><input type="date" id="custSchedule" class="input-field" required></div>
+            <div>
+              <label class="label-field">Frekuensi Kunjungan PM</label>
+              <select id="custFreq" class="input-field" required>
+                <option value="1">Bulanan (Setiap 1 Bulan)</option>
+                <option value="3">3 Bulanan (Quarterly)</option>
+                <option value="4">4 Bulanan</option>
+                <option value="12">Tahunan (Setiap 1 Tahun)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-full"><i data-lucide="building-plus" style="width:16px;height:16px;"></i> Tambah Customer</button>
+          </form>
+        </div>
+        <div class="glass p-6 lg:col-span-2">
+          <div class="flex items-center justify-between mb-4 gap-3 flex-col sm:flex-row">
+            <h3 class="font-display font-bold text-lg">Daftar Customer</h3>
+            <select id="filterCustBase" class="input-field sm:w-56" onchange="renderCustomers()">
+              <option value="">Semua Base Wilayah</option>
+            </select>
+          </div>
+          <div id="custList" class="space-y-3"></div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- PENGATURAN TAB -->
+    <section id="tab-pengaturan" class="tab-content">
+      <div class="max-w-4xl mx-auto space-y-4">
+        <div class="glass p-6">
+          <div class="flex items-center gap-3 mb-5 pb-5 border-b border-white/5">
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3);"><i data-lucide="sheets" style="width:20px;height:20px;color:#10b981;"></i></div>
+            <div><h3 class="font-display font-bold text-lg">Integrasi Google Spreadsheet</h3><p class="text-sm text-gray-400">Hubungkan aplikasi dengan Google Sheet</p></div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="label-field">URL Google Apps Script Web App</label>
+              <input type="text" id="sheetUrl" class="input-field" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <button class="btn btn-primary" onclick="testConnection()"><i data-lucide="plug" style="width:16px;height:16px;"></i> Test Koneksi</button>
+              <button class="btn btn-accent" onclick="syncAllToSheet()"><i data-lucide="refresh-cw" style="width:16px;height:16px;"></i> Sync Data Sekarang</button>
+              <button class="btn btn-ghost" onclick="disconnectSheet()"><i data-lucide="unlink" style="width:16px;height:16px;"></i> Putuskan Koneksi</button>
+            </div>
+          </div>
+        </div>
+        <div class="glass p-6">
+          <h3 class="font-display font-bold text-lg mb-4 flex items-center gap-2"><i data-lucide="book-open" style="width:18px;height:18px;color:#f59e0b;"></i> Panduan Setup</h3>
+          <div class="space-y-3 text-sm text-gray-400">
+            <p>1. Buka Google Spreadsheet baru > Extensions > Apps Script.</p>
+            <p>2. Hapus kode default, paste kode <strong>code.gs</strong> yang diberikan, lalu Save.</p>
+            <p>3. Klik <strong>Deploy > New deployment</strong>. Pilih type <strong>Web app</strong>.</p>
+            <p>4. Execute as <strong>Me</strong>, Who has access <strong>Anyone</strong>. Klik Deploy.</p>
+            <p>5. Salin URL Web App, tempel di kolom di atas, lalu klik <strong>Test Koneksi</strong>.</p>
+            <p>6. Setelah terhubung, aplikasi akan otomatis menarik data dari Spreadsheet setiap 15 detik. Anda juga bisa input data langsung di Spreadsheet dan akan muncul di Web.</p>
+          </div>
+        </div>
+        <div class="glass p-6">
+          <h3 class="font-display font-bold text-lg mb-4 flex items-center gap-2"><i data-lucide="database" style="width:18px;height:18px;color:#06b6d4;"></i> Manajemen Data Lokal</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <button class="btn btn-ghost justify-start" onclick="exportCSV()"><i data-lucide="file-down" style="width:16px;height:16px;"></i> Export CSV</button>
+            <button class="btn btn-ghost justify-start" onclick="loadSampleData()"><i data-lucide="sparkles" style="width:16px;height:16px;"></i> Muat Data Contoh</button>
+            <button class="btn btn-danger justify-start" onclick="clearAllData()"><i data-lucide="trash-2" style="width:16px;height:16px;"></i> Hapus Semua Data</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+  </div>
+</main>
+
+<div id="modalDetail" class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+  <div class="modal-content">
+    <div class="p-6 border-b border-white/5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3);"><i data-lucide="file-text" style="width:20px;height:20px;color:#10b981;"></i></div>
+        <div><h3 class="font-display font-bold text-lg">Detail Kunjungan PM</h3><p id="detailId" class="text-xs text-gray-400 font-mono"></p></div>
+      </div>
+      <button class="btn btn-ghost !p-2" onclick="closeModal()"><i data-lucide="x" style="width:18px;height:18px;"></i></button>
+    </div>
+    <div class="p-6" id="detailContent"></div>
+    <div class="p-6 border-t border-white/5 flex gap-3">
+      <button class="btn btn-primary flex-1" onclick="editFromDetail()"><i data-lucide="edit" style="width:16px;height:16px;"></i> Edit Data</button>
+      <button class="btn btn-danger" onclick="deleteFromDetail()"><i data-lucide="trash-2" style="width:16px;height:16px;"></i> Hapus</button>
+    </div>
+  </div>
+</div>
+
+<div id="modalConfirm" class="modal-backdrop" onclick="if(event.target===this) closeConfirm()">
+  <div class="modal-content max-w-md">
+    <div class="p-6">
+      <h3 id="confirmTitle" class="font-display font-bold text-lg mb-2">Konfirmasi</h3>
+      <p id="confirmMsg" class="text-sm text-gray-400 mb-6">Apakah Anda yakin?</p>
+      <div class="flex gap-3">
+        <button class="btn btn-ghost flex-1" onclick="closeConfirm()">Batal</button>
+        <button class="btn btn-danger flex-1" id="confirmBtn">Hapus</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"><i id="toastIcon" data-lucide="check-circle" style="width:20px;height:20px;"></i><span id="toastMsg"></span></div>
+
+<script>
+// ============= STATE & STORAGE =============
+let visits = JSON.parse(localStorage.getItem('pm_visits') || '[]');
+let technicians = JSON.parse(localStorage.getItem('pm_technicians') || '[]');
+let customers = JSON.parse(localStorage.getItem('pm_customers') || '[]');
+let sheetUrl = localStorage.getItem('pm_sheet_url') || '';
+let isConnected = localStorage.getItem('pm_connected') === 'true';
+let currentDetailId = null;
+let chartDonut = null;
+let syncInterval = null;
+
+// ============= SAMPLE DATA =============
+const SAMPLE_TECHNICIANS = [
+  { id: 'T001', name: 'Budi Santoso', phone: '081234567890', address: 'Jl. Melati No. 12, Jakarta Selatan', base: 'Jakarta Selatan' },
+  { id: 'T002', name: 'Agus Wijaya', phone: '081234567891', address: 'Jl. Mawar No. 5, Bekasi', base: 'Bekasi' },
+  { id: 'T003', name: 'Cahyo Pratama', phone: '081234567892', address: 'Jl. Anggrek No. 8, Tangerang', base: 'Tangerang' }
+];
+const SAMPLE_CUSTOMERS = [
+  { id: 'C001', name: 'PT Maju Jaya Abadi', base: 'Jakarta Selatan', firstSchedule: '2024-01-01', frequency: 3 },
+  { id: 'C002', name: 'CV Sumber Rejeki', base: 'Bekasi', firstSchedule: '2024-01-01', frequency: 1 },
+  { id: 'C003', name: 'PT Bintang Terang', base: 'Tangerang', firstSchedule: '2024-01-01', frequency: 12 },
+  { id: 'C004', name: 'Hotel Grand Permata', base: 'Jakarta Selatan', firstSchedule: '2024-01-01', frequency: 4 },
+  { id: 'C005', name: 'PT Sentosa Teknologi', base: 'Bekasi', firstSchedule: '2024-01-01', frequency: 3 }
+];
+const SAMPLE_VISITS = [
+  { id: 'PM-2024-001', tanggal: '2024-01-05', teknisi: 'Budi Santoso', base: 'Jakarta Selatan', customer: 'PT Maju Jaya Abadi', createdAt: '2024-01-05T10:30:00' },
+  { id: 'PM-2024-002', tanggal: '2024-01-08', teknisi: 'Cahyo Pratama', base: 'Tangerang', customer: 'PT Bintang Terang', createdAt: '2024-01-08T08:00:00' }
+];
+
+// ============= INIT =============
+function init() {
+  if (visits.length === 0 && technicians.length === 0) {
+    technicians = SAMPLE_TECHNICIANS;
+    visits = SAMPLE_VISITS;
+    customers = SAMPLE_CUSTOMERS;
+    saveData();
+  }
+  
+  document.getElementById('tanggal').value = new Date().toISOString().split('T')[0];
+  document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  
+  populateSelects();
+  populateCustBaseFilter();
+  renderDashboard();
+  renderRiwayat();
+  renderTechnicians();
+  renderCustomers();
+  updateConnectionStatus();
+  
+  if (sheetUrl) document.getElementById('sheetUrl').value = sheetUrl;
+  if (isConnected) startAutoSync();
+  
+  lucide.createIcons();
+  
+  document.querySelectorAll('.sidebar-link').forEach(link => {
+    link.addEventListener('click', () => switchTab(link.dataset.tab));
+  });
+  document.getElementById('pmForm').addEventListener('submit', handleSubmit);
+  document.getElementById('techForm').addEventListener('submit', handleAddTech);
+  document.getElementById('custForm').addEventListener('submit', handleAddCust);
+  document.getElementById('searchInput').addEventListener('input', renderRiwayat);
+  document.getElementById('filterTeknisi').addEventListener('change', renderRiwayat);
+}
+
+function saveData() {
+  localStorage.setItem('pm_visits', JSON.stringify(visits));
+  localStorage.setItem('pm_technicians', JSON.stringify(technicians));
+  localStorage.setItem('pm_customers', JSON.stringify(customers));
+}
+
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('tab-' + tabName).classList.add('active');
+  document.querySelector(`.sidebar-link[data-tab="${tabName}"]`)?.classList.add('active');
+  
+  const titles = {
+    dashboard: ['Dashboard', 'Ringkasan aktivitas preventive maintenance'],
+    form: ['Kunjungan Baru', 'Catat kunjungan PM teknisi'],
+    riwayat: ['Riwayat Kunjungan', 'Daftar lengkap kunjungan PM'],
+    teknisi: ['Daftar Teknisi', 'Kelola data teknisi PM'],
+    customer: ['Daftar Customer', 'Kelola data customer'],
+    pengaturan: ['Integrasi Spreadsheet', 'Hubungkan dengan Google Spreadsheet']
+  };
+  const [title, subtitle] = titles[tabName] || ['', ''];
+  document.getElementById('pageTitle').textContent = title;
+  document.getElementById('pageSubtitle').textContent = subtitle;
+  if (window.innerWidth <= 1024) document.querySelector('.sidebar').classList.remove('open');
+  lucide.createIcons();
+}
+
+function toggleSidebar() { document.querySelector('.sidebar').classList.toggle('open'); }
+
+// ============= AUTO-SCHEDULE LOGIC =============
+function getTechNextSchedule(tech, cust) {
+  const freqMonths = parseInt(cust.frequency) || 1;
+  const techVisits = visits.filter(v => v.teknisi === tech.name && v.customer === cust.name);
+  
+  if (techVisits.length > 0) {
+    // Jika sudah pernah ada kunjungan, hitung dari kunjungan terakhir + frekuensi
+    const latestVisit = techVisits.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal))[0];
+    let nextDate = new Date(latestVisit.tanggal);
+    nextDate.setMonth(nextDate.getMonth() + freqMonths);
+    return nextDate;
+  } else {
+    // Jika belum ada kunjungan, jadwalnya adalah firstSchedule itu sendiri
+    return new Date(cust.firstSchedule || new Date().toISOString().split('T')[0]);
+  }
+}
+
+function getFreqLabel(freq) {
+  const f = parseInt(freq);
+  if (f === 1) return 'Bulanan';
+  if (f === 3) return '3 Bulanan';
+  if (f === 4) return '4 Bulanan';
+  if (f === 12) return 'Tahunan';
+  return 'Sekali';
+}
+
+// ============= DASHBOARD =============
+function renderDashboard() {
+  animateCounter('statTotal', visits.length);
+  animateCounter('statBulanIni', visits.filter(v => { const d = new Date(v.tanggal); return d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear(); }).length);
+  
+  const pending = [];
+  const today = new Date(); today.setHours(23,59,59,999);
+  
+  technicians.forEach(tech => {
+    customers.filter(c => c.base === tech.base).forEach(cust => {
+      const nextSched = getTechNextSchedule(tech, cust);
+      if (nextSched <= today) {
+        pending.push({ tech, cust, nextSched });
+      }
+    });
+  });
+  
+  animateCounter('statPending', pending.length);
+  animateCounter('statTeknisi', technicians.length);
+  
+  renderDonutChart();
+  renderPendingTasks(pending);
+  renderRecentActivity();
+  renderTopTech();
+}
+
+function animateCounter(id, target) {
+  const el = document.getElementById(id); const current = parseInt(el.textContent) || 0; const inc = (target - current) / 30; let i = 0;
+  const timer = setInterval(() => { i++; el.textContent = Math.round(current + inc * i); if (i >= 30) { el.textContent = target; clearInterval(timer); } }, 800 / 30);
+}
+
+function renderPendingTasks(pending) {
+  const container = document.getElementById('pendingTasks');
+  if (pending.length === 0) {
+    container.innerHTML = `<div class="empty-state py-8"><div class="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(16,185,129,0.1);"><i data-lucide="check-circle" style="width:24px;height:24px;color:#10b981;"></i></div><p class="text-sm font-semibold text-gray-300">Semua jadwal PM sudah tercatat!</p></div>`;
+    lucide.createIcons(); return;
+  }
+  
+  pending.sort((a, b) => new Date(a.nextSched) - new Date(b.nextSched));
+
+  container.innerHTML = pending.map(({ tech, cust, nextSched }) => {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const isOverdue = nextSched < today;
+    const diffTime = Math.abs(today - nextSched);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return `
+      <div class="glass p-4 pending-card flex items-center gap-4" style="background:rgba(245,158,11,0.05);">
+        <div class="tech-avatar" style="background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid rgba(245,158,11,0.3);">${tech.name.charAt(0)}</div>
+        <div class="flex-1 min-w-0">
+          <p class="font-semibold text-sm">${tech.name} <span class="text-gray-500 font-normal">→ ${cust.name}</span></p>
+          <p class="text-xs text-gray-400 mt-1">Base: ${tech.base} • Frek: ${getFreqLabel(cust.frequency)} • Jatuh Tempo: ${formatDate(nextSched)} ${isOverdue ? `<span class="text-red-400 font-bold">(Terlambat ${diffDays} Hari)</span>` : ''}</p>
+        </div>
+        <button class="btn btn-primary !py-2 !px-3 text-xs" onclick="quickAssign('${tech.name}','${cust.name}')">
+          <i data-lucide="plus" style="width:12px;height:12px;"></i> Catat PM
+        </button>
+      </div>
+    `;
+  }).join('');
+  lucide.createIcons();
+}
+
+function quickAssign(techName, custName) {
+  switchTab('form');
+  document.getElementById('teknisi').value = techName;
+  filterCustomerByBase();
+  document.getElementById('customer').value = custName;
+}
+
+function renderDonutChart() {
+  const ctx = document.getElementById('chartDonut').getContext('2d');
+  const bases = [...new Set(technicians.map(t => t.base))];
+  const baseCounts = bases.map(b => visits.filter(v => v.base === b).length);
+  const colors = ['#10b981', '#06b6d4', '#f59e0b', '#a855f7', '#ef4444', '#ec4899'];
+  
+  if (chartDonut) chartDonut.destroy();
+  chartDonut = new Chart(ctx, { 
+    type: 'doughnut', 
+    data: { labels: bases, datasets: [{ data: baseCounts, backgroundColor: colors.slice(0, bases.length), borderColor: 'rgba(7, 9, 10, 0.8)', borderWidth: 3, hoverOffset: 8 }] }, 
+    options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } } 
+  });
+  
+  const total = baseCounts.reduce((a, b) => a + b, 0) || 1; const legend = document.getElementById('donutLegend');
+  legend.innerHTML = bases.map((b, i) => {
+    const count = baseCounts[i]; const pct = Math.round(count/total*100);
+    return `<div class="flex items-center justify-between text-sm"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:${colors[i]}"></span><span class="text-gray-300">${b}</span></div><div class="flex items-center gap-2"><span class="text-gray-500 text-xs">${pct}%</span><span class="font-semibold text-white">${count}</span></div></div>`;
+  }).join('');
+}
+
+function renderRecentActivity() {
+  const recent = [...visits].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5); const container = document.getElementById('recentActivity');
+  if (recent.length === 0) { container.innerHTML = '<div class="empty-state py-8"><p class="text-sm">Belum ada aktivitas</p></div>'; return; }
+  container.innerHTML = recent.map(v => {
+    return `<div class="activity-item" onclick="showDetail('${v.id}')"><div class="tech-avatar" style="background:linear-gradient(135deg, #10b981, #059669)">${v.teknisi.charAt(0)}</div><div class="flex-1 min-w-0"><div class="flex items-center justify-between gap-2 mb-1"><p class="font-semibold text-sm truncate">${v.customer}</p><span class="badge badge-success flex-shrink-0"><i data-lucide="check-circle" style="width:11px;height:11px;"></i>Selesai</span></div><p class="text-xs text-gray-400 truncate">${v.teknisi} • ${v.base}</p><p class="text-xs text-gray-500 mt-1">${formatDate(v.tanggal)}</p></div></div>`;
+  }).join(''); lucide.createIcons();
+}
+
+function renderTopTech() {
+  const techStats = technicians.map(t => ({ ...t, count: visits.filter(v => v.teknisi === t.name).length })).sort((a,b) => b.count - a.count).slice(0, 5);
+  const maxCount = Math.max(...techStats.map(t => t.count), 1);
+  document.getElementById('topTech').innerHTML = techStats.map(t => {
+    const pct = (t.count / maxCount) * 100;
+    return `<div><div class="flex items-center gap-3 mb-2"><div class="tech-avatar" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); width:32px; height:32px; font-size:11px;">${t.name.charAt(0)}</div><div class="flex-1 min-w-0"><p class="font-semibold text-sm truncate">${t.name}</p><p class="text-xs text-gray-500">Base: ${t.base}</p></div><span class="font-display font-bold text-lg">${t.count}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>`;
+  }).join('');
+}
+
+// ============= FORM LOGIC =============
+function populateSelects() {
+  const techSelect = document.getElementById('teknisi'); const techFilter = document.getElementById('filterTeknisi');
+  techSelect.innerHTML = '<option value="">Pilih teknisi...</option>'; techFilter.innerHTML = '<option value="">Semua Teknisi</option>';
+  technicians.forEach(t => { techSelect.innerHTML += `<option value="${t.name}" data-base="${t.base}">${t.name} (${t.base})</option>`; techFilter.innerHTML += `<option value="${t.name}">${t.name}</option>`; });
+}
+
+function populateCustBaseFilter() {
+  const filter = document.getElementById('filterCustBase');
+  if (!filter) return;
+  const currentValue = filter.value;
+  const bases = [...new Set(customers.map(c => c.base))];
+  filter.innerHTML = '<option value="">Semua Base Wilayah</option>';
+  bases.forEach(b => {
+    filter.innerHTML += `<option value="${b}">${b}</option>`;
+  });
+  filter.value = currentValue;
+}
+
+function filterCustomerByBase() {
+  const techName = document.getElementById('teknisi').value;
+  const tech = technicians.find(t => t.name === techName);
+  const custSelect = document.getElementById('customer');
+  const baseInput = document.getElementById('base');
+  
+  custSelect.innerHTML = '<option value="">Pilih customer...</option>';
+  
+  if (tech) {
+    baseInput.value = tech.base;
+    const baseCustomers = customers.filter(c => c.base === tech.base);
+    if (baseCustomers.length === 0) {
+      custSelect.innerHTML = '<option value="">Tidak ada customer di wilayah ini</option>';
+    } else {
+      baseCustomers.forEach(c => {
+        const nextSched = getTechNextSchedule(tech, c);
+        custSelect.innerHTML += `<option value="${c.name}">${c.name} (Jadwal Berikutnya: ${formatDate(nextSched)})</option>`;
+      });
+    }
+  } else {
+    baseInput.value = '';
+    custSelect.innerHTML = '<option value="">Pilih teknisi dahulu...</option>';
+  }
+}
+
+function handleSubmit(e) {
+  e.preventDefault(); const id = document.getElementById('visitId').value || generateId(); const isEdit = !!document.getElementById('visitId').value;
+  const techName = document.getElementById('teknisi').value;
+  const tech = technicians.find(t => t.name === techName);
+  
+  const data = { id, tanggal: document.getElementById('tanggal').value, teknisi: techName, base: tech?.base || '', customer: document.getElementById('customer').value, createdAt: isEdit ? visits.find(v => v.id === id).createdAt : new Date().toISOString() };
+  
+  if (isEdit) { const idx = visits.findIndex(v => v.id === id); visits[idx] = data; showToast('Data kunjungan diperbarui', 'success'); } else { visits.unshift(data); showToast('Kunjungan PM dicatat', 'success'); }
+  saveData(); if (isConnected) syncToSheet('visits', data, isEdit ? 'update' : 'create'); resetForm(); renderDashboard(); renderRiwayat(); switchTab('riwayat');
+}
+
+function handleAddTech(e) {
+  e.preventDefault(); const tech = { id: document.getElementById('techId').value, name: document.getElementById('techName').value, phone: document.getElementById('techPhone').value, address: document.getElementById('techAddress').value, base: document.getElementById('techBase').value };
+  technicians.push(tech); saveData(); populateSelects(); renderTechnicians(); renderDashboard(); document.getElementById('techForm').reset();
+  if (isConnected) syncToSheet('techs', tech, 'create'); showToast('Teknisi ditambahkan', 'success');
+}
+
+function handleAddCust(e) {
+  e.preventDefault(); 
+  const cust = { 
+    id: 'C' + String(customers.length + 1).padStart(3, '0'), 
+    name: document.getElementById('custName').value, 
+    base: document.getElementById('custBase').value, 
+    firstSchedule: document.getElementById('custSchedule').value, 
+    frequency: parseInt(document.getElementById('custFreq').value) 
+  };
+  customers.push(cust); saveData(); populateCustBaseFilter(); renderCustomers(); renderDashboard(); document.getElementById('custForm').reset();
+  if (isConnected) syncToSheet('customers', cust, 'create'); showToast('Customer ditambahkan', 'success');
+}
+
+function generateId() { const year = new Date().getFullYear(); const count = visits.filter(v => v.id.startsWith(`PM-${year}`)).length + 1; return `PM-${year}-${String(count).padStart(3, '0')}`; }
+function resetForm() { document.getElementById('pmForm').reset(); document.getElementById('visitId').value = ''; document.getElementById('tanggal').value = new Date().toISOString().split('T')[0]; filterCustomerByBase(); document.getElementById('formTitle').textContent = 'Catat Kunjungan PM Baru'; document.getElementById('submitText').textContent = 'Simpan Kunjungan'; }
+
+function editVisit(id) {
+  const v = visits.find(x => x.id === id); if (!v) return; switchTab('form');
+  document.getElementById('visitId').value = v.id; document.getElementById('tanggal').value = v.tanggal; document.getElementById('teknisi').value = v.teknisi; filterCustomerByBase(); document.getElementById('customer').value = v.customer;
+  document.getElementById('formTitle').textContent = 'Edit Kunjungan PM'; document.getElementById('submitText').textContent = 'Update Kunjungan'; window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function deleteVisit(id) {
+  showConfirm('Hapus Data Kunjungan', 'Apakah Anda yakin ingin menghapus data ini?', () => {
+    visits = visits.filter(v => v.id !== id); saveData(); if (isConnected) syncToSheet('visits', { id }, 'delete'); showToast('Data dihapus', 'info'); renderDashboard(); renderRiwayat();
+  });
+}
+function deleteTech(id) { showConfirm('Hapus Teknisi', 'Apakah Anda yakin ingin menghapus teknisi ini?', () => { technicians = technicians.filter(t => t.id !== id); saveData(); populateSelects(); renderTechnicians(); renderDashboard(); if (isConnected) syncToSheet('techs', { id }, 'delete'); showToast('Teknisi dihapus', 'info'); }); }
+function deleteCust(id) { showConfirm('Hapus Customer', 'Apakah Anda yakin ingin menghapus customer ini?', () => { customers = customers.filter(c => c.id !== id); saveData(); populateCustBaseFilter(); renderCustomers(); renderDashboard(); if (isConnected) syncToSheet('customers', { id }, 'delete'); showToast('Customer dihapus', 'info'); }); }
+
+// ============= RENDER LISTS =============
+function renderRiwayat() {
+  const search = document.getElementById('searchInput').value.toLowerCase(); const filterTeknisi = document.getElementById('filterTeknisi').value;
+  let filtered = visits.filter(v => { const matchSearch = !search || v.customer.toLowerCase().includes(search) || v.teknisi.toLowerCase().includes(search); const matchTeknisi = !filterTeknisi || v.teknisi === filterTeknisi; return matchSearch && matchTeknisi; }).sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+  const tbody = document.getElementById('riwayatBody'); const empty = document.getElementById('emptyRiwayat');
+  if (filtered.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); document.getElementById('riwayatTable').classList.add('hidden'); return; }
+  empty.classList.add('hidden'); document.getElementById('riwayatTable').classList.remove('hidden');
+  tbody.innerHTML = filtered.map(v => {
+    return `<tr onclick="showDetail('${v.id}')"><td><span class="font-mono text-xs text-gray-400">${v.id}</span></td><td class="whitespace-nowrap">${formatDate(v.tanggal)}</td><td class="font-medium">${v.teknisi}</td><td><span class="badge badge-info">${v.base}</span></td><td><div class="font-medium">${v.customer}</div></td><td class="text-right" onclick="event.stopPropagation()"><div class="flex justify-end gap-1"><button class="btn btn-ghost !p-2" onclick="editVisit('${v.id}')"><i data-lucide="edit" style="width:14px;height:14px;"></i></button><button class="btn btn-danger !p-2" onclick="deleteVisit('${v.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div></td></tr>`;
+  }).join(''); lucide.createIcons();
+}
+
+function renderTechnicians() {
+  const container = document.getElementById('techList'); if (technicians.length === 0) { container.innerHTML = '<div class="empty-state"><p>Belum ada teknisi</p></div>'; return; }
+  container.innerHTML = technicians.map(t => {
+    const count = visits.filter(v => v.teknisi === t.name).length;
+    return `<div class="glass p-4 flex items-center gap-4" style="background:rgba(0,0,0,0.2);"><div class="tech-avatar" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); width:44px; height:44px; font-size:15px;">${t.name.charAt(0)}</div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1"><p class="font-semibold">${t.name}</p><span class="badge badge-info">${t.base}</span></div><p class="text-xs text-gray-400 truncate">${t.address || '-'}</p><p class="text-xs text-gray-500 mt-1">${t.phone || '-'}</p></div><div class="text-right hide-mobile"><p class="font-display font-bold text-2xl">${count}</p><p class="text-xs text-gray-500">Kunjungan</p></div><button class="btn btn-danger !p-2" onclick="deleteTech('${t.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div>`;
+  }).join(''); lucide.createIcons();
+}
+
+function renderCustomers() {
+  const container = document.getElementById('custList'); 
+  const filterBase = document.getElementById('filterCustBase')?.value || '';
+  
+  let displayedCustomers = filterBase ? customers.filter(c => c.base === filterBase) : customers;
+
+  if (displayedCustomers.length === 0) { 
+    container.innerHTML = `<div class="empty-state"><p>Belum ada customer ${filterBase ? 'di wilayah ' + filterBase : ''}</p></div>`; 
+    return; 
+  }
+  
+  container.innerHTML = displayedCustomers.map(c => {
+    const count = visits.filter(v => v.customer === c.name).length;
+    const lastVisit = visits.filter(v => v.customer === c.name).sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal))[0];
+    let nextSchedStr = '-';
+    let isOverdue = false;
+
+    if (c.firstSchedule) {
+      let nextDate;
+      if (lastVisit) {
+        // Jika sudah ada kunjungan, hitung dari kunjungan terakhir + frekuensi
+        nextDate = new Date(lastVisit.tanggal);
+        nextDate.setMonth(nextDate.getMonth() + (parseInt(c.frequency) || 1));
+      } else {
+        // Jika belum ada kunjungan, jadwalnya adalah firstSchedule itu sendiri
+        nextDate = new Date(c.firstSchedule);
+      }
+      
+      const today = new Date(); today.setHours(0,0,0,0);
+      if (nextDate <= today) isOverdue = true;
+      nextSchedStr = formatDate(nextDate);
+    }
+
+    return `<div class="glass p-4 flex items-center gap-4" style="background:rgba(0,0,0,0.2);"><div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.3);"><i data-lucide="building" style="width:20px;height:20px;color:#06b6d4;"></i></div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1 flex-wrap"><p class="font-semibold">${c.name}</p><span class="badge badge-info">${c.base}</span><span class="badge ${isOverdue ? 'badge-danger' : 'badge-success'}">${getFreqLabel(c.frequency)}</span></div><p class="text-xs text-gray-400 mt-1">Jadwal PM Berikutnya: <span class="${isOverdue ? 'text-red-400 font-bold' : 'text-gray-300'}">${nextSchedStr} ${isOverdue ? '(Jatuh Tempo)' : ''}</span></p></div><div class="text-right hide-mobile"><p class="font-display font-bold text-2xl">${count}</p><p class="text-xs text-gray-500">Kunjungan</p></div><button class="btn btn-danger !p-2" onclick="deleteCust('${c.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div>`;
+  }).join(''); 
+  lucide.createIcons();
+}
+
+function showDetail(id) {
+  const v = visits.find(x => x.id === id); if (!v) return; currentDetailId = id; document.getElementById('detailId').textContent = v.id;
+  document.getElementById('detailContent').innerHTML = `<div class="detail-row"><div class="detail-label">Tanggal</div><div class="detail-value">${formatDate(v.tanggal)}</div></div><div class="detail-row"><div class="detail-label">Teknisi</div><div class="detail-value">${v.teknisi}</div></div><div class="detail-row"><div class="detail-label">Base Wilayah</div><div class="detail-value">${v.base}</div></div><div class="detail-row"><div class="detail-label">Customer</div><div class="detail-value">${v.customer}</div></div>`;
+  document.getElementById('modalDetail').classList.add('show'); lucide.createIcons();
+}
+function closeModal() { document.getElementById('modalDetail').classList.remove('show'); currentDetailId = null; }
+function editFromDetail() { if (currentDetailId) { closeModal(); editVisit(currentDetailId); } }
+function deleteFromDetail() { if (currentDetailId) { const id = currentDetailId; closeModal(); deleteVisit(id); } }
+
+// ============= CONFIRM MODAL =============
+function showConfirm(title, msg, callback) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').textContent = msg;
+  document.getElementById('modalConfirm').classList.add('show');
+  document.getElementById('confirmBtn').onclick = () => { callback(); closeConfirm(); };
+}
+function closeConfirm() { document.getElementById('modalConfirm').classList.remove('show'); }
+
+// ============= GOOGLE SHEET INTEGRATION & AUTO SYNC =============
+async function testConnection() {
+  const url = document.getElementById('sheetUrl').value.trim(); if (!url) return showToast('Masukkan URL Apps Script', 'error');
+  showToast('Menguji koneksi...', 'info');
+  try {
+    const response = await fetch(`${url}?action=read&type=visits`); const result = await response.json();
+    if (result.success) {
+      sheetUrl = url; isConnected = true; localStorage.setItem('pm_sheet_url', url); localStorage.setItem('pm_connected', 'true'); updateConnectionStatus();
+      showToast('Berhasil terhubung ke Spreadsheet', 'success');
+      startAutoSync();
+      
+      if (result.data && result.data.length > 0) {
+        showConfirm('Muat Data', 'Ditemukan ' + result.data.length + ' data kunjungan di spreadsheet. Muat ke aplikasi?', () => {
+          visits = result.data; saveData(); renderDashboard(); renderRiwayat(); showToast('Data dari spreadsheet dimuat', 'success');
+        });
+      }
+    } else throw new Error('Koneksi gagal');
+  } catch (error) { showToast('Gagal terhubung: ' + error.message, 'error'); }
+}
+
+function startAutoSync() {
+  if (syncInterval) clearInterval(syncInterval);
+  syncInterval = setInterval(loadFromSheet, 15000);
+  setTimeout(loadFromSheet, 1000);
+}
+
+async function loadFromSheet() {
+  if (!isConnected || !sheetUrl) return;
+  try {
+    const [visitsRes, techsRes, custRes] = await Promise.all([
+      fetch(`${sheetUrl}?action=read&type=visits`).then(r => r.json()),
+      fetch(`${sheetUrl}?action=read&type=techs`).then(r => r.json()),
+      fetch(`${sheetUrl}?action=read&type=customers`).then(r => r.json())
+    ]);
+
+    let needsRender = false;
+
+    if (visitsRes.success && JSON.stringify(visitsRes.data) !== JSON.stringify(visits)) {
+      visits = visitsRes.data || []; needsRender = true;
+    }
+    if (techsRes.success && JSON.stringify(techsRes.data) !== JSON.stringify(technicians)) {
+      technicians = techsRes.data || []; needsRender = true;
+    }
+    if (custRes.success && JSON.stringify(custRes.data) !== JSON.stringify(customers)) {
+      customers = custRes.data || []; needsRender = true;
+    }
+
+    if (needsRender) {
+      saveData();
+      populateSelects();
+      populateCustBaseFilter();
+      renderDashboard();
+      renderRiwayat();
+      renderTechnicians();
+      renderCustomers();
+      showToast('Data disinkronisasi dari Spreadsheet', 'info');
+    }
+  } catch (error) {
+    console.error('Auto sync error:', error);
+  }
+}
+
+async function syncToSheet(type, data, action) {
+  if (!isConnected) return; 
+  try { 
+    await fetch(sheetUrl, { method: 'POST', body: JSON.stringify({ action, type, data }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } }); 
+    setTimeout(loadFromSheet, 500);
+  } catch (e) { 
+    console.error('Sync error:', e); 
+  }
+}
+
+async function syncAllToSheet() {
+  if (!isConnected) return showToast('Hubungkan ke spreadsheet dulu', 'error'); showToast('Menyinkronkan semua data...', 'info');
+  try {
+    await fetch(sheetUrl, { method: 'POST', body: JSON.stringify({ action: 'clear', type: 'visits', data: visits }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
+    await fetch(sheetUrl, { method: 'POST', body: JSON.stringify({ action: 'clear', type: 'techs', data: technicians }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
+    await fetch(sheetUrl, { method: 'POST', body: JSON.stringify({ action: 'clear', type: 'customers', data: customers }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
+    showToast('Semua data berhasil dikirim ke Spreadsheet', 'success');
+  } catch (e) { showToast('Sync gagal: ' + e.message, 'error'); }
+}
+
+function disconnectSheet() { 
+  showConfirm('Putuskan Koneksi', 'Putuskan koneksi dari Google Spreadsheet?', () => { 
+    isConnected = false; localStorage.removeItem('pm_connected'); localStorage.removeItem('pm_sheet_url'); sheetUrl = ''; 
+    if (syncInterval) clearInterval(syncInterval);
+    document.getElementById('sheetUrl').value = ''; updateConnectionStatus(); showToast('Koneksi diputus', 'info'); 
+  }); 
+}
+
+function updateConnectionStatus() {
+  const status = document.getElementById('connStatus'); const desc = document.getElementById('connDesc');
+  if (isConnected) { 
+    status.className = 'conn-status connected'; status.innerHTML = '<span class="pulse-dot"></span> Terhubung'; 
+    desc.textContent = 'Sinkronisasi otomatis aktif (setiap 15 detik). Data dari Spreadsheet akan otomatis masuk.'; 
+  }
+  else { 
+    status.className = 'conn-status disconnected'; status.innerHTML = '<span class="pulse-dot" style="background:#f59e0b;"></span> Lokal'; 
+    desc.textContent = 'Menggunakan penyimpanan lokal. Hubungkan ke Google Sheet di menu Pengaturan.'; 
+  }
+}
+
+// ============= UTILITIES =============
+function formatDate(dateStr) { if(!dateStr) return '-'; const d = new Date(dateStr); if (isNaN(d)) return '-'; return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); }
+function showToast(msg, type = 'success') {
+  const toast = document.getElementById('toast'); const icon = document.getElementById('toastIcon'); const msgEl = document.getElementById('toastMsg');
+  toast.className = 'toast ' + type; msgEl.textContent = msg; icon.setAttribute('data-lucide', type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info'); lucide.createIcons();
+  setTimeout(() => toast.classList.add('show'), 50); setTimeout(() => toast.classList.remove('show'), 3500);
+}
+function exportCSV() {
+  if (visits.length === 0) return showToast('Tidak ada data', 'error'); const headers = ['ID','Tanggal','Teknisi','Base','Customer'];
+  let csv = headers.join(',') + '\n'; visits.forEach(v => { csv += [v.id, v.tanggal, v.teknisi, v.base, v.customer].map(c => `"${String(c).replace(/"/g, '""')}"`).join(',') + '\n'; });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `PM_Visits_${new Date().toISOString().split('T')[0]}.csv`; a.click();
+}
+function loadSampleData() { showConfirm('Muat Data Contoh', 'Data saat ini akan ditimpa. Lanjutkan?', () => { technicians = SAMPLE_TECHNICIANS; customers = SAMPLE_CUSTOMERS; visits = SAMPLE_VISITS; saveData(); populateSelects(); populateCustBaseFilter(); renderDashboard(); renderRiwayat(); renderTechnicians(); renderCustomers(); showToast('Data contoh dimuat', 'success'); }); }
+function clearAllData() { showConfirm('Hapus Semua Data', 'Semua data akan dihapus permanen. Lanjutkan?', () => { visits = []; technicians = []; customers = []; saveData(); populateSelects(); populateCustBaseFilter(); renderDashboard(); renderRiwayat(); renderTechnicians(); renderCustomers(); showToast('Semua data dihapus', 'info'); }); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeConfirm(); } });
+
+init();
+</script>
+</body>
+</html>
