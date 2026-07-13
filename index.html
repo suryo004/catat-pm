@@ -138,7 +138,7 @@
     </div>
     <div>
       <h1 class="font-display font-bold text-lg leading-none">ServiceTrack</h1>
-      <p class="text-xs text-emerald-400 mt-0.5 font-medium">PM System v5.1</p>
+      <p class="text-xs text-emerald-400 mt-0.5 font-medium">PM System v5.2</p>
     </div>
   </div>
   
@@ -537,16 +537,16 @@ function getTechNextSchedule(tech, cust) {
   const freqMonths = parseInt(cust.frequency) || 1;
   const techVisits = visits.filter(v => v.teknisi === tech.name && v.customer === cust.name);
   
-  let baseDateStr = cust.firstSchedule || new Date().toISOString().split('T')[0];
-  
   if (techVisits.length > 0) {
+    // Jika sudah pernah ada kunjungan, hitung dari kunjungan terakhir + frekuensi
     const latestVisit = techVisits.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal))[0];
-    baseDateStr = latestVisit.tanggal;
+    let nextDate = new Date(latestVisit.tanggal);
+    nextDate.setMonth(nextDate.getMonth() + freqMonths);
+    return nextDate;
+  } else {
+    // Jika belum ada kunjungan, jadwalnya adalah firstSchedule itu sendiri
+    return new Date(cust.firstSchedule || new Date().toISOString().split('T')[0]);
   }
-  
-  let nextDate = new Date(baseDateStr);
-  nextDate.setMonth(nextDate.getMonth() + freqMonths);
-  return nextDate;
 }
 
 function getFreqLabel(freq) {
@@ -793,10 +793,15 @@ function renderCustomers() {
     let isOverdue = false;
 
     if (c.firstSchedule) {
-      let baseDateStr = c.firstSchedule;
-      if (lastVisit) baseDateStr = lastVisit.tanggal;
-      let nextDate = new Date(baseDateStr);
-      nextDate.setMonth(nextDate.getMonth() + (parseInt(c.frequency) || 1));
+      let nextDate;
+      if (lastVisit) {
+        // Jika sudah ada kunjungan, hitung dari kunjungan terakhir + frekuensi
+        nextDate = new Date(lastVisit.tanggal);
+        nextDate.setMonth(nextDate.getMonth() + (parseInt(c.frequency) || 1));
+      } else {
+        // Jika belum ada kunjungan, jadwalnya adalah firstSchedule itu sendiri
+        nextDate = new Date(c.firstSchedule);
+      }
       
       const today = new Date(); today.setHours(0,0,0,0);
       if (nextDate <= today) isOverdue = true;
