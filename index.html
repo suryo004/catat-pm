@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ServiceTrack PM — Sistem Pencatatan Preventive Maintenance</title>
+<title>ServiceTrack PM & CM — Sistem Pencatatan Maintenance</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -144,14 +144,15 @@
     </div>
     <div>
       <h1 class="font-display font-bold text-lg leading-none">ServiceTrack</h1>
-      <p class="text-xs text-emerald-400 mt-0.5 font-medium">PM System v5.3</p>
+      <p class="text-xs text-emerald-400 mt-0.5 font-medium">PM & CM System v6.1</p>
     </div>
   </div>
   
   <nav class="flex flex-col gap-1.5 flex-1">
     <div class="sidebar-link active" data-tab="dashboard"><i data-lucide="layout-dashboard" class="tab-icon"></i><span>Dashboard</span></div>
-    <div class="sidebar-link" data-tab="form"><i data-lucide="plus-circle" class="tab-icon"></i><span>Kunjungan Baru</span></div>
-    <div class="sidebar-link" data-tab="riwayat"><i data-lucide="clipboard-list" class="tab-icon"></i><span>Riwayat Kunjungan</span></div>
+    <div class="sidebar-link" data-tab="form"><i data-lucide="plus-circle" class="tab-icon"></i><span>Kunjungan PM Baru</span></div>
+    <div class="sidebar-link" data-tab="cm"><i data-lucide="hammer" class="tab-icon"></i><span>Input CM (Corrective)</span></div>
+    <div class="sidebar-link" data-tab="riwayat"><i data-lucide="clipboard-list" class="tab-icon"></i><span>Riwayat PM</span></div>
     <div class="sidebar-link" data-tab="teknisi"><i data-lucide="users" class="tab-icon"></i><span>Daftar Teknisi</span></div>
     <div class="sidebar-link" data-tab="customer"><i data-lucide="building" class="tab-icon"></i><span>Daftar Customer</span></div>
     <div class="sidebar-link" data-tab="pengaturan"><i data-lucide="settings" class="tab-icon"></i><span>Integrasi Spreadsheet</span></div>
@@ -172,13 +173,12 @@
     <button class="mobile-menu-btn btn-ghost btn !p-2" onclick="toggleSidebar()"><i data-lucide="menu" style="width:18px;height:18px;"></i></button>
     <div class="flex-1">
       <h2 id="pageTitle" class="font-display font-bold text-xl">Dashboard</h2>
-      <p id="pageSubtitle" class="text-xs text-gray-400 mt-0.5">Ringkasan aktivitas preventive maintenance</p>
+      <p id="pageSubtitle" class="text-xs text-gray-400 mt-0.5">Ringkasan aktivitas maintenance</p>
     </div>
     <div class="hide-mobile flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(255,255,255,0.04); border: 1px solid var(--border);">
       <i data-lucide="calendar" style="width:14px;height:14px;color:var(--muted);"></i>
       <span id="currentDate" class="text-xs font-medium text-gray-300"></span>
     </div>
-    <button class="btn btn-primary" onclick="switchTab('form')"><i data-lucide="plus" style="width:16px;height:16px;"></i><span class="hide-mobile">Kunjungan Baru</span></button>
   </header>
   
   <div class="p-6">
@@ -191,16 +191,16 @@
           <div class="flex items-start justify-between mb-4 relative">
             <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3);"><i data-lucide="clipboard-check" style="width:20px;height:20px;color:#10b981;"></i></div>
           </div>
-          <div class="counter text-white" id="statTotal">0</div>
+          <div class="counter text-white" id="statTotalPM">0</div>
           <p class="text-xs text-gray-400 mt-2 font-medium">Total Kunjungan PM</p>
         </div>
         <div class="glass stat-card glass-hover">
-          <div class="stat-glow" style="background: radial-gradient(circle, #06b6d4, transparent);"></div>
+          <div class="stat-glow" style="background: radial-gradient(circle, #ef4444, transparent);"></div>
           <div class="flex items-start justify-between mb-4 relative">
-            <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.3);"><i data-lucide="calendar-check" style="width:20px;height:20px;color:#06b6d4;"></i></div>
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3);"><i data-lucide="hammer" style="width:20px;height:20px;color:#ef4444;"></i></div>
           </div>
-          <div class="counter text-white" id="statBulanIni">0</div>
-          <p class="text-xs text-gray-400 mt-2 font-medium">PM Dicatat Bulan Ini</p>
+          <div class="counter text-white" id="statTotalCM">0</div>
+          <p class="text-xs text-gray-400 mt-2 font-medium">Total Kunjungan CM</p>
         </div>
         <div class="glass stat-card glass-hover">
           <div class="stat-glow" style="background: radial-gradient(circle, #f59e0b, transparent);"></div>
@@ -241,18 +241,17 @@
         <div class="glass p-6 lg:col-span-2">
           <div class="flex items-center justify-between mb-4">
             <h3 class="font-display font-bold text-lg">Aktivitas Terbaru</h3>
-            <button class="text-xs text-emerald-400 font-semibold hover:underline" onclick="switchTab('riwayat')">Lihat Semua →</button>
           </div>
           <div id="recentActivity" class="space-y-1 max-h-80 overflow-y-auto"></div>
         </div>
         <div class="glass p-6">
-          <div class="mb-4"><h3 class="font-display font-bold text-lg">Performa Teknisi</h3><p class="text-xs text-gray-400 mt-1">Berdasarkan jumlah PM</p></div>
+          <div class="mb-4"><h3 class="font-display font-bold text-lg">Performa Teknisi</h3><p class="text-xs text-gray-400 mt-1">Berdasarkan total PM+CM</p></div>
           <div id="topTech" class="space-y-4"></div>
         </div>
       </div>
     </section>
     
-    <!-- FORM TAB -->
+    <!-- FORM PM TAB -->
     <section id="tab-form" class="tab-content">
       <div class="max-w-4xl mx-auto">
         <div class="glass p-8">
@@ -293,8 +292,62 @@
         </div>
       </div>
     </section>
+
+    <!-- FORM CM TAB -->
+    <section id="tab-cm" class="tab-content">
+      <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="glass p-6 lg:col-span-1">
+          <h3 class="font-display font-bold text-lg mb-4 flex items-center gap-2"><i data-lucide="hammer" style="width:18px;height:18px;color:#ef4444;"></i> Input CM Baru</h3>
+          <form id="cmForm" class="space-y-4">
+            <input type="hidden" id="cmVisitId" value="">
+            <div><label class="label-field">Tanggal Kerusakan</label><input type="date" id="cmTanggal" class="input-field" required></div>
+            <div>
+              <label class="label-field">Teknisi</label>
+              <select id="cmTeknisi" class="input-field" required onchange="filterCMCustomerByBase()">
+                <option value="">Pilih teknisi...</option>
+              </select>
+            </div>
+            <div>
+              <label class="label-field">Customer</label>
+              <div class="cust-search-container">
+                <input type="text" id="cmCustomerSearch" class="input-field" placeholder="Pilih teknisi dahulu..." onfocus="showCMCustomerDropdown()" oninput="showCMCustomerDropdown()" onblur="hideCMCustomerDropdown()" disabled>
+                <input type="hidden" id="cmCustomer" required>
+                <div id="cmCustomerDropdownList" class="cust-dropdown"></div>
+              </div>
+            </div>
+            <div><label class="label-field">Masalah / Kerusakan</label><textarea id="cmMasalah" class="input-field" placeholder="Jelaskan kelainan/kerusakan..." required></textarea></div>
+            <div><label class="label-field">Tindakan / Perbaikan</label><textarea id="cmTindakan" class="input-field" placeholder="Jelaskan tindakan yang diambil..."></textarea></div>
+            <div>
+              <label class="label-field">Status</label>
+              <select id="cmStatus" class="input-field" required>
+                <option value="Open">Open (Belum Selesai)</option>
+                <option value="In Progress">In Progress (Dalam Proses)</option>
+                <option value="Closed">Closed (Selesai)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-full"><i data-lucide="save" style="width:16px;height:16px;"></i> <span id="cmSubmitText">Simpan Data CM</span></button>
+          </form>
+        </div>
+        
+        <div class="glass p-6 lg:col-span-2">
+          <div class="flex items-center justify-between mb-4 gap-3 flex-col sm:flex-row">
+            <h3 class="font-display font-bold text-lg">Riwayat Corrective Maintenance</h3>
+            <input type="text" id="searchCM" class="input-field sm:w-64" placeholder="Cari customer atau masalah..." oninput="renderCMHistory()">
+          </div>
+          <div class="overflow-x-auto -mx-6 px-6 max-h-[60vh] overflow-y-auto">
+            <table class="data-table" id="cmTable">
+              <thead><tr><th>ID</th><th>Tanggal</th><th>Teknisi</th><th>Customer</th><th>Masalah</th><th>Status</th><th class="text-right">Aksi</th></tr></thead>
+              <tbody id="cmBody"></tbody>
+            </table>
+            <div id="emptyCM" class="empty-state">
+              <p class="font-semibold text-gray-400">Belum ada data CM</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
     
-    <!-- RIWAYAT TAB -->
+    <!-- RIWAYAT PM TAB -->
     <section id="tab-riwayat" class="tab-content">
       <div class="glass p-6">
         <div class="flex flex-col lg:flex-row gap-3 mb-5">
@@ -401,7 +454,6 @@
             <p>3. Klik <strong>Deploy > New deployment</strong>. Pilih type <strong>Web app</strong>.</p>
             <p>4. Execute as <strong>Me</strong>, Who has access <strong>Anyone</strong>. Klik Deploy.</p>
             <p>5. Salin URL Web App, tempel di kolom di atas, lalu klik <strong>Test Koneksi</strong>.</p>
-            <p>6. Setelah terhubung, aplikasi akan otomatis menarik data dari Spreadsheet setiap 15 detik. Anda juga bisa input data langsung di Spreadsheet dan akan muncul di Web.</p>
           </div>
         </div>
         <div class="glass p-6">
@@ -453,6 +505,7 @@
 <script>
 // ============= STATE & STORAGE =============
 let visits = JSON.parse(localStorage.getItem('pm_visits') || '[]');
+let cmVisits = JSON.parse(localStorage.getItem('pm_cm_visits') || '[]');
 let technicians = JSON.parse(localStorage.getItem('pm_technicians') || '[]');
 let customers = JSON.parse(localStorage.getItem('pm_customers') || '[]');
 let sheetUrl = localStorage.getItem('pm_sheet_url') || '';
@@ -478,23 +531,29 @@ const SAMPLE_VISITS = [
   { id: 'PM-2024-001', tanggal: '2024-01-05', teknisi: 'Budi Santoso', base: 'Jakarta Selatan', customer: 'PT Maju Jaya Abadi', createdAt: '2024-01-05T10:30:00' },
   { id: 'PM-2024-002', tanggal: '2024-01-08', teknisi: 'Cahyo Pratama', base: 'Tangerang', customer: 'PT Bintang Terang', createdAt: '2024-01-08T08:00:00' }
 ];
+const SAMPLE_CM = [
+  { id: 'CM-2024-001', tanggal: '2024-01-10', teknisi: 'Budi Santoso', base: 'Jakarta Selatan', customer: 'PT Maju Jaya Abadi', masalah: 'AC tidak dingin', tindakan: 'Tambah freon, cek kapasitor', status: 'Closed', createdAt: '2024-01-10T14:00:00' }
+];
 
 // ============= INIT =============
 function init() {
   if (visits.length === 0 && technicians.length === 0) {
     technicians = SAMPLE_TECHNICIANS;
     visits = SAMPLE_VISITS;
+    cmVisits = SAMPLE_CM;
     customers = SAMPLE_CUSTOMERS;
     saveData();
   }
   
   document.getElementById('tanggal').value = new Date().toISOString().split('T')[0];
+  document.getElementById('cmTanggal').value = new Date().toISOString().split('T')[0];
   document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   
   populateSelects();
   populateCustBaseFilter();
   renderDashboard();
   renderRiwayat();
+  renderCMHistory();
   renderTechnicians();
   renderCustomers();
   updateConnectionStatus();
@@ -508,6 +567,7 @@ function init() {
     link.addEventListener('click', () => switchTab(link.dataset.tab));
   });
   document.getElementById('pmForm').addEventListener('submit', handleSubmit);
+  document.getElementById('cmForm').addEventListener('submit', handleAddCM);
   document.getElementById('techForm').addEventListener('submit', handleAddTech);
   document.getElementById('custForm').addEventListener('submit', handleAddCust);
   document.getElementById('searchInput').addEventListener('input', renderRiwayat);
@@ -516,6 +576,7 @@ function init() {
 
 function saveData() {
   localStorage.setItem('pm_visits', JSON.stringify(visits));
+  localStorage.setItem('pm_cm_visits', JSON.stringify(cmVisits));
   localStorage.setItem('pm_technicians', JSON.stringify(technicians));
   localStorage.setItem('pm_customers', JSON.stringify(customers));
 }
@@ -527,10 +588,11 @@ function switchTab(tabName) {
   document.querySelector(`.sidebar-link[data-tab="${tabName}"]`)?.classList.add('active');
   
   const titles = {
-    dashboard: ['Dashboard', 'Ringkasan aktivitas preventive maintenance'],
-    form: ['Kunjungan Baru', 'Catat kunjungan PM teknisi'],
-    riwayat: ['Riwayat Kunjungan', 'Daftar lengkap kunjungan PM'],
-    teknisi: ['Daftar Teknisi', 'Kelola data teknisi PM'],
+    dashboard: ['Dashboard', 'Ringkasan aktivitas maintenance'],
+    form: ['Kunjungan PM Baru', 'Catat kunjungan PM teknisi'],
+    cm: ['Input CM (Corrective)', 'Catat kerusakan/perbaikan corrective maintenance'],
+    riwayat: ['Riwayat PM', 'Daftar lengkap kunjungan PM'],
+    teknisi: ['Daftar Teknisi', 'Kelola data teknisi'],
     customer: ['Daftar Customer', 'Kelola data customer'],
     pengaturan: ['Integrasi Spreadsheet', 'Hubungkan dengan Google Spreadsheet']
   };
@@ -569,8 +631,8 @@ function getFreqLabel(freq) {
 
 // ============= DASHBOARD =============
 function renderDashboard() {
-  animateCounter('statTotal', visits.length);
-  animateCounter('statBulanIni', visits.filter(v => { const d = new Date(v.tanggal); return d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear(); }).length);
+  animateCounter('statTotalPM', visits.length);
+  animateCounter('statTotalCM', cmVisits.length);
   
   const pending = [];
   const today = new Date(); today.setHours(23,59,59,999);
@@ -658,15 +720,25 @@ function renderDonutChart() {
 }
 
 function renderRecentActivity() {
-  const recent = [...visits].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5); const container = document.getElementById('recentActivity');
-  if (recent.length === 0) { container.innerHTML = '<div class="empty-state py-8"><p class="text-sm">Belum ada aktivitas</p></div>'; return; }
-  container.innerHTML = recent.map(v => {
-    return `<div class="activity-item" onclick="showDetail('${v.id}')"><div class="tech-avatar" style="background:linear-gradient(135deg, #10b981, #059669)">${v.teknisi.charAt(0)}</div><div class="flex-1 min-w-0"><div class="flex items-center justify-between gap-2 mb-1"><p class="font-semibold text-sm truncate">${v.customer}</p><span class="badge badge-success flex-shrink-0"><i data-lucide="check-circle" style="width:11px;height:11px;"></i>Selesai</span></div><p class="text-xs text-gray-400 truncate">${v.teknisi} • ${v.base}</p><p class="text-xs text-gray-500 mt-1">${formatDate(v.tanggal)}</p></div></div>`;
-  }).join(''); lucide.createIcons();
+  const container = document.getElementById('recentActivity');
+  
+  const pmActs = visits.map(v => ({ ...v, type: 'PM' }));
+  const cmActs = cmVisits.map(v => ({ ...v, type: 'CM', masalah: v.masalah }));
+  const allActs = [...pmActs, ...cmActs].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 6);
+  
+  if (allActs.length === 0) { container.innerHTML = '<div class="empty-state py-8"><p class="text-sm">Belum ada aktivitas</p></div>'; return; }
+  container.innerHTML = allActs.map(v => {
+    const isCM = v.type === 'CM';
+    const title = isCM ? v.masalah : v.customer;
+    const subtitle = isCM ? `CM: ${v.customer}` : `PM: ${v.teknisi}`;
+    const badge = isCM ? `<span class="badge badge-danger flex-shrink-0">CM</span>` : `<span class="badge badge-success flex-shrink-0">PM</span>`;
+    return `<div class="activity-item" onclick="${isCM ? `showCMDetail('${v.id}')` : `showDetail('${v.id}')`}"><div class="tech-avatar" style="background:${isCM ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'linear-gradient(135deg, #10b981, #059669)'}">${v.teknisi.charAt(0)}</div><div class="flex-1 min-w-0"><div class="flex items-center justify-between gap-2 mb-1"><p class="font-semibold text-sm truncate">${title}</p>${badge}</div><p class="text-xs text-gray-400 truncate">${subtitle} • ${v.base}</p><p class="text-xs text-gray-500 mt-1">${formatDate(v.tanggal)}</p></div></div>`;
+  }).join(''); 
+  lucide.createIcons();
 }
 
 function renderTopTech() {
-  const techStats = technicians.map(t => ({ ...t, count: visits.filter(v => v.teknisi === t.name).length })).sort((a,b) => b.count - a.count).slice(0, 5);
+  const techStats = technicians.map(t => ({ ...t, count: visits.filter(v => v.teknisi === t.name).length + cmVisits.filter(v => v.teknisi === t.name).length })).sort((a,b) => b.count - a.count).slice(0, 5);
   const maxCount = Math.max(...techStats.map(t => t.count), 1);
   document.getElementById('topTech').innerHTML = techStats.map(t => {
     const pct = (t.count / maxCount) * 100;
@@ -677,8 +749,15 @@ function renderTopTech() {
 // ============= FORM LOGIC =============
 function populateSelects() {
   const techSelect = document.getElementById('teknisi'); const techFilter = document.getElementById('filterTeknisi');
-  techSelect.innerHTML = '<option value="">Pilih teknisi...</option>'; techFilter.innerHTML = '<option value="">Semua Teknisi</option>';
-  technicians.forEach(t => { techSelect.innerHTML += `<option value="${t.name}" data-base="${t.base}">${t.name} (${t.base})</option>`; techFilter.innerHTML += `<option value="${t.name}">${t.name}</option>`; });
+  const cmTechSelect = document.getElementById('cmTeknisi');
+  techSelect.innerHTML = '<option value="">Pilih teknisi...</option>'; 
+  techFilter.innerHTML = '<option value="">Semua Teknisi</option>'; 
+  cmTechSelect.innerHTML = '<option value="">Pilih teknisi...</option>';
+  technicians.forEach(t => { 
+    techSelect.innerHTML += `<option value="${t.name}" data-base="${t.base}">${t.name} (${t.base})</option>`; 
+    techFilter.innerHTML += `<option value="${t.name}">${t.name}</option>`; 
+    cmTechSelect.innerHTML += `<option value="${t.name}" data-base="${t.base}">${t.name} (${t.base})</option>`;
+  });
 }
 
 function populateCustBaseFilter() {
@@ -693,6 +772,7 @@ function populateCustBaseFilter() {
   filter.value = currentValue;
 }
 
+// PM Customer Dropdown
 function filterCustomerByBase() {
   const techName = document.getElementById('teknisi').value;
   const tech = technicians.find(t => t.name === techName);
@@ -736,39 +816,128 @@ function showCustomerDropdown() {
               </div>`;
     }).join('');
   }
-  
   dropdown.classList.add('show');
 }
 
-function hideCustomerDropdown() {
-  setTimeout(() => {
-    document.getElementById('customerDropdownList').classList.remove('show');
-  }, 150);
-}
-
+function hideCustomerDropdown() { setTimeout(() => { document.getElementById('customerDropdownList').classList.remove('show'); }, 150); }
 function selectCustomer(name) {
   document.getElementById('customerSearch').value = name;
   document.getElementById('customer').value = name;
   document.getElementById('customerDropdownList').classList.remove('show');
 }
 
+// CM Customer Dropdown
+function filterCMCustomerByBase() {
+  const techName = document.getElementById('cmTeknisi').value;
+  const tech = technicians.find(t => t.name === techName);
+  const custSearch = document.getElementById('cmCustomerSearch');
+  
+  custSearch.value = '';
+  document.getElementById('cmCustomer').value = '';
+  
+  if (tech) {
+    custSearch.disabled = false;
+    custSearch.placeholder = "Ketik nama customer...";
+  } else {
+    custSearch.disabled = true;
+    custSearch.placeholder = "Pilih teknisi dahulu...";
+    document.getElementById('cmCustomerDropdownList').classList.remove('show');
+  }
+}
+
+function showCMCustomerDropdown() {
+  const techName = document.getElementById('cmTeknisi').value;
+  const tech = technicians.find(t => t.name === techName);
+  if (!tech) return;
+  
+  const dropdown = document.getElementById('cmCustomerDropdownList');
+  const searchText = document.getElementById('cmCustomerSearch').value.toLowerCase();
+  
+  const baseCustomers = customers.filter(c => c.base === tech.base);
+  const filteredCustomers = baseCustomers.filter(c => c.name.toLowerCase().includes(searchText));
+  
+  if (filteredCustomers.length === 0) {
+    dropdown.innerHTML = '<div class="cust-option" style="color: var(--muted); cursor: default;">Customer tidak ditemukan</div>';
+  } else {
+    dropdown.innerHTML = filteredCustomers.map(c => {
+      return `<div class="cust-option" onmousedown="selectCMCustomer('${c.name}')">${c.name}</div>`;
+    }).join('');
+  }
+  dropdown.classList.add('show');
+}
+
+function hideCMCustomerDropdown() { setTimeout(() => { document.getElementById('cmCustomerDropdownList').classList.remove('show'); }, 150); }
+function selectCMCustomer(name) {
+  document.getElementById('cmCustomerSearch').value = name;
+  document.getElementById('cmCustomer').value = name;
+  document.getElementById('cmCustomerDropdownList').classList.remove('show');
+}
+
+// Handle Submits
 function handleSubmit(e) {
   e.preventDefault(); 
-  const id = document.getElementById('visitId').value || generateId(); 
+  const id = document.getElementById('visitId').value || generateId('PM'); 
   const isEdit = !!document.getElementById('visitId').value;
   const techName = document.getElementById('teknisi').value;
   const tech = technicians.find(t => t.name === techName);
   const custName = document.getElementById('customer').value;
   
-  if (!custName) {
-    showToast('Silakan pilih customer dari daftar', 'error');
-    return;
-  }
+  if (!custName) return showToast('Silakan pilih customer dari daftar', 'error');
   
   const data = { id, tanggal: document.getElementById('tanggal').value, teknisi: techName, base: tech?.base || '', customer: custName, createdAt: isEdit ? visits.find(v => v.id === id).createdAt : new Date().toISOString() };
   
-  if (isEdit) { const idx = visits.findIndex(v => v.id === id); visits[idx] = data; showToast('Data kunjungan diperbarui', 'success'); } else { visits.unshift(data); showToast('Kunjungan PM dicatat', 'success'); }
-  saveData(); if (isConnected) syncToSheet('visits', data, isEdit ? 'update' : 'create'); resetForm(); renderDashboard(); renderRiwayat(); switchTab('riwayat');
+  if (isEdit) { 
+    const idx = visits.findIndex(v => v.id === id); 
+    visits[idx] = data; 
+    showToast('Data PM berhasil diperbarui!', 'success'); 
+  } else { 
+    visits.unshift(data); 
+    showToast('Kunjungan PM berhasil dicatat!', 'success'); 
+  }
+  saveData(); 
+  if (isConnected) syncToSheet('visits', data, isEdit ? 'update' : 'create'); 
+  resetForm(); 
+  renderDashboard(); 
+  renderRiwayat(); 
+  // Dihapus: switchTab('riwayat');
+}
+
+function handleAddCM(e) {
+  e.preventDefault(); 
+  const id = document.getElementById('cmVisitId').value || generateId('CM'); 
+  const isEdit = !!document.getElementById('cmVisitId').value;
+  const techName = document.getElementById('cmTeknisi').value;
+  const tech = technicians.find(t => t.name === techName);
+  const custName = document.getElementById('cmCustomer').value;
+  
+  if (!custName) return showToast('Silakan pilih customer dari daftar', 'error');
+  
+  const data = { 
+    id, 
+    tanggal: document.getElementById('cmTanggal').value, 
+    teknisi: techName, 
+    base: tech?.base || '', 
+    customer: custName, 
+    masalah: document.getElementById('cmMasalah').value,
+    tindakan: document.getElementById('cmTindakan').value,
+    status: document.getElementById('cmStatus').value,
+    createdAt: isEdit ? cmVisits.find(v => v.id === id).createdAt : new Date().toISOString() 
+  };
+  
+  if (isEdit) { 
+    const idx = cmVisits.findIndex(v => v.id === id); 
+    cmVisits[idx] = data; 
+    showToast('Data CM berhasil diperbarui!', 'success'); 
+  } else { 
+    cmVisits.unshift(data); 
+    showToast('Data CM berhasil dicatat!', 'success'); 
+  }
+  saveData(); 
+  if (isConnected) syncToSheet('cm_visits', data, isEdit ? 'update' : 'create'); 
+  resetCMForm(); 
+  renderDashboard(); 
+  renderCMHistory(); 
+  // Tetap di tab CM
 }
 
 function handleAddTech(e) {
@@ -790,8 +959,14 @@ function handleAddCust(e) {
   if (isConnected) syncToSheet('customers', cust, 'create'); showToast('Customer ditambahkan', 'success');
 }
 
-function generateId() { const year = new Date().getFullYear(); const count = visits.filter(v => v.id.startsWith(`PM-${year}`)).length + 1; return `PM-${year}-${String(count).padStart(3, '0')}`; }
+function generateId(type) { 
+  const year = new Date().getFullYear(); 
+  const count = (type === 'CM' ? cmVisits : visits).filter(v => v.id.startsWith(`${type}-${year}`)).length + 1; 
+  return `${type}-${year}-${String(count).padStart(3, '0')}`; 
+}
+
 function resetForm() { document.getElementById('pmForm').reset(); document.getElementById('visitId').value = ''; document.getElementById('tanggal').value = new Date().toISOString().split('T')[0]; filterCustomerByBase(); document.getElementById('formTitle').textContent = 'Catat Kunjungan PM Baru'; document.getElementById('submitText').textContent = 'Simpan Kunjungan'; }
+function resetCMForm() { document.getElementById('cmForm').reset(); document.getElementById('cmVisitId').value = ''; document.getElementById('cmTanggal').value = new Date().toISOString().split('T')[0]; filterCMCustomerByBase(); document.getElementById('cmSubmitText').textContent = 'Simpan Data CM'; }
 
 function editVisit(id) {
   const v = visits.find(x => x.id === id); if (!v) return; switchTab('form');
@@ -801,11 +976,19 @@ function editVisit(id) {
   document.getElementById('formTitle').textContent = 'Edit Kunjungan PM'; document.getElementById('submitText').textContent = 'Update Kunjungan'; window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function deleteVisit(id) {
-  showConfirm('Hapus Data Kunjungan', 'Apakah Anda yakin ingin menghapus data ini?', () => {
-    visits = visits.filter(v => v.id !== id); saveData(); if (isConnected) syncToSheet('visits', { id }, 'delete'); showToast('Data dihapus', 'info'); renderDashboard(); renderRiwayat();
-  });
+function editCMVisit(id) {
+  const v = cmVisits.find(x => x.id === id); if (!v) return; switchTab('cm');
+  document.getElementById('cmVisitId').value = v.id; document.getElementById('cmTanggal').value = v.tanggal; document.getElementById('cmTeknisi').value = v.teknisi; filterCMCustomerByBase(); 
+  document.getElementById('cmCustomerSearch').value = v.customer;
+  document.getElementById('cmCustomer').value = v.customer;
+  document.getElementById('cmMasalah').value = v.masalah;
+  document.getElementById('cmTindakan').value = v.tindakan || '';
+  document.getElementById('cmStatus').value = v.status;
+  document.getElementById('cmSubmitText').textContent = 'Update Data CM'; window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+function deleteVisit(id) { showConfirm('Hapus Data PM', 'Apakah Anda yakin ingin menghapus data ini?', () => { visits = visits.filter(v => v.id !== id); saveData(); if (isConnected) syncToSheet('visits', { id }, 'delete'); showToast('Data dihapus', 'info'); renderDashboard(); renderRiwayat(); }); }
+function deleteCMVisit(id) { showConfirm('Hapus Data CM', 'Apakah Anda yakin ingin menghapus data ini?', () => { cmVisits = cmVisits.filter(v => v.id !== id); saveData(); if (isConnected) syncToSheet('cm_visits', { id }, 'delete'); showToast('Data dihapus', 'info'); renderDashboard(); renderCMHistory(); }); }
 function deleteTech(id) { showConfirm('Hapus Teknisi', 'Apakah Anda yakin ingin menghapus teknisi ini?', () => { technicians = technicians.filter(t => t.id !== id); saveData(); populateSelects(); renderTechnicians(); renderDashboard(); if (isConnected) syncToSheet('techs', { id }, 'delete'); showToast('Teknisi dihapus', 'info'); }); }
 function deleteCust(id) { showConfirm('Hapus Customer', 'Apakah Anda yakin ingin menghapus customer ini?', () => { customers = customers.filter(c => c.id !== id); saveData(); populateCustBaseFilter(); renderCustomers(); renderDashboard(); if (isConnected) syncToSheet('customers', { id }, 'delete'); showToast('Customer dihapus', 'info'); }); }
 
@@ -821,11 +1004,23 @@ function renderRiwayat() {
   }).join(''); lucide.createIcons();
 }
 
+function renderCMHistory() {
+  const search = document.getElementById('searchCM').value.toLowerCase();
+  let filtered = cmVisits.filter(v => !search || v.customer.toLowerCase().includes(search) || v.masalah.toLowerCase().includes(search)).sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+  const tbody = document.getElementById('cmBody'); const empty = document.getElementById('emptyCM');
+  if (filtered.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); document.getElementById('cmTable').classList.add('hidden'); return; }
+  empty.classList.add('hidden'); document.getElementById('cmTable').classList.remove('hidden');
+  tbody.innerHTML = filtered.map(v => {
+    let statusClass = 'badge-warning'; if (v.status === 'Closed') statusClass = 'badge-success'; if (v.status === 'In Progress') statusClass = 'badge-info';
+    return `<tr onclick="showCMDetail('${v.id}')"><td><span class="font-mono text-xs text-gray-400">${v.id}</span></td><td class="whitespace-nowrap">${formatDate(v.tanggal)}</td><td class="font-medium">${v.teknisi}</td><td><div class="font-medium">${v.customer}</div></td><td class="max-w-xs truncate">${v.masalah}</td><td><span class="badge ${statusClass}">${v.status}</span></td><td class="text-right" onclick="event.stopPropagation()"><div class="flex justify-end gap-1"><button class="btn btn-ghost !p-2" onclick="editCMVisit('${v.id}')"><i data-lucide="edit" style="width:14px;height:14px;"></i></button><button class="btn btn-danger !p-2" onclick="deleteCMVisit('${v.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div></td></tr>`;
+  }).join(''); lucide.createIcons();
+}
+
 function renderTechnicians() {
   const container = document.getElementById('techList'); if (technicians.length === 0) { container.innerHTML = '<div class="empty-state"><p>Belum ada teknisi</p></div>'; return; }
   container.innerHTML = technicians.map(t => {
-    const count = visits.filter(v => v.teknisi === t.name).length;
-    return `<div class="glass p-4 flex items-center gap-4" style="background:rgba(0,0,0,0.2);"><div class="tech-avatar" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); width:44px; height:44px; font-size:15px;">${t.name.charAt(0)}</div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1"><p class="font-semibold">${t.name}</p><span class="badge badge-info">${t.base}</span></div><p class="text-xs text-gray-400 truncate">${t.address || '-'}</p><p class="text-xs text-gray-500 mt-1">${t.phone || '-'}</p></div><div class="text-right hide-mobile"><p class="font-display font-bold text-2xl">${count}</p><p class="text-xs text-gray-500">Kunjungan</p></div><button class="btn btn-danger !p-2" onclick="deleteTech('${t.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div>`;
+    const count = visits.filter(v => v.teknisi === t.name).length + cmVisits.filter(v => v.teknisi === t.name).length;
+    return `<div class="glass p-4 flex items-center gap-4" style="background:rgba(0,0,0,0.2);"><div class="tech-avatar" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); width:44px; height:44px; font-size:15px;">${t.name.charAt(0)}</div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1"><p class="font-semibold">${t.name}</p><span class="badge badge-info">${t.base}</span></div><p class="text-xs text-gray-400 truncate">${t.address || '-'}</p><p class="text-xs text-gray-500 mt-1">${t.phone || '-'}</p></div><div class="text-right hide-mobile"><p class="font-display font-bold text-2xl">${count}</p><p class="text-xs text-gray-500">Tugas</p></div><button class="btn btn-danger !p-2" onclick="deleteTech('${t.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div>`;
   }).join(''); lucide.createIcons();
 }
 
@@ -846,7 +1041,7 @@ function renderCustomers() {
   }
   
   container.innerHTML = displayedCustomers.map(c => {
-    const count = visits.filter(v => v.customer === c.name).length;
+    const count = visits.filter(v => v.customer === c.name).length + cmVisits.filter(v => v.customer === c.name).length;
     const lastVisit = visits.filter(v => v.customer === c.name).sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal))[0];
     let nextSchedStr = '-';
     let isOverdue = false;
@@ -859,7 +1054,6 @@ function renderCustomers() {
       } else {
         nextDate = new Date(c.firstSchedule);
       }
-      
       const today = new Date(); today.setHours(0,0,0,0);
       if (nextDate <= today) isOverdue = true;
       nextSchedStr = formatDate(nextDate);
@@ -875,6 +1069,21 @@ function showDetail(id) {
   document.getElementById('detailContent').innerHTML = `<div class="detail-row"><div class="detail-label">Tanggal</div><div class="detail-value">${formatDate(v.tanggal)}</div></div><div class="detail-row"><div class="detail-label">Teknisi</div><div class="detail-value">${v.teknisi}</div></div><div class="detail-row"><div class="detail-label">Base Wilayah</div><div class="detail-value">${v.base}</div></div><div class="detail-row"><div class="detail-label">Customer</div><div class="detail-value">${v.customer}</div></div>`;
   document.getElementById('modalDetail').classList.add('show'); lucide.createIcons();
 }
+
+function showCMDetail(id) {
+  const v = cmVisits.find(x => x.id === id); if (!v) return; currentDetailId = id; document.getElementById('detailId').textContent = v.id;
+  let statusClass = 'badge-warning'; if (v.status === 'Closed') statusClass = 'badge-success'; if (v.status === 'In Progress') statusClass = 'badge-info';
+  document.getElementById('detailContent').innerHTML = `
+    <div class="detail-row"><div class="detail-label">Tanggal</div><div class="detail-value">${formatDate(v.tanggal)}</div></div>
+    <div class="detail-row"><div class="detail-label">Teknisi</div><div class="detail-value">${v.teknisi}</div></div>
+    <div class="detail-row"><div class="detail-label">Customer</div><div class="detail-value">${v.customer}</div></div>
+    <div class="detail-row"><div class="detail-label">Masalah</div><div class="detail-value">${v.masalah}</div></div>
+    <div class="detail-row"><div class="detail-label">Tindakan</div><div class="detail-value">${v.tindakan || '-'}</div></div>
+    <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value"><span class="badge ${statusClass}">${v.status}</span></div></div>
+  `;
+  document.getElementById('modalDetail').classList.add('show'); lucide.createIcons();
+}
+
 function closeModal() { document.getElementById('modalDetail').classList.remove('show'); currentDetailId = null; }
 function editFromDetail() { if (currentDetailId) { closeModal(); editVisit(currentDetailId); } }
 function deleteFromDetail() { if (currentDetailId) { const id = currentDetailId; closeModal(); deleteVisit(id); } }
@@ -900,8 +1109,8 @@ async function testConnection() {
       startAutoSync();
       
       if (result.data && result.data.length > 0) {
-        showConfirm('Muat Data', 'Ditemukan ' + result.data.length + ' data kunjungan di spreadsheet. Muat ke aplikasi?', () => {
-          visits = result.data; saveData(); renderDashboard(); renderRiwayat(); showToast('Data dari spreadsheet dimuat', 'success');
+        showConfirm('Muat Data', 'Ditemukan ' + result.data.length + ' data di spreadsheet. Muat ke aplikasi?', () => {
+          loadFromSheet(true);
         });
       }
     } else throw new Error('Koneksi gagal');
@@ -914,36 +1123,33 @@ function startAutoSync() {
   setTimeout(loadFromSheet, 1000);
 }
 
-async function loadFromSheet() {
+async function loadFromSheet(forceLoad = false) {
   if (!isConnected || !sheetUrl) return;
   try {
-    const [visitsRes, techsRes, custRes] = await Promise.all([
+    const [visitsRes, cmRes, techsRes, custRes] = await Promise.all([
       fetch(`${sheetUrl}?action=read&type=visits`).then(r => r.json()),
+      fetch(`${sheetUrl}?action=read&type=cm_visits`).then(r => r.json()),
       fetch(`${sheetUrl}?action=read&type=techs`).then(r => r.json()),
       fetch(`${sheetUrl}?action=read&type=customers`).then(r => r.json())
     ]);
 
     let needsRender = false;
 
-    if (visitsRes.success && JSON.stringify(visitsRes.data) !== JSON.stringify(visits)) {
-      visits = visitsRes.data || []; needsRender = true;
-    }
-    if (techsRes.success && JSON.stringify(techsRes.data) !== JSON.stringify(technicians)) {
-      technicians = techsRes.data || []; needsRender = true;
-    }
-    if (custRes.success && JSON.stringify(custRes.data) !== JSON.stringify(customers)) {
-      customers = custRes.data || []; needsRender = true;
-    }
+    if (visitsRes.success && JSON.stringify(visitsRes.data) !== JSON.stringify(visits)) { visits = visitsRes.data || []; needsRender = true; }
+    if (cmRes.success && JSON.stringify(cmRes.data) !== JSON.stringify(cmVisits)) { cmVisits = cmRes.data || []; needsRender = true; }
+    if (techsRes.success && JSON.stringify(techsRes.data) !== JSON.stringify(technicians)) { technicians = techsRes.data || []; needsRender = true; }
+    if (custRes.success && JSON.stringify(custRes.data) !== JSON.stringify(customers)) { customers = custRes.data || []; needsRender = true; }
 
-    if (needsRender) {
+    if (needsRender || forceLoad) {
       saveData();
       populateSelects();
       populateCustBaseFilter();
       renderDashboard();
       renderRiwayat();
+      renderCMHistory();
       renderTechnicians();
       renderCustomers();
-      showToast('Data disinkronisasi dari Spreadsheet', 'info');
+      if (!forceLoad) showToast('Data disinkronisasi dari Spreadsheet', 'info');
     }
   } catch (error) {
     console.error('Auto sync error:', error);
@@ -964,6 +1170,7 @@ async function syncAllToSheet() {
   if (!isConnected) return showToast('Hubungkan ke spreadsheet dulu', 'error'); showToast('Menyinkronkan semua data...', 'info');
   try {
     await fetch(sheetUrl, { method: 'POST', body: JSON.stringify({ action: 'clear', type: 'visits', data: visits }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
+    await fetch(sheetUrl, { method: 'POST', body: JSON.stringify({ action: 'clear', type: 'cm_visits', data: cmVisits }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
     await fetch(sheetUrl, { method: 'POST', body: JSON.stringify({ action: 'clear', type: 'techs', data: technicians }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
     await fetch(sheetUrl, { method: 'POST', body: JSON.stringify({ action: 'clear', type: 'customers', data: customers }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
     showToast('Semua data berhasil dikirim ke Spreadsheet', 'success');
@@ -1002,8 +1209,8 @@ function exportCSV() {
   let csv = headers.join(',') + '\n'; visits.forEach(v => { csv += [v.id, v.tanggal, v.teknisi, v.base, v.customer].map(c => `"${String(c).replace(/"/g, '""')}"`).join(',') + '\n'; });
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `PM_Visits_${new Date().toISOString().split('T')[0]}.csv`; a.click();
 }
-function loadSampleData() { showConfirm('Muat Data Contoh', 'Data saat ini akan ditimpa. Lanjutkan?', () => { technicians = SAMPLE_TECHNICIANS; customers = SAMPLE_CUSTOMERS; visits = SAMPLE_VISITS; saveData(); populateSelects(); populateCustBaseFilter(); renderDashboard(); renderRiwayat(); renderTechnicians(); renderCustomers(); showToast('Data contoh dimuat', 'success'); }); }
-function clearAllData() { showConfirm('Hapus Semua Data', 'Semua data akan dihapus permanen. Lanjutkan?', () => { visits = []; technicians = []; customers = []; saveData(); populateSelects(); populateCustBaseFilter(); renderDashboard(); renderRiwayat(); renderTechnicians(); renderCustomers(); showToast('Semua data dihapus', 'info'); }); }
+function loadSampleData() { showConfirm('Muat Data Contoh', 'Data saat ini akan ditimpa. Lanjutkan?', () => { technicians = SAMPLE_TECHNICIANS; customers = SAMPLE_CUSTOMERS; visits = SAMPLE_VISITS; cmVisits = SAMPLE_CM; saveData(); populateSelects(); populateCustBaseFilter(); renderDashboard(); renderRiwayat(); renderCMHistory(); renderTechnicians(); renderCustomers(); showToast('Data contoh dimuat', 'success'); }); }
+function clearAllData() { showConfirm('Hapus Semua Data', 'Semua data akan dihapus permanen. Lanjutkan?', () => { visits = []; cmVisits = []; technicians = []; customers = []; saveData(); populateSelects(); populateCustBaseFilter(); renderDashboard(); renderRiwayat(); renderCMHistory(); renderTechnicians(); renderCustomers(); showToast('Semua data dihapus', 'info'); }); }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeConfirm(); } });
 
 init();
