@@ -278,7 +278,7 @@
               <div>
                 <label class="label-field">Customer (Ketik untuk mencari)</label>
                 <div class="cust-search-container">
-                  <input type="text" id="customerSearch" class="input-field" placeholder="Pilih teknisi dahulu..." onfocus="showCustomerDropdown()" oninput="showCustomerDropdown()" onblur="hideCustomerDropdown()" disabled>
+                  <input type="text" id="customerSearch" class="input-field" placeholder="Pilih teknisi dahulu..." onfocus="showCustomerDropdown()" oninput="showCustomerDropdown()" onblur="hideCustomerDropdown()" autocomplete="off" disabled>
                   <input type="hidden" id="customer" required>
                   <div id="customerDropdownList" class="cust-dropdown"></div>
                 </div>
@@ -311,7 +311,7 @@
             <div>
               <label class="label-field">Customer</label>
               <div class="cust-search-container">
-                <input type="text" id="cmCustomerSearch" class="input-field" placeholder="Pilih teknisi dahulu..." onfocus="showCMCustomerDropdown()" oninput="showCMCustomerDropdown()" onblur="hideCMCustomerDropdown()" disabled>
+                <input type="text" id="cmCustomerSearch" class="input-field" placeholder="Pilih teknisi dahulu..." onfocus="showCMCustomerDropdown()" oninput="showCMCustomerDropdown()" onblur="hideCMCustomerDropdown()" autocomplete="off" disabled>
                 <input type="hidden" id="cmCustomer" required>
                 <div id="cmCustomerDropdownList" class="cust-dropdown"></div>
               </div>
@@ -416,7 +416,7 @@
           <div class="flex items-center justify-between mb-4 gap-3 flex-col sm:flex-row">
             <h3 class="font-display font-bold text-lg text-white">Daftar Customer</h3>
             <div class="flex gap-2 w-full sm:w-auto">
-              <input type="text" id="searchCustName" class="input-field flex-1" placeholder="Cari nama customer..." oninput="renderCustomers()">
+              <input type="text" id="searchCustName" class="input-field flex-1" placeholder="Cari nama customer..." oninput="renderCustomers()" autocomplete="off">
               <select id="filterCustBase" class="input-field sm:w-48" onchange="renderCustomers()">
                 <option value="">Semua Base</option>
               </select>
