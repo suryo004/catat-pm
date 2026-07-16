@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ServiceTrack PM & CM — Sistem Pencatatan Maintenance</title>
+<title>Service Track PM & CM — Sistem Pencatatan Maintenance</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -882,10 +882,33 @@ function handleSubmit(e) {
   const techName = document.getElementById('teknisi').value;
   const tech = technicians.find(t => t.name === techName);
   const custName = document.getElementById('customer').value;
+  const tanggalInput = document.getElementById('tanggal').value;
   
   if (!custName) return showToast('Silakan pilih customer dari daftar', 'error');
   
-  const data = { id, tanggal: document.getElementById('tanggal').value, teknisi: techName, base: tech?.base || '', customer: custName, createdAt: isEdit ? visits.find(v => v.id === id).createdAt : new Date().toISOString() };
+  // Normalisasi format tanggal ke YYYY-MM-DD agar cocok dengan data dari Spreadsheet
+  const inputDateStr = new Date(tanggalInput).toISOString().split('T')[0];
+  
+  // CEK DOUBLE INPUT (Hanya cek Tanggal dan Customer, abaikan teknisi)
+  const isDuplicate = visits.some(v => {
+      const dbDateStr = new Date(v.tanggal).toISOString().split('T')[0];
+      return dbDateStr === inputDateStr && 
+             v.customer.trim().toLowerCase() === custName.trim().toLowerCase() && 
+             v.id !== id; // Abaikan jika sedang mengedit data yang sama
+  });
+  
+  if (isDuplicate) {
+      return showToast('Gagal: Customer ini sudah ada kunjungan PM di tanggal yang sama!', 'error');
+  }
+  
+  const data = { 
+    id, 
+    tanggal: tanggalInput, 
+    teknisi: techName, 
+    base: tech?.base || '', 
+    customer: custName, 
+    createdAt: isEdit ? visits.find(v => v.id === id).createdAt : new Date().toISOString() 
+  };
   
   if (isEdit) { 
     const idx = visits.findIndex(v => v.id === id); 
