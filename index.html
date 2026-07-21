@@ -41,12 +41,13 @@
   textarea.input-field { resize: vertical; min-height: 80px; font-family: inherit; }
   .label-field { font-size: 11px; font-weight: 700; color: var(--fg-dim); margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 1px; }
   
-  .btn { padding: 12px 20px; border-radius: 12px; font-weight: 600; font-size: 14px; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; border: none; font-family: inherit; white-space: nowrap; }
+  .btn { padding: 12px 20px; border-radius: 12px; font-weight: 600; font-size: 14px; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; border: none; font-family: inherit; white-space: nowrap; text-decoration: none; }
   .btn-primary { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3); }
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5); }
   .btn-ghost { background: rgba(255, 255, 255, 0.05); color: var(--fg); border: 1px solid var(--border); }
   .btn-ghost:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--border-hover); }
   .btn-accent { background: linear-gradient(135deg, #06b6d4, #0891b2); color: #fff; box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3); }
+  .btn-success { background: linear-gradient(135deg, #10b981, #047857); color: #fff; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); }
   .btn-danger { background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3); }
   .btn-danger:hover { background: rgba(244, 63, 94, 0.25); box-shadow: 0 0 15px rgba(244, 63, 94, 0.2); }
   
@@ -121,7 +122,7 @@
   .detail-row { display: flex; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 16px; }
   .detail-row:last-child { border-bottom: none; }
   .detail-label { flex-shrink: 0; width: 140px; color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding-top: 2px; }
-  .detail-value { flex: 1; color: var(--fg); font-size: 14px; font-weight: 500; }
+  .detail-value { flex: 1; color: var(--fg); font-size: 14px; font-weight: 500; word-break: break-all; }
   
   .pending-card { border-left: 3px solid var(--warning); transition: all 0.2s; }
   .pending-card:hover { border-left-color: var(--primary); background: rgba(139, 92, 246, 0.05) !important; }
@@ -135,6 +136,16 @@
   .cust-checkbox-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
   .cust-checkbox-item:hover { background: rgba(255,255,255,0.05); }
   .cust-checkbox-item input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+
+  /* Print Styles */
+  @media print {
+    body { background: white !important; color: black !important; }
+    .sidebar, header, .mobile-menu-btn, .btn, .bg-ambient, .bg-grid { display: none !important; }
+    .main-content { margin: 0 !important; padding: 0 !important; }
+    .glass { border: 1px solid #ccc !important; box-shadow: none !important; background: white !important; page-break-inside: avoid; }
+    .text-white { color: black !important; }
+    .text-gray-400 { color: #555 !important; }
+  }
 </style>
 </head>
 <body>
@@ -149,7 +160,7 @@
     </div>
     <div>
       <h1 class="font-display font-bold text-lg leading-none text-white">ServiceTrack</h1>
-      <p class="text-xs text-violet-400 mt-0.5 font-medium">PM & CM System v10.0</p>
+      <p class="text-xs text-violet-400 mt-0.5 font-medium">PM & CM System v11.0</p>
     </div>
   </div>
   
@@ -158,6 +169,7 @@
     <div class="sidebar-link" data-tab="jadwal"><i data-lucide="calendar-days" class="tab-icon"></i><span>Jadwal Harian</span></div>
     <div class="sidebar-link" data-tab="form"><i data-lucide="plus-circle" class="tab-icon"></i><span>Kunjungan PM Baru</span></div>
     <div class="sidebar-link" data-tab="cm"><i data-lucide="hammer" class="tab-icon"></i><span>Input CM (Corrective)</span></div>
+    <div class="sidebar-link" data-tab="laporan"><i data-lucide="file-text" class="tab-icon"></i><span>Laporan Bulanan</span></div>
     <div class="sidebar-link" data-tab="riwayat"><i data-lucide="clipboard-list" class="tab-icon"></i><span>Riwayat PM</span></div>
     <div class="sidebar-link" data-tab="teknisi"><i data-lucide="users" class="tab-icon"></i><span>Daftar Teknisi</span></div>
     <div class="sidebar-link" data-tab="customer"><i data-lucide="building" class="tab-icon"></i><span>Daftar Customer</span></div>
@@ -237,9 +249,11 @@
           <div id="pendingTasks" class="space-y-3 max-h-96 overflow-y-auto pr-2"></div>
         </div>
         <div class="glass p-6">
-          <div class="mb-4"><h3 class="font-display font-bold text-lg text-white">Distribusi Kunjungan</h3><p class="text-xs text-gray-400 mt-1">Berdasarkan Base Wilayah</p></div>
-          <div style="height: 200px;"><canvas id="chartDonut"></canvas></div>
-          <div id="donutLegend" class="mt-4 space-y-2"></div>
+          <div class="mb-4">
+            <h3 class="font-display font-bold text-lg flex items-center gap-2 text-white"><i data-lucide="alert-octagon" style="width:18px;height:18px;color:#f43f5e;"></i> CM Belum Selesai</h3>
+            <p class="text-xs text-gray-400 mt-1">Tiket Corrective Maintenance yang masih Open/Progress</p>
+          </div>
+          <div id="unresolvedCM" class="space-y-2 max-h-96 overflow-y-auto"></div>
         </div>
       </div>
       
@@ -251,12 +265,13 @@
           <div id="recentActivity" class="space-y-1 max-h-80 overflow-y-auto"></div>
         </div>
         <div class="glass p-6">
-          <div class="mb-4"><h3 class="font-display font-bold text-lg text-white">Performa Teknisi</h3><p class="text-xs text-gray-400 mt-1">Berdasarkan total PM+CM</p></div>
-          <div id="topTech" class="space-y-4"></div>
+          <div class="mb-4"><h3 class="font-display font-bold text-lg text-white">Distribusi Kunjungan</h3><p class="text-xs text-gray-400 mt-1">Berdasarkan Base Wilayah</p></div>
+          <div style="height: 200px;"><canvas id="chartDonut"></canvas></div>
+          <div id="donutLegend" class="mt-4 space-y-2"></div>
         </div>
       </div>
     </section>
-    
+
     <!-- JADWAL HARIAN TAB -->
     <section id="tab-jadwal" class="tab-content">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -283,9 +298,12 @@
         </div>
         
         <div class="glass p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-display font-bold text-lg text-white">Hasil Jadwal (Siap Copy)</h3>
-            <button class="btn btn-ghost !py-2 !px-3 text-xs" onclick="copyText(document.getElementById('jadwalResult').value)"><i data-lucide="copy" style="width:14px;height:14px;"></i> Copy</button>
+          <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <h3 class="font-display font-bold text-lg text-white">Hasil Jadwal</h3>
+            <div class="flex gap-2">
+              <button class="btn btn-ghost !py-2 !px-3 text-xs" onclick="copyText(document.getElementById('jadwalResult').value)"><i data-lucide="copy" style="width:14px;height:14px;"></i> Copy</button>
+              <a href="#" id="waLinkBtn" target="_blank" class="btn btn-success !py-2 !px-3 text-xs hidden"><i data-lucide="send" style="width:14px;height:14px;"></i> Kirim WA</a>
+            </div>
           </div>
           <textarea id="jadwalResult" class="input-field" rows="12" readonly style="font-family: monospace; white-space: pre-wrap; background: rgba(0,0,0,0.4); line-height: 1.6;" placeholder="Hasil jadwal akan muncul di sini..."></textarea>
         </div>
@@ -296,6 +314,20 @@
           <h3 class="font-display font-bold text-lg text-white flex items-center gap-2"><i data-lucide="history" style="width:18px;height:18px;color:var(--accent);"></i> Histori Jadwal</h3>
         </div>
         <div id="schedList" class="space-y-3"></div>
+      </div>
+    </section>
+    
+    <!-- LAPORAN TAB -->
+    <section id="tab-laporan" class="tab-content">
+      <div class="glass p-6">
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+          <h3 class="font-display font-bold text-lg text-white flex items-center gap-2"><i data-lucide="file-text" style="width:18px;height:18px;color:var(--accent);"></i> Generator Laporan Bulanan</h3>
+          <div class="flex gap-3 items-center">
+            <input type="month" id="reportMonth" class="input-field" onchange="generateReport()">
+            <button class="btn btn-ghost" onclick="window.print()"><i data-lucide="printer" style="width:16px;height:16px;"></i> Print / PDF</button>
+          </div>
+        </div>
+        <div id="reportContent" class="text-gray-300"></div>
       </div>
     </section>
     
@@ -446,6 +478,7 @@
           <form id="custForm" class="space-y-4">
             <div><label class="label-field">Nama Customer</label><input type="text" id="custName" class="input-field" placeholder="PT. Conton" required></div>
             <div><label class="label-field">Base Wilayah</label><input type="text" id="custBase" class="input-field" placeholder="Jakarta Selatan" required></div>
+            <div><label class="label-field">Link Google Maps</label><input type="text" id="custMaps" class="input-field" placeholder="https://maps.app.goo.gl/..."></div>
             <div><label class="label-field">Tanggal Mulai Jadwal PM</label><input type="date" id="custSchedule" class="input-field" required></div>
             <div>
               <label class="label-field">Frekuensi Kunjungan PM</label>
@@ -570,18 +603,19 @@ const SAMPLE_TECHNICIANS = [
   { id: 'T003', name: 'Cahyo Pratama', phone: '081234567892', address: 'Jl. Anggrek No. 8, Tangerang', base: 'Tangerang' }
 ];
 const SAMPLE_CUSTOMERS = [
-  { id: 'C001', name: 'PT Maju Jaya Abadi', base: 'Jakarta Selatan', firstSchedule: '2024-01-01', frequency: 3 },
-  { id: 'C002', name: 'CV Sumber Rejeki', base: 'Bekasi', firstSchedule: '2024-01-01', frequency: 1 },
-  { id: 'C003', name: 'PT Bintang Terang', base: 'Tangerang', firstSchedule: '2024-01-01', frequency: 12 },
-  { id: 'C004', name: 'Hotel Grand Permata', base: 'Jakarta Selatan', firstSchedule: '2024-01-01', frequency: 4 },
-  { id: 'C005', name: 'PT Sentosa Teknologi', base: 'Bekasi', firstSchedule: '2024-01-01', frequency: 3 }
+  { id: 'C001', name: 'PT Maju Jaya Abadi', base: 'Jakarta Selatan', firstSchedule: '2024-01-01', frequency: 3, mapsLink: 'https://maps.app.goo.gl/example1' },
+  { id: 'C002', name: 'CV Sumber Rejeki', base: 'Bekasi', firstSchedule: '2024-01-01', frequency: 1, mapsLink: '' },
+  { id: 'C003', name: 'PT Bintang Terang', base: 'Tangerang', firstSchedule: '2024-01-01', frequency: 12, mapsLink: 'https://maps.app.goo.gl/example3' },
+  { id: 'C004', name: 'Hotel Grand Permata', base: 'Jakarta Selatan', firstSchedule: '2024-01-01', frequency: 4, mapsLink: '' },
+  { id: 'C005', name: 'PT Sentosa Teknologi', base: 'Bekasi', firstSchedule: '2024-01-01', frequency: 3, mapsLink: '' }
 ];
 const SAMPLE_VISITS = [
   { id: 'PM-2024-001', tanggal: '2024-01-05', teknisi: 'Budi Santoso', base: 'Jakarta Selatan', customer: 'PT Maju Jaya Abadi', createdAt: '2024-01-05T10:30:00' },
   { id: 'PM-2024-002', tanggal: '2024-01-08', teknisi: 'Cahyo Pratama', base: 'Tangerang', customer: 'PT Bintang Terang', createdAt: '2024-01-08T08:00:00' }
 ];
 const SAMPLE_CM = [
-  { id: 'CM-2024-001', tanggal: '2024-01-10', teknisi: 'Budi Santoso', base: 'Jakarta Selatan', customer: 'PT Maju Jaya Abadi', masalah: 'AC tidak dingin', tindakan: 'Tambah freon, cek kapasitor', status: 'Closed', createdAt: '2024-01-10T14:00:00' }
+  { id: 'CM-2024-001', tanggal: '2024-01-10', teknisi: 'Budi Santoso', base: 'Jakarta Selatan', customer: 'PT Maju Jaya Abadi', masalah: 'AC tidak dingin', tindakan: 'Tambah freon, cek kapasitor', status: 'Closed', createdAt: '2024-01-10T14:00:00' },
+  { id: 'CM-2024-002', tanggal: '2024-07-15', teknisi: 'Agus Wijaya', base: 'Bekasi', customer: 'CV Sumber Rejeki', masalah: 'Mesin mati total', tindakan: 'Cek power supply', status: 'Open', createdAt: '2024-07-15T09:00:00' }
 ];
 
 // ============= INIT =============
@@ -597,6 +631,7 @@ function init() {
   document.getElementById('tanggal').value = new Date().toISOString().split('T')[0];
   document.getElementById('cmTanggal').value = new Date().toISOString().split('T')[0];
   document.getElementById('jadwalTanggal').value = new Date().toISOString().split('T')[0];
+  document.getElementById('reportMonth').value = new Date().toISOString().split('T')[0].substring(0, 7);
   document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   
   populateSelects();
@@ -608,6 +643,7 @@ function init() {
   renderTechnicians();
   renderCustomers();
   renderSchedules();
+  generateReport();
   updateConnectionStatus();
   
   if (sheetUrl) document.getElementById('sheetUrl').value = sheetUrl;
@@ -646,6 +682,7 @@ function switchTab(tabName) {
     jadwal: ['Jadwal Harian', 'Buat jadwal kunjungan harian per base'],
     form: ['Kunjungan PM Baru', 'Catat kunjungan PM teknisi'],
     cm: ['Input CM (Corrective)', 'Catat kerusakan/perbaikan corrective maintenance'],
+    laporan: ['Laporan Bulanan', 'Rekap data PM & CM untuk laporan atasan'],
     riwayat: ['Riwayat PM', 'Daftar lengkap kunjungan PM'],
     teknisi: ['Daftar Teknisi', 'Kelola data teknisi'],
     customer: ['Daftar Customer', 'Kelola data customer'],
@@ -679,14 +716,13 @@ function populateJadwalCustomers() {
     return;
   }
   
-  const selectedMonth = tanggal.substring(0, 7); // Format YYYY-MM
+  const selectedMonth = tanggal.substring(0, 7);
   const baseCustomers = customers.filter(c => c.base === base);
   if (baseCustomers.length === 0) {
     container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Tidak ada customer di base ini.</p>';
     return;
   }
   
-  // Cek customer yang sudah dijadwalkan bulan ini di base ini
   let scheduledThisMonth = [];
   schedules.forEach(s => {
     if (s.tanggal && s.tanggal.substring(0, 7) === selectedMonth && s.base === base) {
@@ -695,7 +731,6 @@ function populateJadwalCustomers() {
     }
   });
   
-  // Filter customer yang belum dijadwalkan bulan ini
   const availableCustomers = baseCustomers.filter(c => !scheduledThisMonth.includes(c.name));
   
   if (availableCustomers.length === 0) {
@@ -712,7 +747,7 @@ function populateJadwalCustomers() {
 }
 
 function generateJadwal(e) {
-  e.preventDefault();
+  if (e) e.preventDefault();
   const tanggal = document.getElementById('jadwalTanggal').value;
   const base = document.getElementById('jadwalBase').value;
   const checkboxes = document.querySelectorAll('.jadwal-cust-checkbox:checked');
@@ -729,6 +764,10 @@ function generateJadwal(e) {
   
   checkboxes.forEach((cb, i) => {
     text += `${i + 1}. ${cb.value}\n`;
+    const custData = customers.find(c => c.name === cb.value);
+    if (custData && custData.mapsLink) {
+      text += `   📍 Lokasi: ${custData.mapsLink}\n`;
+    }
     custNames.push(cb.value);
   });
   
@@ -736,21 +775,27 @@ function generateJadwal(e) {
   
   document.getElementById('jadwalResult').value = text;
   
+  // Setup WA Link
+  const waLink = `https://wa.me/?text=${encodeURIComponent(text)}`;
+  const waBtn = document.getElementById('waLinkBtn');
+  waBtn.href = waLink;
+  waBtn.classList.remove('hidden');
+  
   // Save to History
   const newSched = {
     id: 'SCH-' + Date.now(),
     tanggal: tanggal,
     base: base,
     text: text,
-    customers: custNames.join('|||'), // Simpan sebagai string dipisah |||
+    customers: custNames.join('|||'),
     createdAt: new Date().toISOString()
   };
   schedules.unshift(newSched);
   saveData();
   if (isConnected) syncToSheet('schedules', newSched, 'create');
   renderSchedules();
-  populateJadwalCustomers(); // Refresh list agar customer yang baru dijadwalkan hilang
-  showToast('Jadwal berhasil digenerate & disimpan di histori!', 'success');
+  populateJadwalCustomers();
+  showToast('Jadwal berhasil digenerate & disimpan!', 'success');
 }
 
 function renderSchedules() {
@@ -769,6 +814,7 @@ function renderSchedules() {
         </div>
         <div class="flex gap-2">
           <button class="btn btn-ghost !py-1.5 !px-3 text-xs" onclick="copyText('${s.id}')"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
+          <a href="https://wa.me/?text=${encodeURIComponent(s.text)}" target="_blank" class="btn btn-success !py-1.5 !px-3 text-xs"><i data-lucide="send" style="width:12px;height:12px;"></i> WA</a>
           <button class="btn btn-danger !py-1.5 !px-3 text-xs" onclick="deleteSched('${s.id}')"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button>
         </div>
       </div>
@@ -779,19 +825,13 @@ function renderSchedules() {
 }
 
 function copyText(id) {
-  // Jika id adalah string pendek (id jadwal), ambil textnya. Jika panjang (text hasil generate), gunakan langsung.
   let textToCopy = id;
   if (id.length < 30) {
     const s = schedules.find(x => x.id === id);
     if (!s) return showToast('Jadwal tidak ditemukan', 'error');
     textToCopy = s.text;
   }
-  
-  navigator.clipboard.writeText(textToCopy).then(() => {
-    showToast('Jadwal berhasil disalin ke clipboard!', 'success');
-  }).catch(err => {
-    showToast('Gagal menyalin, silakan copy manual', 'error');
-  });
+  navigator.clipboard.writeText(textToCopy).then(() => showToast('Jadwal berhasil disalin!', 'success')).catch(() => showToast('Gagal menyalin', 'error'));
 }
 
 function deleteSched(id) {
@@ -800,16 +840,76 @@ function deleteSched(id) {
     saveData();
     if (isConnected) syncToSheet('schedules', { id }, 'delete');
     renderSchedules();
-    populateJadwalCustomers(); // Refresh list agar customer bisa muncul kembali jika jadwal dihapus
+    populateJadwalCustomers();
     showToast('Histori dihapus', 'info');
   });
+}
+
+// ============= LAPORAN LOGIC =============
+function generateReport() {
+  const monthVal = document.getElementById('reportMonth').value;
+  if (!monthVal) return;
+  const [year, month] = monthVal.split('-');
+  
+  const pmReports = visits.filter(v => v.tanggal && v.tanggal.startsWith(`${year}-${month}`));
+  const cmReports = cmVisits.filter(v => v.tanggal && v.tanggal.startsWith(`${year}-${month}`));
+  const cmOpen = cmReports.filter(v => v.status !== 'Closed');
+  
+  const container = document.getElementById('reportContent');
+  
+  let html = `
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-white mb-1">Laporan Maintenance Bulanan</h2>
+      <p class="text-gray-400">Periode: ${new Date(year, month - 1).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</p>
+    </div>
+    
+    <div class="grid grid-cols-3 gap-4 mb-8">
+      <div class="glass p-4 text-center">
+        <p class="text-3xl font-bold text-emerald-400">${pmReports.length}</p>
+        <p class="text-xs text-gray-400 mt-1">Total PM</p>
+      </div>
+      <div class="glass p-4 text-center">
+        <p class="text-3xl font-bold text-rose-400">${cmReports.length}</p>
+        <p class="text-xs text-gray-400 mt-1">Total CM</p>
+      </div>
+      <div class="glass p-4 text-center">
+        <p class="text-3xl font-bold text-yellow-400">${cmOpen.length}</p>
+        <p class="text-xs text-gray-400 mt-1">CM Belum Selesai</p>
+      </div>
+    </div>
+  `;
+  
+  // PM Table
+  if (pmReports.length > 0) {
+    html += `<h3 class="text-lg font-bold text-white mb-3 mt-6">Detail Preventive Maintenance (PM)</h3>
+    <table class="data-table mb-8">
+      <thead><tr><th>ID</th><th>Tanggal</th><th>Teknisi</th><th>Customer</th><th>Base</th></tr></thead>
+      <tbody>`;
+    pmReports.forEach(v => html += `<tr><td>${v.id}</td><td>${formatDate(v.tanggal)}</td><td>${v.teknisi}</td><td>${v.customer}</td><td>${v.base}</td></tr>`);
+    html += `</tbody></table>`;
+  }
+  
+  // CM Table
+  if (cmReports.length > 0) {
+    html += `<h3 class="text-lg font-bold text-white mb-3 mt-6">Detail Corrective Maintenance (CM)</h3>
+    <table class="data-table">
+      <thead><tr><th>ID</th><th>Tanggal</th><th>Customer</th><th>Masalah</th><th>Status</th></tr></thead>
+      <tbody>`;
+    cmReports.forEach(v => html += `<tr><td>${v.id}</td><td>${formatDate(v.tanggal)}</td><td>${v.customer}</td><td>${v.masalah}</td><td>${v.status}</td></tr>`);
+    html += `</tbody></table>`;
+  }
+  
+  if (pmReports.length === 0 && cmReports.length === 0) {
+    html += `<div class="empty-state py-12"><p class="text-gray-500">Tidak ada data maintenance pada bulan ini.</p></div>`;
+  }
+  
+  container.innerHTML = html;
 }
 
 // ============= AUTO-SCHEDULE LOGIC =============
 function getTechNextSchedule(tech, cust) {
   const freqMonths = parseInt(cust.frequency) || 1;
   const techVisits = visits.filter(v => v.teknisi === tech.name && v.customer === cust.name);
-  
   if (techVisits.length > 0) {
     const latestVisit = techVisits.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal))[0];
     let nextDate = new Date(latestVisit.tanggal);
@@ -836,13 +936,10 @@ function renderDashboard() {
   
   const pending = [];
   const today = new Date(); today.setHours(23,59,59,999);
-  
   technicians.forEach(tech => {
     customers.filter(c => c.base === tech.base).forEach(cust => {
       const nextSched = getTechNextSchedule(tech, cust);
-      if (nextSched <= today) {
-        pending.push({ tech, cust, nextSched });
-      }
+      if (nextSched <= today) pending.push({ tech, cust, nextSched });
     });
   });
   
@@ -851,13 +948,33 @@ function renderDashboard() {
   
   renderDonutChart();
   renderPendingTasks(pending);
+  renderUnresolvedCM();
   renderRecentActivity();
-  renderTopTech();
 }
 
 function animateCounter(id, target) {
   const el = document.getElementById(id); const current = parseInt(el.textContent) || 0; const inc = (target - current) / 30; let i = 0;
   const timer = setInterval(() => { i++; el.textContent = Math.round(current + inc * i); if (i >= 30) { el.textContent = target; clearInterval(timer); } }, 800 / 30);
+}
+
+function renderUnresolvedCM() {
+  const container = document.getElementById('unresolvedCM');
+  if (!container) return;
+  const unresolved = cmVisits.filter(v => v.status !== 'Closed');
+  if (unresolved.length === 0) {
+    container.innerHTML = `<div class="empty-state py-4"><i data-lucide="check-circle" style="width:24px;height:24px;color:#10b981;margin:0 auto 8px;"></i><p class="text-sm text-gray-400">Semua CM sudah selesai!</p></div>`;
+    lucide.createIcons(); return;
+  }
+  container.innerHTML = unresolved.slice(0, 5).map(v => `
+    <div class="glass p-3 flex items-center gap-3 cursor-pointer" style="background:rgba(244,63,94,0.05); border-left: 2px solid #f43f5e;" onclick="showCMDetail('${v.id}')">
+      <div class="flex-1 min-w-0">
+        <p class="font-semibold text-sm text-white truncate">${v.customer}</p>
+        <p class="text-xs text-gray-400 truncate">${v.masalah}</p>
+      </div>
+      <span class="badge ${v.status === 'Open' ? 'badge-danger' : 'badge-warning'}">${v.status}</span>
+    </div>
+  `).join('');
+  lucide.createIcons();
 }
 
 function renderPendingTasks(pending) {
@@ -866,15 +983,12 @@ function renderPendingTasks(pending) {
     container.innerHTML = `<div class="empty-state py-8"><div class="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(139,92,246,0.1);"><i data-lucide="check-circle" style="width:24px;height:24px;color:#8b5cf6;"></i></div><p class="text-sm font-semibold text-gray-300">Semua jadwal PM sudah tercatat!</p></div>`;
     lucide.createIcons(); return;
   }
-  
   pending.sort((a, b) => new Date(a.nextSched) - new Date(b.nextSched));
-
   container.innerHTML = pending.map(({ tech, cust, nextSched }) => {
     const today = new Date(); today.setHours(0,0,0,0);
     const isOverdue = nextSched < today;
     const diffTime = Math.abs(today - nextSched);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
     return `
       <div class="glass p-4 pending-card flex items-center gap-4" style="background:rgba(245,158,11,0.05);">
         <div class="tech-avatar" style="background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid rgba(245,158,11,0.3);">${tech.name.charAt(0)}</div>
@@ -904,14 +1018,12 @@ function renderDonutChart() {
   const bases = [...new Set(technicians.map(t => t.base))];
   const baseCounts = bases.map(b => visits.filter(v => v.base === b).length);
   const colors = ['#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#f43f5e', '#ec4899'];
-  
   if (chartDonut) chartDonut.destroy();
   chartDonut = new Chart(ctx, { 
     type: 'doughnut', 
     data: { labels: bases, datasets: [{ data: baseCounts, backgroundColor: colors.slice(0, bases.length), borderColor: 'rgba(8, 9, 13, 0.8)', borderWidth: 3, hoverOffset: 8 }] }, 
     options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } } 
   });
-  
   const total = baseCounts.reduce((a, b) => a + b, 0) || 1; const legend = document.getElementById('donutLegend');
   legend.innerHTML = bases.map((b, i) => {
     const count = baseCounts[i]; const pct = Math.round(count/total*100);
@@ -921,11 +1033,9 @@ function renderDonutChart() {
 
 function renderRecentActivity() {
   const container = document.getElementById('recentActivity');
-  
   const pmActs = visits.map(v => ({ ...v, type: 'PM' }));
   const cmActs = cmVisits.map(v => ({ ...v, type: 'CM', masalah: v.masalah }));
   const allActs = [...pmActs, ...cmActs].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 6);
-  
   if (allActs.length === 0) { container.innerHTML = '<div class="empty-state py-8"><p class="text-sm">Belum ada aktivitas</p></div>'; return; }
   container.innerHTML = allActs.map(v => {
     const isCM = v.type === 'CM';
@@ -935,15 +1045,6 @@ function renderRecentActivity() {
     return `<div class="activity-item" onclick="${isCM ? `showCMDetail('${v.id}')` : `showDetail('${v.id}')`}"><div class="tech-avatar" style="background:${isCM ? 'linear-gradient(135deg, #f43f5e, #be123c)' : 'linear-gradient(135deg, #10b981, #047857)'}">${v.teknisi.charAt(0)}</div><div class="flex-1 min-w-0"><div class="flex items-center justify-between gap-2 mb-1"><p class="font-semibold text-sm truncate text-white">${title}</p>${badge}</div><p class="text-xs text-gray-400 truncate">${subtitle} • ${v.base}</p><p class="text-xs text-gray-500 mt-1">${formatDate(v.tanggal)}</p></div></div>`;
   }).join(''); 
   lucide.createIcons();
-}
-
-function renderTopTech() {
-  const techStats = technicians.map(t => ({ ...t, count: visits.filter(v => v.teknisi === t.name).length + cmVisits.filter(v => v.teknisi === t.name).length })).sort((a,b) => b.count - a.count).slice(0, 5);
-  const maxCount = Math.max(...techStats.map(t => t.count), 1);
-  document.getElementById('topTech').innerHTML = techStats.map(t => {
-    const pct = (t.count / maxCount) * 100;
-    return `<div><div class="flex items-center gap-3 mb-2"><div class="tech-avatar" style="background:rgba(139,92,246,0.15); color:#8b5cf6; border:1px solid rgba(139,92,246,0.3); width:32px; height:32px; font-size:11px;">${t.name.charAt(0)}</div><div class="flex-1 min-w-0"><p class="font-semibold text-sm truncate text-white">${t.name}</p><p class="text-xs text-gray-500">Base: ${t.base}</p></div><span class="font-display font-bold text-lg text-white">${t.count}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>`;
-  }).join('');
 }
 
 // ============= FORM LOGIC =============
@@ -966,48 +1067,30 @@ function populateCustBaseFilter() {
   const currentValue = filter.value;
   const bases = [...new Set(customers.map(c => c.base))];
   filter.innerHTML = '<option value="">Semua Base</option>';
-  bases.forEach(b => {
-    filter.innerHTML += `<option value="${b}">${b}</option>`;
-  });
+  bases.forEach(b => filter.innerHTML += `<option value="${b}">${b}</option>`);
   filter.value = currentValue;
 }
 
-// PM Customer Dropdown
 function filterCustomerByBase() {
   const techName = document.getElementById('teknisi').value;
   const tech = technicians.find(t => t.name === techName);
   const custSearch = document.getElementById('customerSearch');
   const baseInput = document.getElementById('base');
-  
-  custSearch.value = '';
-  document.getElementById('customer').value = '';
-  
-  if (tech) {
-    baseInput.value = tech.base;
-    custSearch.disabled = false;
-    custSearch.placeholder = "Ketik nama customer...";
-  } else {
-    baseInput.value = '';
-    custSearch.disabled = true;
-    custSearch.placeholder = "Pilih teknisi dahulu...";
-    document.getElementById('customerDropdownList').classList.remove('show');
-  }
+  custSearch.value = ''; document.getElementById('customer').value = '';
+  if (tech) { baseInput.value = tech.base; custSearch.disabled = false; custSearch.placeholder = "Ketik nama customer..."; } 
+  else { baseInput.value = ''; custSearch.disabled = true; custSearch.placeholder = "Pilih teknisi dahulu..."; document.getElementById('customerDropdownList').classList.remove('show'); }
 }
 
 function showCustomerDropdown() {
   const techName = document.getElementById('teknisi').value;
   const tech = technicians.find(t => t.name === techName);
   if (!tech) return;
-  
   const dropdown = document.getElementById('customerDropdownList');
   const searchText = document.getElementById('customerSearch').value.toLowerCase();
-  
   const baseCustomers = customers.filter(c => c.base === tech.base);
   const filteredCustomers = baseCustomers.filter(c => c.name.toLowerCase().includes(searchText));
-  
-  if (filteredCustomers.length === 0) {
-    dropdown.innerHTML = '<div class="cust-option" style="color: var(--muted); cursor: default;">Customer tidak ditemukan</div>';
-  } else {
+  if (filteredCustomers.length === 0) { dropdown.innerHTML = '<div class="cust-option" style="color: var(--muted); cursor: default;">Customer tidak ditemukan</div>'; } 
+  else {
     dropdown.innerHTML = filteredCustomers.map(c => {
       const nextSched = getTechNextSchedule(tech, c);
       return `<div class="cust-option" onmousedown="selectCustomer('${c.name}')" style="display: flex; justify-content: space-between; align-items: center;">
@@ -1020,60 +1103,33 @@ function showCustomerDropdown() {
 }
 
 function hideCustomerDropdown() { setTimeout(() => { document.getElementById('customerDropdownList').classList.remove('show'); }, 150); }
-function selectCustomer(name) {
-  document.getElementById('customerSearch').value = name;
-  document.getElementById('customer').value = name;
-  document.getElementById('customerDropdownList').classList.remove('show');
-}
+function selectCustomer(name) { document.getElementById('customerSearch').value = name; document.getElementById('customer').value = name; document.getElementById('customerDropdownList').classList.remove('show'); }
 
-// CM Customer Dropdown
 function filterCMCustomerByBase() {
   const techName = document.getElementById('cmTeknisi').value;
   const tech = technicians.find(t => t.name === techName);
   const custSearch = document.getElementById('cmCustomerSearch');
-  
-  custSearch.value = '';
-  document.getElementById('cmCustomer').value = '';
-  
-  if (tech) {
-    custSearch.disabled = false;
-    custSearch.placeholder = "Ketik nama customer...";
-  } else {
-    custSearch.disabled = true;
-    custSearch.placeholder = "Pilih teknisi dahulu...";
-    document.getElementById('cmCustomerDropdownList').classList.remove('show');
-  }
+  custSearch.value = ''; document.getElementById('cmCustomer').value = '';
+  if (tech) { custSearch.disabled = false; custSearch.placeholder = "Ketik nama customer..."; } 
+  else { custSearch.disabled = true; custSearch.placeholder = "Pilih teknisi dahulu..."; document.getElementById('cmCustomerDropdownList').classList.remove('show'); }
 }
 
 function showCMCustomerDropdown() {
   const techName = document.getElementById('cmTeknisi').value;
   const tech = technicians.find(t => t.name === techName);
   if (!tech) return;
-  
   const dropdown = document.getElementById('cmCustomerDropdownList');
   const searchText = document.getElementById('cmCustomerSearch').value.toLowerCase();
-  
   const baseCustomers = customers.filter(c => c.base === tech.base);
   const filteredCustomers = baseCustomers.filter(c => c.name.toLowerCase().includes(searchText));
-  
-  if (filteredCustomers.length === 0) {
-    dropdown.innerHTML = '<div class="cust-option" style="color: var(--muted); cursor: default;">Customer tidak ditemukan</div>';
-  } else {
-    dropdown.innerHTML = filteredCustomers.map(c => {
-      return `<div class="cust-option" onmousedown="selectCMCustomer('${c.name}')">${c.name}</div>`;
-    }).join('');
-  }
+  if (filteredCustomers.length === 0) { dropdown.innerHTML = '<div class="cust-option" style="color: var(--muted); cursor: default;">Customer tidak ditemukan</div>'; } 
+  else { dropdown.innerHTML = filteredCustomers.map(c => `<div class="cust-option" onmousedown="selectCMCustomer('${c.name}')">${c.name}</div>`).join(''); }
   dropdown.classList.add('show');
 }
 
 function hideCMCustomerDropdown() { setTimeout(() => { document.getElementById('cmCustomerDropdownList').classList.remove('show'); }, 150); }
-function selectCMCustomer(name) {
-  document.getElementById('cmCustomerSearch').value = name;
-  document.getElementById('cmCustomer').value = name;
-  document.getElementById('cmCustomerDropdownList').classList.remove('show');
-}
+function selectCMCustomer(name) { document.getElementById('cmCustomerSearch').value = name; document.getElementById('cmCustomer').value = name; document.getElementById('cmCustomerDropdownList').classList.remove('show'); }
 
-// Handle Submits
 function handleSubmit(e) {
   e.preventDefault(); 
   const id = document.getElementById('visitId').value || generateId('PM'); 
@@ -1082,44 +1138,18 @@ function handleSubmit(e) {
   const tech = technicians.find(t => t.name === techName);
   const custName = document.getElementById('customer').value;
   const tanggalInput = document.getElementById('tanggal').value;
-  
   if (!custName) return showToast('Silakan pilih customer dari daftar', 'error');
-  
   const inputDateStr = new Date(tanggalInput).toISOString().split('T')[0];
-  
   const isDuplicate = visits.some(v => {
       const dbDateStr = new Date(v.tanggal).toISOString().split('T')[0];
-      return dbDateStr === inputDateStr && 
-             v.customer.trim().toLowerCase() === custName.trim().toLowerCase() && 
-             v.id !== id; 
+      return dbDateStr === inputDateStr && v.customer.trim().toLowerCase() === custName.trim().toLowerCase() && v.id !== id; 
   });
-  
-  if (isDuplicate) {
-      return showToast('Gagal: Customer ini sudah ada kunjungan PM di tanggal yang sama!', 'error');
-  }
-  
-  const data = { 
-    id, 
-    tanggal: tanggalInput, 
-    teknisi: techName, 
-    base: tech?.base || '', 
-    customer: custName, 
-    createdAt: isEdit ? visits.find(v => v.id === id).createdAt : new Date().toISOString() 
-  };
-  
-  if (isEdit) { 
-    const idx = visits.findIndex(v => v.id === id); 
-    visits[idx] = data; 
-    showToast('Data PM berhasil diperbarui!', 'success'); 
-  } else { 
-    visits.unshift(data); 
-    showToast('Kunjungan PM berhasil dicatat!', 'success'); 
-  }
-  saveData(); 
-  if (isConnected) syncToSheet('visits', data, isEdit ? 'update' : 'create'); 
-  resetForm(); 
-  renderDashboard(); 
-  renderRiwayat(); 
+  if (isDuplicate) return showToast('Gagal: Customer ini sudah ada kunjungan PM di tanggal yang sama!', 'error');
+  const data = { id, tanggal: tanggalInput, teknisi: techName, base: tech?.base || '', customer: custName, createdAt: isEdit ? visits.find(v => v.id === id).createdAt : new Date().toISOString() };
+  if (isEdit) { const idx = visits.findIndex(v => v.id === id); visits[idx] = data; showToast('Data PM berhasil diperbarui!', 'success'); } 
+  else { visits.unshift(data); showToast('Kunjungan PM berhasil dicatat!', 'success'); }
+  saveData(); if (isConnected) syncToSheet('visits', data, isEdit ? 'update' : 'create'); 
+  resetForm(); renderDashboard(); renderRiwayat(); 
 }
 
 function handleAddCM(e) {
@@ -1129,34 +1159,12 @@ function handleAddCM(e) {
   const techName = document.getElementById('cmTeknisi').value;
   const tech = technicians.find(t => t.name === techName);
   const custName = document.getElementById('cmCustomer').value;
-  
   if (!custName) return showToast('Silakan pilih customer dari daftar', 'error');
-  
-  const data = { 
-    id, 
-    tanggal: document.getElementById('cmTanggal').value, 
-    teknisi: techName, 
-    base: tech?.base || '', 
-    customer: custName, 
-    masalah: document.getElementById('cmMasalah').value,
-    tindakan: document.getElementById('cmTindakan').value,
-    status: document.getElementById('cmStatus').value,
-    createdAt: isEdit ? cmVisits.find(v => v.id === id).createdAt : new Date().toISOString() 
-  };
-  
-  if (isEdit) { 
-    const idx = cmVisits.findIndex(v => v.id === id); 
-    cmVisits[idx] = data; 
-    showToast('Data CM berhasil diperbarui!', 'success'); 
-  } else { 
-    cmVisits.unshift(data); 
-    showToast('Data CM berhasil dicatat!', 'success'); 
-  }
-  saveData(); 
-  if (isConnected) syncToSheet('cm_visits', data, isEdit ? 'update' : 'create'); 
-  resetCMForm(); 
-  renderDashboard(); 
-  renderCMHistory(); 
+  const data = { id, tanggal: document.getElementById('cmTanggal').value, teknisi: techName, base: tech?.base || '', customer: custName, masalah: document.getElementById('cmMasalah').value, tindakan: document.getElementById('cmTindakan').value, status: document.getElementById('cmStatus').value, createdAt: isEdit ? cmVisits.find(v => v.id === id).createdAt : new Date().toISOString() };
+  if (isEdit) { const idx = cmVisits.findIndex(v => v.id === id); cmVisits[idx] = data; showToast('Data CM berhasil diperbarui!', 'success'); } 
+  else { cmVisits.unshift(data); showToast('Data CM berhasil dicatat!', 'success'); }
+  saveData(); if (isConnected) syncToSheet('cm_visits', data, isEdit ? 'update' : 'create'); 
+  resetCMForm(); renderDashboard(); renderCMHistory(); 
 }
 
 function handleAddTech(e) {
@@ -1167,60 +1175,31 @@ function handleAddTech(e) {
 
 function handleAddCust(e) {
   e.preventDefault(); 
-  const cust = { 
-    id: 'C' + String(customers.length + 1).padStart(3, '0'), 
-    name: document.getElementById('custName').value, 
-    base: document.getElementById('custBase').value, 
-    firstSchedule: document.getElementById('custSchedule').value, 
-    frequency: parseInt(document.getElementById('custFreq').value) 
-  };
+  const cust = { id: 'C' + String(customers.length + 1).padStart(3, '0'), name: document.getElementById('custName').value, base: document.getElementById('custBase').value, firstSchedule: document.getElementById('custSchedule').value, frequency: parseInt(document.getElementById('custFreq').value), mapsLink: document.getElementById('custMaps').value };
   customers.push(cust); saveData(); populateCustBaseFilter(); populateJadwalBase(); renderCustomers(); renderDashboard(); document.getElementById('custForm').reset();
   if (isConnected) syncToSheet('customers', cust, 'create'); showToast('Customer ditambahkan', 'success');
 }
 
-function generateId(type) { 
-  const year = new Date().getFullYear(); 
-  const count = (type === 'CM' ? cmVisits : visits).filter(v => v.id.startsWith(`${type}-${year}`)).length + 1; 
-  return `${type}-${year}-${String(count).padStart(3, '0')}`; 
-}
+function generateId(type) { const year = new Date().getFullYear(); const count = (type === 'CM' ? cmVisits : visits).filter(v => v.id.startsWith(`${type}-${year}`)).length + 1; return `${type}-${year}-${String(count).padStart(3, '0')}`; }
 
 function resetForm() { document.getElementById('pmForm').reset(); document.getElementById('visitId').value = ''; document.getElementById('tanggal').value = new Date().toISOString().split('T')[0]; filterCustomerByBase(); document.getElementById('formTitle').textContent = 'Catat Kunjungan PM Baru'; document.getElementById('submitText').textContent = 'Simpan Kunjungan'; }
 function resetCMForm() { document.getElementById('cmForm').reset(); document.getElementById('cmVisitId').value = ''; document.getElementById('cmTanggal').value = new Date().toISOString().split('T')[0]; filterCMCustomerByBase(); document.getElementById('cmSubmitText').textContent = 'Simpan Data CM'; }
 
-function editVisit(id) {
-  const v = visits.find(x => x.id === id); if (!v) return; switchTab('form');
-  document.getElementById('visitId').value = v.id; document.getElementById('tanggal').value = v.tanggal; document.getElementById('teknisi').value = v.teknisi; filterCustomerByBase(); 
-  document.getElementById('customerSearch').value = v.customer;
-  document.getElementById('customer').value = v.customer;
-  document.getElementById('formTitle').textContent = 'Edit Kunjungan PM'; document.getElementById('submitText').textContent = 'Update Kunjungan'; window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function editCMVisit(id) {
-  const v = cmVisits.find(x => x.id === id); if (!v) return; switchTab('cm');
-  document.getElementById('cmVisitId').value = v.id; document.getElementById('cmTanggal').value = v.tanggal; document.getElementById('cmTeknisi').value = v.teknisi; filterCMCustomerByBase(); 
-  document.getElementById('cmCustomerSearch').value = v.customer;
-  document.getElementById('cmCustomer').value = v.customer;
-  document.getElementById('cmMasalah').value = v.masalah;
-  document.getElementById('cmTindakan').value = v.tindakan || '';
-  document.getElementById('cmStatus').value = v.status;
-  document.getElementById('cmSubmitText').textContent = 'Update Data CM'; window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+function editVisit(id) { const v = visits.find(x => x.id === id); if (!v) return; switchTab('form'); document.getElementById('visitId').value = v.id; document.getElementById('tanggal').value = v.tanggal; document.getElementById('teknisi').value = v.teknisi; filterCustomerByBase(); document.getElementById('customerSearch').value = v.customer; document.getElementById('customer').value = v.customer; document.getElementById('formTitle').textContent = 'Edit Kunjungan PM'; document.getElementById('submitText').textContent = 'Update Kunjungan'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function editCMVisit(id) { const v = cmVisits.find(x => x.id === id); if (!v) return; switchTab('cm'); document.getElementById('cmVisitId').value = v.id; document.getElementById('cmTanggal').value = v.tanggal; document.getElementById('cmTeknisi').value = v.teknisi; filterCMCustomerByBase(); document.getElementById('cmCustomerSearch').value = v.customer; document.getElementById('cmCustomer').value = v.customer; document.getElementById('cmMasalah').value = v.masalah; document.getElementById('cmTindakan').value = v.tindakan || ''; document.getElementById('cmStatus').value = v.status; document.getElementById('cmSubmitText').textContent = 'Update Data CM'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
 function deleteVisit(id) { showConfirm('Hapus Data PM', 'Apakah Anda yakin ingin menghapus data ini?', () => { visits = visits.filter(v => v.id !== id); saveData(); if (isConnected) syncToSheet('visits', { id }, 'delete'); showToast('Data dihapus', 'info'); renderDashboard(); renderRiwayat(); }); }
 function deleteCMVisit(id) { showConfirm('Hapus Data CM', 'Apakah Anda yakin ingin menghapus data ini?', () => { cmVisits = cmVisits.filter(v => v.id !== id); saveData(); if (isConnected) syncToSheet('cm_visits', { id }, 'delete'); showToast('Data dihapus', 'info'); renderDashboard(); renderCMHistory(); }); }
 function deleteTech(id) { showConfirm('Hapus Teknisi', 'Apakah Anda yakin ingin menghapus teknisi ini?', () => { technicians = technicians.filter(t => t.id !== id); saveData(); populateSelects(); renderTechnicians(); renderDashboard(); if (isConnected) syncToSheet('techs', { id }, 'delete'); showToast('Teknisi dihapus', 'info'); }); }
 function deleteCust(id) { showConfirm('Hapus Customer', 'Apakah Anda yakin ingin menghapus customer ini?', () => { customers = customers.filter(c => c.id !== id); saveData(); populateCustBaseFilter(); populateJadwalBase(); renderCustomers(); renderDashboard(); if (isConnected) syncToSheet('customers', { id }, 'delete'); showToast('Customer dihapus', 'info'); }); }
 
-// ============= RENDER LISTS =============
 function renderRiwayat() {
   const search = document.getElementById('searchInput').value.toLowerCase(); const filterTeknisi = document.getElementById('filterTeknisi').value;
   let filtered = visits.filter(v => { const matchSearch = !search || v.customer.toLowerCase().includes(search) || v.teknisi.toLowerCase().includes(search); const matchTeknisi = !filterTeknisi || v.teknisi === filterTeknisi; return matchSearch && matchTeknisi; }).sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
   const tbody = document.getElementById('riwayatBody'); const empty = document.getElementById('emptyRiwayat');
   if (filtered.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); document.getElementById('riwayatTable').classList.add('hidden'); return; }
   empty.classList.add('hidden'); document.getElementById('riwayatTable').classList.remove('hidden');
-  tbody.innerHTML = filtered.map(v => {
-    return `<tr onclick="showDetail('${v.id}')"><td><span class="font-mono text-xs text-gray-400">${v.id}</span></td><td class="whitespace-nowrap">${formatDate(v.tanggal)}</td><td class="font-medium text-white">${v.teknisi}</td><td><span class="badge badge-info">${v.base}</span></td><td><div class="font-medium text-white">${v.customer}</div></td><td class="text-right" onclick="event.stopPropagation()"><div class="flex justify-end gap-1"><button class="btn btn-ghost !p-2" onclick="editVisit('${v.id}')"><i data-lucide="edit" style="width:14px;height:14px;"></i></button><button class="btn btn-danger !p-2" onclick="deleteVisit('${v.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div></td></tr>`;
-  }).join(''); lucide.createIcons();
+  tbody.innerHTML = filtered.map(v => `<tr onclick="showDetail('${v.id}')"><td><span class="font-mono text-xs text-gray-400">${v.id}</span></td><td class="whitespace-nowrap">${formatDate(v.tanggal)}</td><td class="font-medium text-white">${v.teknisi}</td><td><span class="badge badge-info">${v.base}</span></td><td><div class="font-medium text-white">${v.customer}</div></td><td class="text-right" onclick="event.stopPropagation()"><div class="flex justify-end gap-1"><button class="btn btn-ghost !p-2" onclick="editVisit('${v.id}')"><i data-lucide="edit" style="width:14px;height:14px;"></i></button><button class="btn btn-danger !p-2" onclick="deleteVisit('${v.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div></td></tr>`).join(''); lucide.createIcons();
 }
 
 function renderCMHistory() {
@@ -1247,40 +1226,23 @@ function renderCustomers() {
   const container = document.getElementById('custList'); 
   const filterBase = document.getElementById('filterCustBase')?.value || '';
   const searchName = document.getElementById('searchCustName')?.value.toLowerCase() || '';
-  
-  let displayedCustomers = customers.filter(c => {
-    const matchBase = !filterBase || c.base === filterBase;
-    const matchName = !searchName || c.name.toLowerCase().includes(searchName);
-    return matchBase && matchName;
-  });
-
-  if (displayedCustomers.length === 0) { 
-    container.innerHTML = `<div class="empty-state"><p>Customer tidak ditemukan</p></div>`; 
-    return; 
-  }
-  
+  let displayedCustomers = customers.filter(c => { const matchBase = !filterBase || c.base === filterBase; const matchName = !searchName || c.name.toLowerCase().includes(searchName); return matchBase && matchName; });
+  if (displayedCustomers.length === 0) { container.innerHTML = `<div class="empty-state"><p>Customer tidak ditemukan</p></div>`; return; }
   container.innerHTML = displayedCustomers.map(c => {
     const count = visits.filter(v => v.customer === c.name).length + cmVisits.filter(v => v.customer === c.name).length;
     const lastVisit = visits.filter(v => v.customer === c.name).sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal))[0];
-    let nextSchedStr = '-';
-    let isOverdue = false;
-
+    let nextSchedStr = '-'; let isOverdue = false;
     if (c.firstSchedule) {
       let nextDate;
-      if (lastVisit) {
-        nextDate = new Date(lastVisit.tanggal);
-        nextDate.setMonth(nextDate.getMonth() + (parseInt(c.frequency) || 1));
-      } else {
-        nextDate = new Date(c.firstSchedule);
-      }
+      if (lastVisit) { nextDate = new Date(lastVisit.tanggal); nextDate.setMonth(nextDate.getMonth() + (parseInt(c.frequency) || 1)); } 
+      else { nextDate = new Date(c.firstSchedule); }
       const today = new Date(); today.setHours(0,0,0,0);
       if (nextDate <= today) isOverdue = true;
       nextSchedStr = formatDate(nextDate);
     }
-
-    return `<div class="glass p-4 flex items-center gap-4" style="background:rgba(255,255,255,0.02);"><div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.3);"><i data-lucide="building" style="width:20px;height:20px;color:#06b6d4;"></i></div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1 flex-wrap"><p class="font-semibold text-white">${c.name}</p><span class="badge badge-info">${c.base}</span><span class="badge ${isOverdue ? 'badge-danger' : 'badge-success'}">${getFreqLabel(c.frequency)}</span></div><p class="text-xs text-gray-400 mt-1">Jadwal PM Berikutnya: <span class="${isOverdue ? 'text-rose-400 font-bold' : 'text-gray-300'}">${nextSchedStr} ${isOverdue ? '(Jatuh Tempo)' : ''}</span></p></div><div class="text-right hide-mobile"><p class="font-display font-bold text-2xl text-white">${count}</p><p class="text-xs text-gray-500">Kunjungan</p></div><button class="btn btn-danger !p-2" onclick="deleteCust('${c.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div>`;
-  }).join(''); 
-  lucide.createIcons();
+    const mapsBtn = c.mapsLink ? `<a href="${c.mapsLink}" target="_blank" class="btn btn-ghost !p-2" onclick="event.stopPropagation()"><i data-lucide="map-pin" style="width:14px;height:14px;color:#06b6d4;"></i></a>` : '';
+    return `<div class="glass p-4 flex items-center gap-4" style="background:rgba(255,255,255,0.02);"><div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.3);"><i data-lucide="building" style="width:20px;height:20px;color:#06b6d4;"></i></div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1 flex-wrap"><p class="font-semibold text-white">${c.name}</p><span class="badge badge-info">${c.base}</span><span class="badge ${isOverdue ? 'badge-danger' : 'badge-success'}">${getFreqLabel(c.frequency)}</span></div><p class="text-xs text-gray-400 mt-1">Jadwal PM Berikutnya: <span class="${isOverdue ? 'text-rose-400 font-bold' : 'text-gray-300'}">${nextSchedStr} ${isOverdue ? '(Jatuh Tempo)' : ''}</span></p></div><div class="text-right hide-mobile"><p class="font-display font-bold text-2xl text-white">${count}</p><p class="text-xs text-gray-500">Kunjungan</p></div><div class="flex gap-1">${mapsBtn}<button class="btn btn-danger !p-2" onclick="deleteCust('${c.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div></div>`;
+  }).join(''); lucide.createIcons();
 }
 
 function showDetail(id) {
@@ -1307,16 +1269,12 @@ function closeModal() { document.getElementById('modalDetail').classList.remove(
 function editFromDetail() { if (currentDetailId) { closeModal(); editVisit(currentDetailId); } }
 function deleteFromDetail() { if (currentDetailId) { const id = currentDetailId; closeModal(); deleteVisit(id); } }
 
-// ============= CONFIRM MODAL =============
 function showConfirm(title, msg, callback) {
-  document.getElementById('confirmTitle').textContent = title;
-  document.getElementById('confirmMsg').textContent = msg;
-  document.getElementById('modalConfirm').classList.add('show');
-  document.getElementById('confirmBtn').onclick = () => { callback(); closeConfirm(); };
+  document.getElementById('confirmTitle').textContent = title; document.getElementById('confirmMsg').textContent = msg;
+  document.getElementById('modalConfirm').classList.add('show'); document.getElementById('confirmBtn').onclick = () => { callback(); closeConfirm(); };
 }
 function closeConfirm() { document.getElementById('modalConfirm').classList.remove('show'); }
 
-// ============= GOOGLE SHEET INTEGRATION & AUTO SYNC =============
 async function testConnection() {
   const url = document.getElementById('sheetUrl').value.trim(); if (!url) return showToast('Masukkan URL Apps Script', 'error');
   showToast('Menguji koneksi...', 'info');
@@ -1326,21 +1284,12 @@ async function testConnection() {
       sheetUrl = url; isConnected = true; localStorage.setItem('pm_sheet_url', url); localStorage.setItem('pm_connected', 'true'); updateConnectionStatus();
       showToast('Berhasil terhubung ke Spreadsheet', 'success');
       startAutoSync();
-      
-      if (result.data && result.data.length > 0) {
-        showConfirm('Muat Data', 'Ditemukan ' + result.data.length + ' data di spreadsheet. Muat ke aplikasi?', () => {
-          loadFromSheet(true);
-        });
-      }
+      if (result.data && result.data.length > 0) { showConfirm('Muat Data', 'Ditemukan ' + result.data.length + ' data di spreadsheet. Muat ke aplikasi?', () => { loadFromSheet(true); }); }
     } else throw new Error('Koneksi gagal');
   } catch (error) { showToast('Gagal terhubung: ' + error.message, 'error'); }
 }
 
-function startAutoSync() {
-  if (syncInterval) clearInterval(syncInterval);
-  syncInterval = setInterval(loadFromSheet, 15000);
-  setTimeout(loadFromSheet, 1000);
-}
+function startAutoSync() { if (syncInterval) clearInterval(syncInterval); syncInterval = setInterval(loadFromSheet, 15000); setTimeout(loadFromSheet, 1000); }
 
 async function loadFromSheet(forceLoad = false) {
   if (!isConnected || !sheetUrl) return;
@@ -1352,41 +1301,23 @@ async function loadFromSheet(forceLoad = false) {
       fetch(`${sheetUrl}?action=read&type=customers`).then(r => r.json()),
       fetch(`${sheetUrl}?action=read&type=schedules`).then(r => r.json())
     ]);
-
     let needsRender = false;
-
     if (visitsRes.success && JSON.stringify(visitsRes.data) !== JSON.stringify(visits)) { visits = visitsRes.data || []; needsRender = true; }
     if (cmRes.success && JSON.stringify(cmRes.data) !== JSON.stringify(cmVisits)) { cmVisits = cmRes.data || []; needsRender = true; }
     if (techsRes.success && JSON.stringify(techsRes.data) !== JSON.stringify(technicians)) { technicians = techsRes.data || []; needsRender = true; }
     if (custRes.success && JSON.stringify(custRes.data) !== JSON.stringify(customers)) { customers = custRes.data || []; needsRender = true; }
     if (schedRes.success && JSON.stringify(schedRes.data) !== JSON.stringify(schedules)) { schedules = schedRes.data || []; needsRender = true; }
-
     if (needsRender || forceLoad) {
-      saveData();
-      populateSelects();
-      populateCustBaseFilter();
-      populateJadwalBase();
-      renderDashboard();
-      renderRiwayat();
-      renderCMHistory();
-      renderTechnicians();
-      renderCustomers();
-      renderSchedules();
+      saveData(); populateSelects(); populateCustBaseFilter(); populateJadwalBase(); renderDashboard(); renderRiwayat(); renderCMHistory(); renderTechnicians(); renderCustomers(); renderSchedules();
       if (!forceLoad) showToast('Data disinkronisasi dari Spreadsheet', 'info');
     }
-  } catch (error) {
-    console.error('Auto sync error:', error);
-  }
+  } catch (error) { console.error('Auto sync error:', error); }
 }
 
 async function syncToSheet(type, data, action) {
   if (!isConnected) return; 
-  try { 
-    await fetch(sheetUrl, { method: 'POST', body: JSON.stringify({ action, type, data }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } }); 
-    setTimeout(loadFromSheet, 500);
-  } catch (e) { 
-    console.error('Sync error:', e); 
-  }
+  try { await fetch(sheetUrl, { method: 'POST', body: JSON.stringify({ action, type, data }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } }); setTimeout(loadFromSheet, 500); } 
+  catch (e) { console.error('Sync error:', e); }
 }
 
 async function syncAllToSheet() {
@@ -1411,17 +1342,10 @@ function disconnectSheet() {
 
 function updateConnectionStatus() {
   const status = document.getElementById('connStatus'); const desc = document.getElementById('connDesc');
-  if (isConnected) { 
-    status.className = 'conn-status connected'; status.innerHTML = '<span class="pulse-dot"></span> Terhubung'; 
-    desc.textContent = 'Sinkronisasi otomatis aktif (setiap 15 detik). Data dari Spreadsheet akan otomatis masuk.'; 
-  }
-  else { 
-    status.className = 'conn-status disconnected'; status.innerHTML = '<span class="pulse-dot" style="background:#f59e0b;"></span> Lokal'; 
-    desc.textContent = 'Menggunakan penyimpanan lokal. Hubungkan ke Google Sheet di menu Pengaturan.'; 
-  }
+  if (isConnected) { status.className = 'conn-status connected'; status.innerHTML = '<span class="pulse-dot"></span> Terhubung'; desc.textContent = 'Sinkronisasi otomatis aktif (setiap 15 detik). Data dari Spreadsheet akan otomatis masuk.'; } 
+  else { status.className = 'conn-status disconnected'; status.innerHTML = '<span class="pulse-dot" style="background:#f59e0b;"></span> Lokal'; desc.textContent = 'Menggunakan penyimpanan lokal. Hubungkan ke Google Sheet di menu Pengaturan.'; }
 }
 
-// ============= UTILITIES =============
 function formatDate(dateStr) { if(!dateStr) return '-'; const d = new Date(dateStr); if (isNaN(d)) return '-'; return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); }
 function showToast(msg, type = 'success') {
   const toast = document.getElementById('toast'); const icon = document.getElementById('toastIcon'); const msgEl = document.getElementById('toastMsg');
