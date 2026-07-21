@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Service Track PM & CM — Sistem Pencatatan Maintenance</title>
+<title>ServiceTrack PM & CM — Sistem Pencatatan Maintenance</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -131,6 +131,11 @@
   .cust-dropdown.show { display: block; }
   .cust-option { padding: 12px 14px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.1s; }
   .cust-option:hover { background: rgba(139, 92, 246, 0.1); }
+
+  /* Style untuk Checkbox Jadwal */
+  .cust-checkbox-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+  .cust-checkbox-item:hover { background: rgba(255,255,255,0.05); }
+  .cust-checkbox-item input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
 </style>
 </head>
 <body>
@@ -144,13 +149,14 @@
       <i data-lucide="wrench" class="text-white" style="width:20px;height:20px;"></i>
     </div>
     <div>
-      <h1 class="font-display font-bold text-lg leading-none text-white">Service Track</h1>
-      <p class="text-xs text-violet-400 mt-0.5 font-medium">PM & CM System v7.0</p>
+      <h1 class="font-display font-bold text-lg leading-none text-white">ServiceTrack</h1>
+      <p class="text-xs text-violet-400 mt-0.5 font-medium">PM & CM System v8.0</p>
     </div>
   </div>
   
   <nav class="flex flex-col gap-1.5 flex-1">
     <div class="sidebar-link active" data-tab="dashboard"><i data-lucide="layout-dashboard" class="tab-icon"></i><span>Dashboard</span></div>
+    <div class="sidebar-link" data-tab="jadwal"><i data-lucide="calendar-days" class="tab-icon"></i><span>Jadwal Harian</span></div>
     <div class="sidebar-link" data-tab="form"><i data-lucide="plus-circle" class="tab-icon"></i><span>Kunjungan PM Baru</span></div>
     <div class="sidebar-link" data-tab="cm"><i data-lucide="hammer" class="tab-icon"></i><span>Input CM (Corrective)</span></div>
     <div class="sidebar-link" data-tab="riwayat"><i data-lucide="clipboard-list" class="tab-icon"></i><span>Riwayat PM</span></div>
@@ -248,6 +254,41 @@
         <div class="glass p-6">
           <div class="mb-4"><h3 class="font-display font-bold text-lg text-white">Performa Teknisi</h3><p class="text-xs text-gray-400 mt-1">Berdasarkan total PM+CM</p></div>
           <div id="topTech" class="space-y-4"></div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- JADWAL HARIAN TAB -->
+    <section id="tab-jadwal" class="tab-content">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="glass p-6">
+          <h3 class="font-display font-bold text-lg mb-4 text-white flex items-center gap-2"><i data-lucide="calendar-plus" style="width:18px;height:18px;color:var(--accent);"></i> Generate Jadwal Harian</h3>
+          <form id="jadwalForm" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div><label class="label-field">Tanggal Kunjungan</label><input type="date" id="jadwalTanggal" class="input-field" required></div>
+              <div>
+                <label class="label-field">Base Wilayah</label>
+                <select id="jadwalBase" class="input-field" required onchange="populateJadwalCustomers()">
+                  <option value="">Pilih Base...</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="label-field">Pilih Customer (Minimal 2)</label>
+              <div id="jadwalCustList" class="space-y-1 max-h-60 overflow-y-auto p-3 rounded-lg" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border);">
+                <p class="text-sm text-gray-500 text-center py-4">Pilih base dahulu...</p>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-full"><i data-lucide="file-text" style="width:16px;height:16px;"></i> Generate Jadwal</button>
+          </form>
+        </div>
+        
+        <div class="glass p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-display font-bold text-lg text-white">Hasil Jadwal (Siap Copy)</h3>
+            <button class="btn btn-ghost !py-2 !px-3 text-xs" onclick="copyJadwal()"><i data-lucide="copy" style="width:14px;height:14px;"></i> Copy</button>
+          </div>
+          <textarea id="jadwalResult" class="input-field" rows="12" readonly style="font-family: monospace; white-space: pre-wrap; background: rgba(0,0,0,0.4); line-height: 1.6;" placeholder="Hasil jadwal akan muncul di sini..."></textarea>
         </div>
       </div>
     </section>
@@ -548,10 +589,12 @@ function init() {
   
   document.getElementById('tanggal').value = new Date().toISOString().split('T')[0];
   document.getElementById('cmTanggal').value = new Date().toISOString().split('T')[0];
+  document.getElementById('jadwalTanggal').value = new Date().toISOString().split('T')[0];
   document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   
   populateSelects();
   populateCustBaseFilter();
+  populateJadwalBase();
   renderDashboard();
   renderRiwayat();
   renderCMHistory();
@@ -571,6 +614,7 @@ function init() {
   document.getElementById('cmForm').addEventListener('submit', handleAddCM);
   document.getElementById('techForm').addEventListener('submit', handleAddTech);
   document.getElementById('custForm').addEventListener('submit', handleAddCust);
+  document.getElementById('jadwalForm').addEventListener('submit', generateJadwal);
   document.getElementById('searchInput').addEventListener('input', renderRiwayat);
   document.getElementById('filterTeknisi').addEventListener('change', renderRiwayat);
 }
@@ -590,6 +634,7 @@ function switchTab(tabName) {
   
   const titles = {
     dashboard: ['Dashboard', 'Ringkasan aktivitas maintenance'],
+    jadwal: ['Jadwal Harian', 'Buat jadwal kunjungan harian per base'],
     form: ['Kunjungan PM Baru', 'Catat kunjungan PM teknisi'],
     cm: ['Input CM (Corrective)', 'Catat kerusakan/perbaikan corrective maintenance'],
     riwayat: ['Riwayat PM', 'Daftar lengkap kunjungan PM'],
@@ -605,6 +650,71 @@ function switchTab(tabName) {
 }
 
 function toggleSidebar() { document.querySelector('.sidebar').classList.toggle('open'); }
+
+// ============= JADWAL HARIAN LOGIC =============
+function populateJadwalBase() {
+  const select = document.getElementById('jadwalBase');
+  if(!select) return;
+  const bases = [...new Set(customers.map(c => c.base))];
+  select.innerHTML = '<option value="">Pilih Base...</option>';
+  bases.forEach(b => select.innerHTML += `<option value="${b}">${b}</option>`);
+}
+
+function populateJadwalCustomers() {
+  const base = document.getElementById('jadwalBase').value;
+  const container = document.getElementById('jadwalCustList');
+  if (!base) {
+    container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Pilih base dahulu...</p>';
+    return;
+  }
+  const baseCustomers = customers.filter(c => c.base === base);
+  if (baseCustomers.length === 0) {
+    container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Tidak ada customer di base ini.</p>';
+    return;
+  }
+  container.innerHTML = baseCustomers.map(c => `
+    <label class="cust-checkbox-item">
+      <input type="checkbox" value="${c.name}" class="jadwal-cust-checkbox">
+      <span class="text-sm text-white">${c.name}</span>
+    </label>
+  `).join('');
+}
+
+function generateJadwal(e) {
+  e.preventDefault();
+  const tanggal = document.getElementById('jadwalTanggal').value;
+  const base = document.getElementById('jadwalBase').value;
+  const checkboxes = document.querySelectorAll('.jadwal-cust-checkbox:checked');
+  
+  if (!tanggal || !base) return showToast('Lengkapi tanggal dan base', 'error');
+  if (checkboxes.length < 2) return showToast('Minimal harus memilih 2 customer!', 'error');
+  
+  const dateObj = new Date(tanggal);
+  const dayName = dateObj.toLocaleDateString('id-ID', { weekday: 'long' });
+  const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  
+  let text = `📅 *JADWAL KUNJUNGAN PM*\n📍 *Base:* ${base}\n🗓️ *Tanggal:* ${dayName}, ${dateStr}\n\n`;
+  
+  checkboxes.forEach((cb, i) => {
+    text += `${i + 1}. ${cb.value}\n`;
+  });
+  
+  text += `\nMohon dilakukan pemeriksaan PM sesuai jadwal. Terima kasih.`;
+  
+  document.getElementById('jadwalResult').value = text;
+  showToast('Jadwal berhasil digenerate, silakan di-copy!', 'success');
+}
+
+function copyJadwal() {
+  const text = document.getElementById('jadwalResult').value;
+  if (!text) return showToast('Jadwal masih kosong', 'error');
+  
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Jadwal berhasil disalin ke clipboard!', 'success');
+  }).catch(err => {
+    showToast('Gagal menyalin, silakan copy manual', 'error');
+  });
+}
 
 // ============= AUTO-SCHEDULE LOGIC =============
 function getTechNextSchedule(tech, cust) {
@@ -977,7 +1087,7 @@ function handleAddCust(e) {
     firstSchedule: document.getElementById('custSchedule').value, 
     frequency: parseInt(document.getElementById('custFreq').value) 
   };
-  customers.push(cust); saveData(); populateCustBaseFilter(); renderCustomers(); renderDashboard(); document.getElementById('custForm').reset();
+  customers.push(cust); saveData(); populateCustBaseFilter(); populateJadwalBase(); renderCustomers(); renderDashboard(); document.getElementById('custForm').reset();
   if (isConnected) syncToSheet('customers', cust, 'create'); showToast('Customer ditambahkan', 'success');
 }
 
@@ -1012,7 +1122,7 @@ function editCMVisit(id) {
 function deleteVisit(id) { showConfirm('Hapus Data PM', 'Apakah Anda yakin ingin menghapus data ini?', () => { visits = visits.filter(v => v.id !== id); saveData(); if (isConnected) syncToSheet('visits', { id }, 'delete'); showToast('Data dihapus', 'info'); renderDashboard(); renderRiwayat(); }); }
 function deleteCMVisit(id) { showConfirm('Hapus Data CM', 'Apakah Anda yakin ingin menghapus data ini?', () => { cmVisits = cmVisits.filter(v => v.id !== id); saveData(); if (isConnected) syncToSheet('cm_visits', { id }, 'delete'); showToast('Data dihapus', 'info'); renderDashboard(); renderCMHistory(); }); }
 function deleteTech(id) { showConfirm('Hapus Teknisi', 'Apakah Anda yakin ingin menghapus teknisi ini?', () => { technicians = technicians.filter(t => t.id !== id); saveData(); populateSelects(); renderTechnicians(); renderDashboard(); if (isConnected) syncToSheet('techs', { id }, 'delete'); showToast('Teknisi dihapus', 'info'); }); }
-function deleteCust(id) { showConfirm('Hapus Customer', 'Apakah Anda yakin ingin menghapus customer ini?', () => { customers = customers.filter(c => c.id !== id); saveData(); populateCustBaseFilter(); renderCustomers(); renderDashboard(); if (isConnected) syncToSheet('customers', { id }, 'delete'); showToast('Customer dihapus', 'info'); }); }
+function deleteCust(id) { showConfirm('Hapus Customer', 'Apakah Anda yakin ingin menghapus customer ini?', () => { customers = customers.filter(c => c.id !== id); saveData(); populateCustBaseFilter(); populateJadwalBase(); renderCustomers(); renderDashboard(); if (isConnected) syncToSheet('customers', { id }, 'delete'); showToast('Customer dihapus', 'info'); }); }
 
 // ============= RENDER LISTS =============
 function renderRiwayat() {
@@ -1166,6 +1276,7 @@ async function loadFromSheet(forceLoad = false) {
       saveData();
       populateSelects();
       populateCustBaseFilter();
+      populateJadwalBase();
       renderDashboard();
       renderRiwayat();
       renderCMHistory();
@@ -1231,8 +1342,8 @@ function exportCSV() {
   let csv = headers.join(',') + '\n'; visits.forEach(v => { csv += [v.id, v.tanggal, v.teknisi, v.base, v.customer].map(c => `"${String(c).replace(/"/g, '""')}"`).join(',') + '\n'; });
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `PM_Visits_${new Date().toISOString().split('T')[0]}.csv`; a.click();
 }
-function loadSampleData() { showConfirm('Muat Data Contoh', 'Data saat ini akan ditimpa. Lanjutkan?', () => { technicians = SAMPLE_TECHNICIANS; customers = SAMPLE_CUSTOMERS; visits = SAMPLE_VISITS; cmVisits = SAMPLE_CM; saveData(); populateSelects(); populateCustBaseFilter(); renderDashboard(); renderRiwayat(); renderCMHistory(); renderTechnicians(); renderCustomers(); showToast('Data contoh dimuat', 'success'); }); }
-function clearAllData() { showConfirm('Hapus Semua Data', 'Semua data akan dihapus permanen. Lanjutkan?', () => { visits = []; cmVisits = []; technicians = []; customers = []; saveData(); populateSelects(); populateCustBaseFilter(); renderDashboard(); renderRiwayat(); renderCMHistory(); renderTechnicians(); renderCustomers(); showToast('Semua data dihapus', 'info'); }); }
+function loadSampleData() { showConfirm('Muat Data Contoh', 'Data saat ini akan ditimpa. Lanjutkan?', () => { technicians = SAMPLE_TECHNICIANS; customers = SAMPLE_CUSTOMERS; visits = SAMPLE_VISITS; cmVisits = SAMPLE_CM; saveData(); populateSelects(); populateCustBaseFilter(); populateJadwalBase(); renderDashboard(); renderRiwayat(); renderCMHistory(); renderTechnicians(); renderCustomers(); showToast('Data contoh dimuat', 'success'); }); }
+function clearAllData() { showConfirm('Hapus Semua Data', 'Semua data akan dihapus permanen. Lanjutkan?', () => { visits = []; cmVisits = []; technicians = []; customers = []; saveData(); populateSelects(); populateCustBaseFilter(); populateJadwalBase(); renderDashboard(); renderRiwayat(); renderCMHistory(); renderTechnicians(); renderCustomers(); showToast('Semua data dihapus', 'info'); }); }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeConfirm(); } });
 
 init();
