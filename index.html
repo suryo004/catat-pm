@@ -329,7 +329,7 @@
               </div>
             </div>
             <div>
-              <label class="label-field">Pilih Customer (Minimal 2)</label>
+              <label class="label-field">Pilih Customer (Minimal 1)</label>
               <div id="jadwalCustList" class="space-y-1 max-h-60 overflow-y-auto p-3 rounded-lg" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border);">
                 <p class="text-sm text-gray-500 text-center py-4">Pilih tanggal dan base dahulu...</p>
               </div>
@@ -912,7 +912,7 @@ function generateJadwal(e) {
   const checkboxes = document.querySelectorAll('.jadwal-cust-checkbox:checked');
   
   if (!tanggal || !base) return showToast('Lengkapi tanggal dan base', 'error');
-  if (checkboxes.length < 2) return showToast('Minimal harus memilih 2 customer!', 'error');
+  if (checkboxes.length < 2) return showToast('Minimal harus memilih 1 customer!', 'error');
   
   const dateObj = new Date(tanggal);
   const dayName = dateObj.toLocaleDateString('id-ID', { weekday: 'long' });
