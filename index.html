@@ -137,7 +137,6 @@
   .cust-checkbox-item:hover { background: rgba(255,255,255,0.05); }
   .cust-checkbox-item input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
 
-  /* Print Styles */
   @media print {
     body { background: white !important; color: black !important; }
     .sidebar, header, .mobile-menu-btn, .btn, .bg-ambient, .bg-grid { display: none !important; }
@@ -160,12 +159,13 @@
     </div>
     <div>
       <h1 class="font-display font-bold text-lg leading-none text-white">ServiceTrack</h1>
-      <p class="text-xs text-violet-400 mt-0.5 font-medium">PM & CM System v11.0</p>
+      <p class="text-xs text-violet-400 mt-0.5 font-medium">PM & CM System v12.0</p>
     </div>
   </div>
   
   <nav class="flex flex-col gap-1.5 flex-1">
     <div class="sidebar-link active" data-tab="dashboard"><i data-lucide="layout-dashboard" class="tab-icon"></i><span>Dashboard</span></div>
+    <div class="sidebar-link" data-tab="surat"><i data-lucide="file-signature" class="tab-icon"></i><span>Surat Tugas</span></div>
     <div class="sidebar-link" data-tab="jadwal"><i data-lucide="calendar-days" class="tab-icon"></i><span>Jadwal Harian</span></div>
     <div class="sidebar-link" data-tab="form"><i data-lucide="plus-circle" class="tab-icon"></i><span>Kunjungan PM Baru</span></div>
     <div class="sidebar-link" data-tab="cm"><i data-lucide="hammer" class="tab-icon"></i><span>Input CM (Corrective)</span></div>
@@ -200,7 +200,48 @@
   </header>
   
   <div class="p-6">
-    
+
+    <!-- SURAT TUGAS TAB -->
+    <section id="tab-surat" class="tab-content">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="glass p-6">
+          <h3 class="font-display font-bold text-lg mb-4 text-white flex items-center gap-2"><i data-lucide="file-signature" style="width:18px;height:18px;color:var(--accent);"></i> Form Surat Tugas</h3>
+          <form id="suratForm" class="space-y-4">
+            <div><label class="label-field">Monitoring Pemohon</label><input type="text" id="suratPemohon" class="input-field" placeholder="Nama pemohon/monitor" required></div>
+            <div><label class="label-field">Tujuan dan Alamat Surat Tugas</label><input type="text" id="suratTujuan" class="input-field" placeholder="Tujuan & Alamat" required></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div><label class="label-field">Tanggal Kunjungan</label><input type="date" id="suratTanggal" class="input-field" required></div>
+              <div><label class="label-field">Berlaku Berapa Lama</label><input type="text" id="suratBerlaku" class="input-field" placeholder="Cth: 1 Bulan / 3 Hari" required></div>
+            </div>
+            <div><label class="label-field">Lokasi Keperluan / Alasan Kunjungan</label><textarea id="suratAlasan" class="input-field" placeholder="Keperluan atau alasan kunjungan..." required></textarea></div>
+            <div>
+              <label class="label-field">Teknisi Pelaksana</label>
+              <div id="suratTeknisiList" class="space-y-1 max-h-40 overflow-y-auto p-3 rounded-lg" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border);"></div>
+            </div>
+            <button type="submit" class="btn btn-primary w-full"><i data-lucide="file-text" style="width:16px;height:16px;"></i> Generate & Simpan Surat Tugas</button>
+          </form>
+        </div>
+        
+        <div class="glass p-6">
+          <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <h3 class="font-display font-bold text-lg text-white">Hasil Surat Tugas</h3>
+            <div class="flex gap-2">
+              <button class="btn btn-ghost !py-2 !px-3 text-xs" onclick="copyText(document.getElementById('suratResult').value)"><i data-lucide="copy" style="width:14px;height:14px;"></i> Copy</button>
+              <a href="#" id="suratWaLink" target="_blank" class="btn btn-success !py-2 !px-3 text-xs hidden"><i data-lucide="send" style="width:14px;height:14px;"></i> Kirim WA</a>
+            </div>
+          </div>
+          <textarea id="suratResult" class="input-field" rows="12" readonly style="font-family: monospace; white-space: pre-wrap; background: rgba(0,0,0,0.4); line-height: 1.6;" placeholder="Hasil surat tugas akan muncul di sini..."></textarea>
+        </div>
+      </div>
+
+      <div class="glass p-6 mt-4">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-display font-bold text-lg text-white flex items-center gap-2"><i data-lucide="history" style="width:18px;height:18px;color:var(--accent);"></i> Histori Surat Tugas</h3>
+        </div>
+        <div id="suratList" class="space-y-3"></div>
+      </div>
+    </section>
+
     <!-- DASHBOARD TAB -->
     <section id="tab-dashboard" class="tab-content active">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -588,6 +629,7 @@
 let visits = JSON.parse(localStorage.getItem('pm_visits') || '[]');
 let cmVisits = JSON.parse(localStorage.getItem('pm_cm_visits') || '[]');
 let schedules = JSON.parse(localStorage.getItem('pm_schedules') || '[]');
+let suratTugas = JSON.parse(localStorage.getItem('pm_surat_tugas') || '[]');
 let technicians = JSON.parse(localStorage.getItem('pm_technicians') || '[]');
 let customers = JSON.parse(localStorage.getItem('pm_customers') || '[]');
 let sheetUrl = localStorage.getItem('pm_sheet_url') || '';
@@ -631,18 +673,21 @@ function init() {
   document.getElementById('tanggal').value = new Date().toISOString().split('T')[0];
   document.getElementById('cmTanggal').value = new Date().toISOString().split('T')[0];
   document.getElementById('jadwalTanggal').value = new Date().toISOString().split('T')[0];
+  document.getElementById('suratTanggal').value = new Date().toISOString().split('T')[0];
   document.getElementById('reportMonth').value = new Date().toISOString().split('T')[0].substring(0, 7);
   document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   
   populateSelects();
   populateCustBaseFilter();
   populateJadwalBase();
+  populateSuratTeknisi();
   renderDashboard();
   renderRiwayat();
   renderCMHistory();
   renderTechnicians();
   renderCustomers();
   renderSchedules();
+  renderSurat();
   generateReport();
   updateConnectionStatus();
   
@@ -659,6 +704,7 @@ function init() {
   document.getElementById('techForm').addEventListener('submit', handleAddTech);
   document.getElementById('custForm').addEventListener('submit', handleAddCust);
   document.getElementById('jadwalForm').addEventListener('submit', generateJadwal);
+  document.getElementById('suratForm').addEventListener('submit', generateSurat);
   document.getElementById('searchInput').addEventListener('input', renderRiwayat);
   document.getElementById('filterTeknisi').addEventListener('change', renderRiwayat);
 }
@@ -667,6 +713,7 @@ function saveData() {
   localStorage.setItem('pm_visits', JSON.stringify(visits));
   localStorage.setItem('pm_cm_visits', JSON.stringify(cmVisits));
   localStorage.setItem('pm_schedules', JSON.stringify(schedules));
+  localStorage.setItem('pm_surat_tugas', JSON.stringify(suratTugas));
   localStorage.setItem('pm_technicians', JSON.stringify(technicians));
   localStorage.setItem('pm_customers', JSON.stringify(customers));
 }
@@ -679,6 +726,7 @@ function switchTab(tabName) {
   
   const titles = {
     dashboard: ['Dashboard', 'Ringkasan aktivitas maintenance'],
+    surat: ['Surat Tugas', 'Buat permintaan surat tugas kunjungan'],
     jadwal: ['Jadwal Harian', 'Buat jadwal kunjungan harian per base'],
     form: ['Kunjungan PM Baru', 'Catat kunjungan PM teknisi'],
     cm: ['Input CM (Corrective)', 'Catat kerusakan/perbaikan corrective maintenance'],
@@ -696,6 +744,111 @@ function switchTab(tabName) {
 }
 
 function toggleSidebar() { document.querySelector('.sidebar').classList.toggle('open'); }
+
+// ============= SURAT TUGAS LOGIC =============
+function populateSuratTeknisi() {
+  const container = document.getElementById('suratTeknisiList');
+  if(!container) return;
+  if (technicians.length === 0) {
+    container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Belum ada teknisi.</p>';
+    return;
+  }
+  container.innerHTML = technicians.map(t => `
+    <label class="cust-checkbox-item">
+      <input type="checkbox" value="${t.id}" class="surat-tech-checkbox">
+      <span class="text-sm text-white">${t.name} (${t.id})</span>
+    </label>
+  `).join('');
+}
+
+function generateSurat(e) {
+  if(e) e.preventDefault();
+  const pemohon = document.getElementById('suratPemohon').value;
+  const tujuan = document.getElementById('suratTujuan').value;
+  const tanggal = document.getElementById('suratTanggal').value;
+  const berlaku = document.getElementById('suratBerlaku').value;
+  const alasan = document.getElementById('suratAlasan').value;
+  const checkboxes = document.querySelectorAll('.surat-tech-checkbox:checked');
+  
+  if(!pemohon || !tujuan || !tanggal || !berlaku || !alasan) return showToast('Lengkapi semua data', 'error');
+  if(checkboxes.length === 0) return showToast('Pilih minimal 1 teknisi', 'error');
+  
+  const dateObj = new Date(tanggal);
+  const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  
+  let text = `📄 *PERMINTAAN SURAT TUGAS KUNJUNGAN MAINTENANCE*\n\n`;
+  text += `👤 *Monitoring Pemohon :* ${pemohon}\n`;
+  text += `🎯 *Tujuan & Alamat Surat :* ${tujuan}\n`;
+  text += `🗓️ *Tanggal Kunjungan :* ${dateStr}\n`;
+  text += `⏳ *Berlaku Selama :* ${berlaku}\n`;
+  text += `📍 *Lokasi/Alasan Kunjungan :* ${alasan}\n`;
+  text += `👷 *Teknisi Pelaksana :*\n`;
+  
+  const techIds = [];
+  checkboxes.forEach((cb, i) => {
+    const tech = technicians.find(t => t.id === cb.value);
+    if(tech) {
+      text += `${i + 1}. ${tech.name} (${tech.id})\n`;
+      techIds.push(`${tech.name} (${tech.id})`);
+    }
+  });
+  
+  document.getElementById('suratResult').value = text;
+  
+  const waLink = `https://wa.me/?text=${encodeURIComponent(text)}`;
+  const waBtn = document.getElementById('suratWaLink');
+  waBtn.href = waLink;
+  waBtn.classList.remove('hidden');
+  
+  const newSurat = {
+    id: 'ST-' + Date.now(),
+    pemohon, tujuan, tanggalKunjungan: tanggal, berlakuLama: berlaku, alasan,
+    teknisi: techIds.join('|||'),
+    text: text,
+    createdAt: new Date().toISOString()
+  };
+  suratTugas.unshift(newSurat);
+  saveData();
+  if (isConnected) syncToSheet('surat', newSurat, 'create');
+  renderSurat();
+  showToast('Surat tugas berhasil dibuat & disimpan!', 'success');
+}
+
+function renderSurat() {
+  const container = document.getElementById('suratList');
+  if (!container) return;
+  if (suratTugas.length === 0) {
+    container.innerHTML = `<div class="empty-state py-8"><p class="text-sm">Belum ada histori surat tugas</p></div>`;
+    return;
+  }
+  container.innerHTML = suratTugas.map(s => `
+    <div class="glass p-4 flex flex-col gap-3" style="background:rgba(255,255,255,0.02);">
+      <div class="flex items-center justify-between gap-2 flex-wrap">
+        <div class="flex items-center gap-2">
+          <span class="badge badge-info">${s.id}</span>
+          <span class="text-sm text-gray-300">${formatDate(s.tanggalKunjungan)}</span>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn-ghost !py-1.5 !px-3 text-xs" onclick="copyText('${s.id}')"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
+          <a href="https://wa.me/?text=${encodeURIComponent(s.text)}" target="_blank" class="btn btn-success !py-1.5 !px-3 text-xs"><i data-lucide="send" style="width:12px;height:12px;"></i> WA</a>
+          <button class="btn btn-danger !py-1.5 !px-3 text-xs" onclick="deleteSurat('${s.id}')"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button>
+        </div>
+      </div>
+      <pre class="text-xs text-gray-400 bg-black/30 p-3 rounded-md whitespace-pre-wrap font-mono">${s.text}</pre>
+    </div>
+  `).join('');
+  lucide.createIcons();
+}
+
+function deleteSurat(id) {
+  showConfirm('Hapus Surat Tugas', 'Apakah Anda yakin ingin menghapus surat tugas ini?', () => {
+    suratTugas = suratTugas.filter(s => s.id !== id);
+    saveData();
+    if (isConnected) syncToSheet('surat', { id }, 'delete');
+    renderSurat();
+    showToast('Surat tugas dihapus', 'info');
+  });
+}
 
 // ============= JADWAL HARIAN LOGIC =============
 function populateJadwalBase() {
@@ -775,13 +928,11 @@ function generateJadwal(e) {
   
   document.getElementById('jadwalResult').value = text;
   
-  // Setup WA Link
   const waLink = `https://wa.me/?text=${encodeURIComponent(text)}`;
   const waBtn = document.getElementById('waLinkBtn');
   waBtn.href = waLink;
   waBtn.classList.remove('hidden');
   
-  // Save to History
   const newSched = {
     id: 'SCH-' + Date.now(),
     tanggal: tanggal,
@@ -827,11 +978,11 @@ function renderSchedules() {
 function copyText(id) {
   let textToCopy = id;
   if (id.length < 30) {
-    const s = schedules.find(x => x.id === id);
-    if (!s) return showToast('Jadwal tidak ditemukan', 'error');
+    const s = schedules.find(x => x.id === id) || suratTugas.find(x => x.id === id);
+    if (!s) return showToast('Tidak ditemukan', 'error');
     textToCopy = s.text;
   }
-  navigator.clipboard.writeText(textToCopy).then(() => showToast('Jadwal berhasil disalin!', 'success')).catch(() => showToast('Gagal menyalin', 'error'));
+  navigator.clipboard.writeText(textToCopy).then(() => showToast('Teks berhasil disalin!', 'success')).catch(() => showToast('Gagal menyalin', 'error'));
 }
 
 function deleteSched(id) {
@@ -879,7 +1030,6 @@ function generateReport() {
     </div>
   `;
   
-  // PM Table
   if (pmReports.length > 0) {
     html += `<h3 class="text-lg font-bold text-white mb-3 mt-6">Detail Preventive Maintenance (PM)</h3>
     <table class="data-table mb-8">
@@ -889,7 +1039,6 @@ function generateReport() {
     html += `</tbody></table>`;
   }
   
-  // CM Table
   if (cmReports.length > 0) {
     html += `<h3 class="text-lg font-bold text-white mb-3 mt-6">Detail Corrective Maintenance (CM)</h3>
     <table class="data-table">
@@ -1169,7 +1318,7 @@ function handleAddCM(e) {
 
 function handleAddTech(e) {
   e.preventDefault(); const tech = { id: document.getElementById('techId').value, name: document.getElementById('techName').value, phone: document.getElementById('techPhone').value, address: document.getElementById('techAddress').value, base: document.getElementById('techBase').value };
-  technicians.push(tech); saveData(); populateSelects(); renderTechnicians(); renderDashboard(); document.getElementById('techForm').reset();
+  technicians.push(tech); saveData(); populateSelects(); populateSuratTeknisi(); renderTechnicians(); renderDashboard(); document.getElementById('techForm').reset();
   if (isConnected) syncToSheet('techs', tech, 'create'); showToast('Teknisi ditambahkan', 'success');
 }
 
@@ -1190,7 +1339,7 @@ function editCMVisit(id) { const v = cmVisits.find(x => x.id === id); if (!v) re
 
 function deleteVisit(id) { showConfirm('Hapus Data PM', 'Apakah Anda yakin ingin menghapus data ini?', () => { visits = visits.filter(v => v.id !== id); saveData(); if (isConnected) syncToSheet('visits', { id }, 'delete'); showToast('Data dihapus', 'info'); renderDashboard(); renderRiwayat(); }); }
 function deleteCMVisit(id) { showConfirm('Hapus Data CM', 'Apakah Anda yakin ingin menghapus data ini?', () => { cmVisits = cmVisits.filter(v => v.id !== id); saveData(); if (isConnected) syncToSheet('cm_visits', { id }, 'delete'); showToast('Data dihapus', 'info'); renderDashboard(); renderCMHistory(); }); }
-function deleteTech(id) { showConfirm('Hapus Teknisi', 'Apakah Anda yakin ingin menghapus teknisi ini?', () => { technicians = technicians.filter(t => t.id !== id); saveData(); populateSelects(); renderTechnicians(); renderDashboard(); if (isConnected) syncToSheet('techs', { id }, 'delete'); showToast('Teknisi dihapus', 'info'); }); }
+function deleteTech(id) { showConfirm('Hapus Teknisi', 'Apakah Anda yakin ingin menghapus teknisi ini?', () => { technicians = technicians.filter(t => t.id !== id); saveData(); populateSelects(); populateSuratTeknisi(); renderTechnicians(); renderDashboard(); if (isConnected) syncToSheet('techs', { id }, 'delete'); showToast('Teknisi dihapus', 'info'); }); }
 function deleteCust(id) { showConfirm('Hapus Customer', 'Apakah Anda yakin ingin menghapus customer ini?', () => { customers = customers.filter(c => c.id !== id); saveData(); populateCustBaseFilter(); populateJadwalBase(); renderCustomers(); renderDashboard(); if (isConnected) syncToSheet('customers', { id }, 'delete'); showToast('Customer dihapus', 'info'); }); }
 
 function renderRiwayat() {
@@ -1294,12 +1443,13 @@ function startAutoSync() { if (syncInterval) clearInterval(syncInterval); syncIn
 async function loadFromSheet(forceLoad = false) {
   if (!isConnected || !sheetUrl) return;
   try {
-    const [visitsRes, cmRes, techsRes, custRes, schedRes] = await Promise.all([
+    const [visitsRes, cmRes, techsRes, custRes, schedRes, suratRes] = await Promise.all([
       fetch(`${sheetUrl}?action=read&type=visits`).then(r => r.json()),
       fetch(`${sheetUrl}?action=read&type=cm_visits`).then(r => r.json()),
       fetch(`${sheetUrl}?action=read&type=techs`).then(r => r.json()),
       fetch(`${sheetUrl}?action=read&type=customers`).then(r => r.json()),
-      fetch(`${sheetUrl}?action=read&type=schedules`).then(r => r.json())
+      fetch(`${sheetUrl}?action=read&type=schedules`).then(r => r.json()),
+      fetch(`${sheetUrl}?action=read&type=surat`).then(r => r.json())
     ]);
     let needsRender = false;
     if (visitsRes.success && JSON.stringify(visitsRes.data) !== JSON.stringify(visits)) { visits = visitsRes.data || []; needsRender = true; }
@@ -1307,8 +1457,9 @@ async function loadFromSheet(forceLoad = false) {
     if (techsRes.success && JSON.stringify(techsRes.data) !== JSON.stringify(technicians)) { technicians = techsRes.data || []; needsRender = true; }
     if (custRes.success && JSON.stringify(custRes.data) !== JSON.stringify(customers)) { customers = custRes.data || []; needsRender = true; }
     if (schedRes.success && JSON.stringify(schedRes.data) !== JSON.stringify(schedules)) { schedules = schedRes.data || []; needsRender = true; }
+    if (suratRes.success && JSON.stringify(suratRes.data) !== JSON.stringify(suratTugas)) { suratTugas = suratRes.data || []; needsRender = true; }
     if (needsRender || forceLoad) {
-      saveData(); populateSelects(); populateCustBaseFilter(); populateJadwalBase(); renderDashboard(); renderRiwayat(); renderCMHistory(); renderTechnicians(); renderCustomers(); renderSchedules();
+      saveData(); populateSelects(); populateCustBaseFilter(); populateJadwalBase(); populateSuratTeknisi(); renderDashboard(); renderRiwayat(); renderCMHistory(); renderTechnicians(); renderCustomers(); renderSchedules(); renderSurat();
       if (!forceLoad) showToast('Data disinkronisasi dari Spreadsheet', 'info');
     }
   } catch (error) { console.error('Auto sync error:', error); }
@@ -1328,6 +1479,7 @@ async function syncAllToSheet() {
     await fetch(sheetUrl, { method: 'POST', body: JSON.stringify({ action: 'clear', type: 'techs', data: technicians }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
     await fetch(sheetUrl, { method: 'POST', body: JSON.stringify({ action: 'clear', type: 'customers', data: customers }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
     await fetch(sheetUrl, { method: 'POST', body: JSON.stringify({ action: 'clear', type: 'schedules', data: schedules }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
+    await fetch(sheetUrl, { method: 'POST', body: JSON.stringify({ action: 'clear', type: 'surat', data: suratTugas }), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
     showToast('Semua data berhasil dikirim ke Spreadsheet', 'success');
   } catch (e) { showToast('Sync gagal: ' + e.message, 'error'); }
 }
@@ -1346,19 +1498,77 @@ function updateConnectionStatus() {
   else { status.className = 'conn-status disconnected'; status.innerHTML = '<span class="pulse-dot" style="background:#f59e0b;"></span> Lokal'; desc.textContent = 'Menggunakan penyimpanan lokal. Hubungkan ke Google Sheet di menu Pengaturan.'; }
 }
 
+// ============= UTILITIES =============
 function formatDate(dateStr) { if(!dateStr) return '-'; const d = new Date(dateStr); if (isNaN(d)) return '-'; return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); }
 function showToast(msg, type = 'success') {
   const toast = document.getElementById('toast'); const icon = document.getElementById('toastIcon'); const msgEl = document.getElementById('toastMsg');
-  toast.className = 'toast ' + type; msgEl.textContent = msg; icon.setAttribute('data-lucide', type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info'); lucide.createIcons();
-  setTimeout(() => toast.classList.add('show'), 50); setTimeout(() => toast.classList.remove('show'), 3500);
+  toast.className = 'toast ' + type; 
+  msgEl.textContent = msg; 
+  icon.setAttribute('data-lucide', type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info'); 
+  lucide.createIcons();
+  setTimeout(() => toast.classList.add('show'), 50); 
+  setTimeout(() => toast.classList.remove('show'), 3500);
 }
 function exportCSV() {
-  if (visits.length === 0) return showToast('Tidak ada data', 'error'); const headers = ['ID','Tanggal','Teknisi','Base','Customer'];
-  let csv = headers.join(',') + '\n'; visits.forEach(v => { csv += [v.id, v.tanggal, v.teknisi, v.base, v.customer].map(c => `"${String(c).replace(/"/g, '""')}"`).join(',') + '\n'; });
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `PM_Visits_${new Date().toISOString().split('T')[0]}.csv`; a.click();
+  if (visits.length === 0) return showToast('Tidak ada data', 'error'); 
+  const headers = ['ID','Tanggal','Teknisi','Base','Customer'];
+  let csv = headers.join(',') + '\n'; 
+  visits.forEach(v => { 
+    csv += [v.id, v.tanggal, v.teknisi, v.base, v.customer].map(c => `"${String(c).replace(/"/g, '""')}"`).join(',') + '\n'; 
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); 
+  const url = URL.createObjectURL(blob); 
+  const a = document.createElement('a'); 
+  a.href = url; 
+  a.download = `PM_Visits_${new Date().toISOString().split('T')[0]}.csv`; 
+  a.click();
 }
-function loadSampleData() { showConfirm('Muat Data Contoh', 'Data saat ini akan ditimpa. Lanjutkan?', () => { technicians = SAMPLE_TECHNICIANS; customers = SAMPLE_CUSTOMERS; visits = SAMPLE_VISITS; cmVisits = SAMPLE_CM; schedules = []; saveData(); populateSelects(); populateCustBaseFilter(); populateJadwalBase(); renderDashboard(); renderRiwayat(); renderCMHistory(); renderTechnicians(); renderCustomers(); renderSchedules(); showToast('Data contoh dimuat', 'success'); }); }
-function clearAllData() { showConfirm('Hapus Semua Data', 'Semua data akan dihapus permanen. Lanjutkan?', () => { visits = []; cmVisits = []; schedules = []; technicians = []; customers = []; saveData(); populateSelects(); populateCustBaseFilter(); populateJadwalBase(); renderDashboard(); renderRiwayat(); renderCMHistory(); renderTechnicians(); renderCustomers(); renderSchedules(); showToast('Semua data dihapus', 'info'); }); }
+function loadSampleData() { 
+  showConfirm('Muat Data Contoh', 'Data saat ini akan ditimpa. Lanjutkan?', () => { 
+    technicians = SAMPLE_TECHNICIANS; 
+    customers = SAMPLE_CUSTOMERS; 
+    visits = SAMPLE_VISITS; 
+    cmVisits = SAMPLE_CM; 
+    schedules = []; 
+    suratTugas = []; 
+    saveData(); 
+    populateSelects(); 
+    populateCustBaseFilter(); 
+    populateJadwalBase(); 
+    populateSuratTeknisi(); 
+    renderDashboard(); 
+    renderRiwayat(); 
+    renderCMHistory(); 
+    renderTechnicians(); 
+    renderCustomers(); 
+    renderSchedules(); 
+    renderSurat(); 
+    showToast('Data contoh dimuat', 'success'); 
+  }); 
+}
+function clearAllData() { 
+  showConfirm('Hapus Semua Data', 'Semua data akan dihapus permanen. Lanjutkan?', () => { 
+    visits = []; 
+    cmVisits = []; 
+    schedules = []; 
+    suratTugas = []; 
+    technicians = []; 
+    customers = []; 
+    saveData(); 
+    populateSelects(); 
+    populateCustBaseFilter(); 
+    populateJadwalBase(); 
+    populateSuratTeknisi(); 
+    renderDashboard(); 
+    renderRiwayat(); 
+    renderCMHistory(); 
+    renderTechnicians(); 
+    renderCustomers(); 
+    renderSchedules(); 
+    renderSurat(); 
+    showToast('Semua data dihapus', 'info'); 
+  }); 
+}
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeConfirm(); } });
 
 init();
