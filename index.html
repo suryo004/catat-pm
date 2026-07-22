@@ -912,7 +912,7 @@ function generateJadwal(e) {
   const checkboxes = document.querySelectorAll('.jadwal-cust-checkbox:checked');
   
   if (!tanggal || !base) return showToast('Lengkapi tanggal dan base', 'error');
-  if (checkboxes.length < 2) return showToast('Minimal harus memilih 1 customer!', 'error');
+  if (checkboxes.length < 1) return showToast('Minimal harus memilih 1 customer!', 'error');
   
   const dateObj = new Date(tanggal);
   const dayName = dateObj.toLocaleDateString('id-ID', { weekday: 'long' });
