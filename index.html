@@ -812,6 +812,12 @@ function generateSurat(e) {
   if (isConnected) syncToSheet('surat', newSurat, 'create');
   renderSurat();
   showToast('Surat tugas berhasil dibuat & disimpan!', 'success');
+  
+  // --- TAMBAHAN: KOSONGKAN FORM SETELAH DISIMPAN ---
+  document.getElementById('suratForm').reset();
+  document.querySelectorAll('.surat-tech-checkbox').forEach(cb => cb.checked = false);
+  document.getElementById('suratTanggal').value = new Date().toISOString().split('T')[0];
+  document.getElementById('suratWaLink').classList.add('hidden');
 }
 
 function renderSurat() {
