@@ -316,6 +316,8 @@
     <!-- JADWAL HARIAN TAB -->
     <section id="tab-jadwal" class="tab-content">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        
+        <!-- KIRI: FORM INPUT -->
         <div class="glass p-6">
           <h3 class="font-display font-bold text-lg mb-4 text-white flex items-center gap-2"><i data-lucide="calendar-plus" style="width:18px;height:18px;color:var(--accent);"></i> Generate Jadwal Harian</h3>
           <form id="jadwalForm" class="space-y-4">
@@ -323,13 +325,20 @@
               <div><label class="label-field">Tanggal Kunjungan</label><input type="date" id="jadwalTanggal" class="input-field" required onchange="populateJadwalCustomers()"></div>
               <div>
                 <label class="label-field">Base Wilayah</label>
-                <select id="jadwalBase" class="input-field" required onchange="populateJadwalCustomers()">
+                <select id="jadwalBase" class="input-field" required onchange="filterJadwalTeknisi(); populateJadwalCustomers()">
                   <option value="">Pilih Base...</option>
                 </select>
               </div>
             </div>
             <div>
+              <label class="label-field">Teknisi Pelaksana (Sesuai Base)</label>
+              <select id="jadwalTeknisi" class="input-field" required>
+                <option value="">Pilih teknisi...</option>
+              </select>
+            </div>
+            <div>
               <label class="label-field">Pilih Customer (Minimal 1)</label>
+              <input type="text" id="searchJadwalCust" class="input-field mb-3" placeholder="Pilih tanggal & base dahulu..." oninput="populateJadwalCustomers()" autocomplete="off" disabled>
               <div id="jadwalCustList" class="space-y-1 max-h-60 overflow-y-auto p-3 rounded-lg" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border);">
                 <p class="text-sm text-gray-500 text-center py-4">Pilih tanggal dan base dahulu...</p>
               </div>
@@ -338,6 +347,7 @@
           </form>
         </div>
         
+        <!-- KANAN: HASIL & WHATSAPP -->
         <div class="glass p-6">
           <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
             <h3 class="font-display font-bold text-lg text-white">Hasil Jadwal</h3>
@@ -350,6 +360,7 @@
         </div>
       </div>
 
+      <!-- HISTORI JADWAL -->
       <div class="glass p-6 mt-4">
         <div class="flex items-center justify-between mb-4">
           <h3 class="font-display font-bold text-lg text-white flex items-center gap-2"><i data-lucide="history" style="width:18px;height:18px;color:var(--accent);"></i> Histori Jadwal</h3>
@@ -559,7 +570,7 @@
           <div class="space-y-4">
             <div>
               <label class="label-field">URL Google Apps Script Web App</label>
-              <input type="text" id="sheetUrl" class="input-field" placeholder="https://script.google.com/macros/s/AKfycbxKD4tr7e0l7UhTVyqv_ctklMZPJFckEl6yJvrZ-difqmnlNKCQc8JGO0RM4lrIEiCTeA/exec">
+              <input type="text" id="sheetUrl" class="input-field" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
             </div>
             <div class="flex flex-col sm:flex-row gap-3">
               <button class="btn btn-primary" onclick="testConnection()"><i data-lucide="plug" style="width:16px;height:16px;"></i> Test Koneksi</button>
@@ -813,7 +824,7 @@ function generateSurat(e) {
   renderSurat();
   showToast('Surat tugas berhasil dibuat & disimpan!', 'success');
   
-  // --- TAMBAHAN: KOSONGKAN FORM SETELAH DISIMPAN ---
+  // --- KOSONGKAN FORM SETELAH DISIMPAN ---
   document.getElementById('suratForm').reset();
   document.querySelectorAll('.surat-tech-checkbox').forEach(cb => cb.checked = false);
   document.getElementById('suratTanggal').value = new Date().toISOString().split('T')[0];
@@ -865,15 +876,34 @@ function populateJadwalBase() {
   bases.forEach(b => select.innerHTML += `<option value="${b}">${b}</option>`);
 }
 
+function filterJadwalTeknisi() {
+  const base = document.getElementById('jadwalBase').value;
+  const select = document.getElementById('jadwalTeknisi');
+  select.innerHTML = '<option value="">Pilih teknisi...</option>';
+  if (base) {
+    technicians.filter(t => t.base === base).forEach(t => {
+      select.innerHTML += `<option value="${t.name}">${t.name}</option>`;
+    });
+  }
+}
+
 function populateJadwalCustomers() {
   const base = document.getElementById('jadwalBase').value;
   const tanggal = document.getElementById('jadwalTanggal').value;
   const container = document.getElementById('jadwalCustList');
+  const searchInput = document.getElementById('searchJadwalCust');
+  const searchText = searchInput.value.toLowerCase();
   
   if (!base || !tanggal) {
     container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Pilih tanggal dan base dahulu...</p>';
+    searchInput.disabled = true;
+    searchInput.value = '';
+    searchInput.placeholder = "Pilih tanggal & base dahulu...";
     return;
   }
+  
+  searchInput.disabled = false;
+  searchInput.placeholder = "Cari nama customer...";
   
   const selectedMonth = tanggal.substring(0, 7);
   const baseCustomers = customers.filter(c => c.base === base);
@@ -890,10 +920,13 @@ function populateJadwalCustomers() {
     }
   });
   
-  const availableCustomers = baseCustomers.filter(c => !scheduledThisMonth.includes(c.name));
+  const availableCustomers = baseCustomers.filter(c => 
+    !scheduledThisMonth.includes(c.name) && 
+    c.name.toLowerCase().includes(searchText)
+  );
   
   if (availableCustomers.length === 0) {
-    container.innerHTML = '<p class="text-sm text-yellow-500 text-center py-4">Semua customer di base ini sudah dijadwalkan bulan ini.</p>';
+    container.innerHTML = '<p class="text-sm text-yellow-500 text-center py-4">Customer tidak ditemukan atau sudah dijadwalkan bulan ini.</p>';
     return;
   }
   
@@ -909,16 +942,18 @@ function generateJadwal(e) {
   if (e) e.preventDefault();
   const tanggal = document.getElementById('jadwalTanggal').value;
   const base = document.getElementById('jadwalBase').value;
+  const techName = document.getElementById('jadwalTeknisi').value;
   const checkboxes = document.querySelectorAll('.jadwal-cust-checkbox:checked');
   
   if (!tanggal || !base) return showToast('Lengkapi tanggal dan base', 'error');
+  if (!techName) return showToast('Silakan pilih teknisi pelaksana', 'error');
   if (checkboxes.length < 1) return showToast('Minimal harus memilih 1 customer!', 'error');
   
   const dateObj = new Date(tanggal);
   const dayName = dateObj.toLocaleDateString('id-ID', { weekday: 'long' });
   const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
   
-  let text = `📅 *JADWAL KUNJUNGAN PM*\n📍 *Base:* ${base}\n🗓️ *Tanggal:* ${dayName}, ${dateStr}\n\n`;
+  let text = `📅 *JADWAL KUNJUNGAN PM*\n📍 *Base:* ${base}\n🗓️ *Tanggal:* ${dayName}, ${dateStr}\n👷 *Teknisi:* ${techName}\n\n`;
   const custNames = [];
   
   checkboxes.forEach((cb, i) => {
