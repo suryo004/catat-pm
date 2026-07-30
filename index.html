@@ -23,61 +23,62 @@
   body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--fg); margin: 0; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
   .font-display { font-family: 'Space Grotesk', sans-serif; }
   
-  .bg-ambient { position: fixed; inset: 0; z-index: -2; background: radial-gradient(ellipse at 10% 10%, rgba(139, 92, 246, 0.15), transparent 45%), radial-gradient(ellipse at 90% 80%, rgba(6, 182, 212, 0.08), transparent 45%), linear-gradient(180deg, #08090d 0%, #0a0c12 100%); }
-  .bg-grid { position: fixed; inset: 0; z-index: -1; opacity: 0.04; pointer-events: none; background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 40px 40px; mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%); }
+  .bg-ambient { position: fixed; inset: 0; z-index: -2; background: radial-gradient(ellipse at 10% 10%, rgba(139, 92, 246, 0.12), transparent 45%), radial-gradient(ellipse at 90% 80%, rgba(6, 182, 212, 0.08), transparent 45%), linear-gradient(180deg, #08090d 0%, #0a0c12 100%); }
+  .bg-grid { position: fixed; inset: 0; z-index: -1; opacity: 0.03; pointer-events: none; background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 40px 40px; mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%); }
   
-  .glass { background: var(--surface); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border: 1px solid var(--border); border-radius: 20px; }
+  .glass { background: var(--surface); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--border); border-radius: 16px; }
   .glass-hover { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-  .glass-hover:hover { border-color: var(--border-hover); transform: translateY(-4px); box-shadow: 0 15px 50px rgba(0,0,0,0.5), 0 0 30px rgba(139, 92, 246, 0.1); }
+  .glass-hover:hover { border-color: var(--border-hover); transform: translateY(-2px); box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 20px rgba(139, 92, 246, 0.08); }
   
-  .sidebar-link { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; color: var(--fg-dim); transition: all 0.2s ease; cursor: pointer; font-weight: 500; font-size: 14px; border: 1px solid transparent; position: relative; overflow: hidden; }
+  .sidebar-link { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 10px; color: var(--fg-dim); transition: all 0.2s ease; cursor: pointer; font-weight: 500; font-size: 14px; border: 1px solid transparent; }
   .sidebar-link:hover { background: rgba(255, 255, 255, 0.04); color: var(--fg); }
-  .sidebar-link.active { background: linear-gradient(90deg, rgba(139, 92, 246, 0.15), transparent); color: #fff; border-color: rgba(139, 92, 246, 0.3); box-shadow: inset 2px 0 0 var(--primary); }
+  .sidebar-link.active { background: linear-gradient(90deg, rgba(139, 92, 246, 0.15), transparent); color: #fff; border-color: rgba(139, 92, 246, 0.2); box-shadow: inset 2px 0 0 var(--primary); }
   .sidebar-link.active i { color: var(--primary); }
   
-  .input-field { width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; color: var(--fg); font-size: 14px; font-family: inherit; transition: all 0.2s ease; }
-  .input-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-glow); background: rgba(0, 0, 0, 0.4); }
+  .input-field { width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--fg); font-size: 14px; font-family: inherit; transition: all 0.2s ease; }
+  .input-field:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); background: rgba(0, 0, 0, 0.4); }
   .input-field::placeholder { color: var(--muted); }
   textarea.input-field { resize: vertical; min-height: 80px; font-family: inherit; }
-  .label-field { font-size: 11px; font-weight: 700; color: var(--fg-dim); margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 1px; }
+  .label-field { font-size: 12px; font-weight: 700; color: var(--fg-dim); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+  .helper-text { font-size: 11px; color: var(--muted); margin-top: 6px; display: block; }
   
-  .btn { padding: 12px 20px; border-radius: 12px; font-weight: 600; font-size: 14px; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; border: none; font-family: inherit; white-space: nowrap; text-decoration: none; }
+  .btn { padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; border: none; font-family: inherit; white-space: nowrap; text-decoration: none; }
   .btn-primary { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3); }
-  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5); }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4); }
   .btn-ghost { background: rgba(255, 255, 255, 0.05); color: var(--fg); border: 1px solid var(--border); }
   .btn-ghost:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--border-hover); }
   .btn-accent { background: linear-gradient(135deg, #06b6d4, #0891b2); color: #fff; box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3); }
   .btn-success { background: linear-gradient(135deg, #10b981, #047857); color: #fff; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); }
   .btn-danger { background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3); }
-  .btn-danger:hover { background: rgba(244, 63, 94, 0.25); box-shadow: 0 0 15px rgba(244, 63, 94, 0.2); }
+  .btn-danger:hover { background: rgba(244, 63, 94, 0.25); }
   
-  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
   .badge-success { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
   .badge-warning { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
   .badge-danger { background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3); }
   .badge-info { background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3); }
   
-  .stat-card { padding: 24px; position: relative; overflow: hidden; border-top: 1px solid rgba(255,255,255,0.05); }
-  .stat-card .stat-glow { position: absolute; top: 0; right: 0; width: 140px; height: 140px; border-radius: 50%; transform: translate(40%, -40%); opacity: 0.2; filter: blur(24px); }
-  .counter { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 36px; line-height: 1; letter-spacing: -1px; }
+  .stat-card { padding: 20px; position: relative; overflow: hidden; }
+  .stat-card .stat-glow { position: absolute; top: 0; right: 0; width: 120px; height: 120px; border-radius: 50%; transform: translate(40%, -40%); opacity: 0.15; filter: blur(20px); }
+  .counter { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 32px; line-height: 1; letter-spacing: -1px; }
   
   .data-table { width: 100%; border-collapse: collapse; }
-  .data-table th { text-align: left; padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+  .data-table th { text-align: left; padding: 14px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); border-bottom: 1px solid var(--border); }
   .data-table td { padding: 14px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.04); font-size: 14px; color: var(--fg); }
   .data-table tbody tr { transition: background 0.2s ease; cursor: pointer; }
   .data-table tbody tr:hover { background: rgba(139, 92, 246, 0.05); }
   
   .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface-solid); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; color: var(--fg); box-shadow: 0 10px 40px rgba(0,0,0,0.6); z-index: 1000; display: flex; align-items: center; gap: 10px; transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); min-width: 280px; max-width: 400px; }
   .toast.show { transform: translateX(0); }
-  .toast.success { border-left: 4px solid var(--success); box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 20px rgba(16, 185, 129, 0.1); }
+  .toast.success { border-left: 4px solid var(--success); }
   .toast.error { border-left: 4px solid var(--danger); }
   .toast.info { border-left: 4px solid var(--info); }
   
   .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(12px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
   .modal-backdrop.show { display: flex; animation: fadeIn 0.2s ease; }
-  .modal-content { background: var(--surface-solid); border: 1px solid var(--border); border-radius: 20px; max-width: 640px; width: 100%; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 50px rgba(139, 92, 246, 0.05); }
+  .modal-content { background: var(--surface-solid); border: 1px solid var(--border); border-radius: 16px; max-width: 640px; width: 100%; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 20px 60px rgba(0,0,0,0.7); }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -98,10 +99,10 @@
   .conn-status.connected { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
   .conn-status.disconnected { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
   
-  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
   .activity-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 12px; transition: all 0.2s ease; cursor: pointer; border: 1px solid transparent; }
   .activity-item:hover { background: rgba(255,255,255,0.03); border-color: var(--border); transform: translateX(4px); }
-  .tech-avatar { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .tech-avatar { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; flex-shrink: 0; }
   
   .mobile-menu-btn { display: none; }
   @media (max-width: 1024px) {
@@ -111,31 +112,33 @@
     .mobile-menu-btn { display: flex; }
   }
   @media (max-width: 768px) {
-    .counter { font-size: 28px; }
-    .stat-card { padding: 18px; }
+    .counter { font-size: 26px; }
+    .stat-card { padding: 16px; }
     .hide-mobile { display: none; }
   }
   
   .tab-icon { width: 18px; height: 18px; stroke-width: 2; }
-  .progress-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, #8b5cf6, #06b6d4); border-radius: 4px; transition: width 1s cubic-bezier(0.16, 1, 0.3, 1); }
   .detail-row { display: flex; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 16px; }
   .detail-row:last-child { border-bottom: none; }
-  .detail-label { flex-shrink: 0; width: 140px; color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding-top: 2px; }
+  .detail-label { flex-shrink: 0; width: 140px; color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; }
   .detail-value { flex: 1; color: var(--fg); font-size: 14px; font-weight: 500; word-break: break-all; }
   
   .pending-card { border-left: 3px solid var(--warning); transition: all 0.2s; }
   .pending-card:hover { border-left-color: var(--primary); background: rgba(139, 92, 246, 0.05) !important; }
   
   .cust-search-container { position: relative; }
-  .cust-dropdown { position: absolute; z-index: 20; width: 100%; margin-top: 4px; max-height: 250px; overflow-y: auto; background: var(--surface-solid); border: 1px solid var(--border-hover); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 20px rgba(139, 92, 246, 0.1); display: none; }
+  .cust-dropdown { position: absolute; z-index: 20; width: 100%; margin-top: 4px; max-height: 250px; overflow-y: auto; background: var(--surface-solid); border: 1px solid var(--border-hover); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); display: none; }
   .cust-dropdown.show { display: block; }
-  .cust-option { padding: 12px 14px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.1s; }
+  .cust-option { padding: 12px 14px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); }
   .cust-option:hover { background: rgba(139, 92, 246, 0.1); }
 
   .cust-checkbox-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
   .cust-checkbox-item:hover { background: rgba(255,255,255,0.05); }
   .cust-checkbox-item input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+
+  .search-wrapper { position: relative; }
+  .search-wrapper .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+  .search-wrapper input { padding-left: 40px; }
 
   @media print {
     body { background: white !important; color: black !important; }
@@ -152,9 +155,9 @@
 <div class="bg-ambient"></div>
 <div class="bg-grid"></div>
 
-<aside class="sidebar fixed top-0 left-0 h-screen w-64 p-5 z-40 border-r border-white/5 flex flex-col" style="background: rgba(8, 9, 13, 0.85); backdrop-filter: blur(28px);">
+<aside class="sidebar fixed top-0 left-0 h-screen w-64 p-5 z-40 border-r border-white/5 flex flex-col" style="background: rgba(8, 9, 13, 0.85); backdrop-filter: blur(24px);">
   <div class="flex items-center gap-3 mb-8 px-2">
-    <div class="w-10 h-10 rounded-xl flex items-center justify-center relative" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); box-shadow: 0 4px 20px rgba(139,92,246,0.5);">
+    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); box-shadow: 0 4px 20px rgba(139,92,246,0.5);">
       <i data-lucide="wrench" class="text-white" style="width:20px;height:20px;"></i>
     </div>
     <div>
@@ -177,7 +180,7 @@
   </nav>
   
   <div class="glass p-3 mt-4">
-    <div class="flex items-center justify-between mb-2">
+    <div class="flex items-center justify-between mb-1">
       <span class="text-xs font-semibold text-gray-400">Status Koneksi</span>
       <span id="connStatus" class="conn-status disconnected"><span class="pulse-dot" style="background:#f59e0b;"></span> Lokal</span>
     </div>
@@ -187,7 +190,7 @@
 
 <main class="main-content ml-64 min-h-screen">
   
-  <header class="sticky top-0 z-30 px-6 py-4 flex items-center gap-4 border-b border-white/5" style="background: rgba(8, 9, 13, 0.85); backdrop-filter: blur(28px);">
+  <header class="sticky top-0 z-30 px-6 py-4 flex items-center gap-4 border-b border-white/5" style="background: rgba(8, 9, 13, 0.85); backdrop-filter: blur(24px);">
     <button class="mobile-menu-btn btn-ghost btn !p-2" onclick="toggleSidebar()"><i data-lucide="menu" style="width:18px;height:18px;"></i></button>
     <div class="flex-1">
       <h2 id="pageTitle" class="font-display font-bold text-xl text-white">Dashboard</h2>
@@ -244,38 +247,56 @@
 
     <!-- DASHBOARD TAB -->
     <section id="tab-dashboard" class="tab-content active">
+      
+      <!-- WELCOME BANNER -->
+      <div class="glass p-6 mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(6, 182, 212, 0.05)); border-color: rgba(139, 92, 246, 0.2);">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-violet-500/10 border border-violet-500/20">
+            <i data-lucide="sparkles" class="text-violet-400" style="width:24px;height:24px;"></i>
+          </div>
+          <div>
+            <h3 class="font-display font-bold text-lg text-white">Selamat Datang di ServiceTrack! 👋</h3>
+            <p class="text-sm text-gray-400">Kelola aktivitas PM, CM, dan jadwal kunjungan teknisi dengan lebih mudah di satu tempat.</p>
+          </div>
+        </div>
+        <div class="flex gap-2 w-full md:w-auto">
+          <button class="btn btn-primary flex-1 md:flex-none" onclick="switchTab('form')"><i data-lucide="plus-circle" style="width:16px;height:16px;"></i> Input PM</button>
+          <button class="btn btn-danger flex-1 md:flex-none" onclick="switchTab('cm')"><i data-lucide="hammer" style="width:16px;height:16px;"></i> Input CM</button>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div class="glass stat-card glass-hover">
           <div class="stat-glow" style="background: radial-gradient(circle, #10b981, transparent);"></div>
-          <div class="flex items-start justify-between mb-4 relative">
-            <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3);"><i data-lucide="clipboard-check" style="width:20px;height:20px;color:#10b981;"></i></div>
+          <div class="flex items-start justify-between mb-3 relative">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(16,185,129,0.15);"><i data-lucide="clipboard-check" style="width:20px;height:20px;color:#10b981;"></i></div>
           </div>
           <div class="counter text-white" id="statTotalPM">0</div>
-          <p class="text-xs text-gray-400 mt-2 font-medium">Total Kunjungan PM</p>
+          <p class="text-xs text-gray-400 mt-1 font-medium">Total Kunjungan PM</p>
         </div>
         <div class="glass stat-card glass-hover">
           <div class="stat-glow" style="background: radial-gradient(circle, #f43f5e, transparent);"></div>
-          <div class="flex items-start justify-between mb-4 relative">
-            <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: rgba(244,63,94,0.15); border: 1px solid rgba(244,63,94,0.3);"><i data-lucide="hammer" style="width:20px;height:20px;color:#f43f5e;"></i></div>
+          <div class="flex items-start justify-between mb-3 relative">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(244,63,94,0.15);"><i data-lucide="hammer" style="width:20px;height:20px;color:#f43f5e;"></i></div>
           </div>
           <div class="counter text-white" id="statTotalCM">0</div>
-          <p class="text-xs text-gray-400 mt-2 font-medium">Total Kunjungan CM</p>
+          <p class="text-xs text-gray-400 mt-1 font-medium">Total Kunjungan CM</p>
         </div>
         <div class="glass stat-card glass-hover">
           <div class="stat-glow" style="background: radial-gradient(circle, #f59e0b, transparent);"></div>
-          <div class="flex items-start justify-between mb-4 relative">
-            <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3);"><i data-lucide="alert-triangle" style="width:20px;height:20px;color:#f59e0b;"></i></div>
+          <div class="flex items-start justify-between mb-3 relative">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(245,158,11,0.15);"><i data-lucide="alert-triangle" style="width:20px;height:20px;color:#f59e0b;"></i></div>
           </div>
           <div class="counter text-white" id="statPending">0</div>
-          <p class="text-xs text-gray-400 mt-2 font-medium">Tugas PM Jatuh Tempo</p>
+          <p class="text-xs text-gray-400 mt-1 font-medium">Tugas PM Jatuh Tempo</p>
         </div>
         <div class="glass stat-card glass-hover">
           <div class="stat-glow" style="background: radial-gradient(circle, #8b5cf6, transparent);"></div>
-          <div class="flex items-start justify-between mb-4 relative">
-            <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3);"><i data-lucide="users" style="width:20px;height:20px;color:#8b5cf6;"></i></div>
+          <div class="flex items-start justify-between mb-3 relative">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(139,92,246,0.15);"><i data-lucide="users" style="width:20px;height:20px;color:#8b5cf6;"></i></div>
           </div>
           <div class="counter text-white" id="statTeknisi">0</div>
-          <p class="text-xs text-gray-400 mt-2 font-medium">Teknisi Terdaftar</p>
+          <p class="text-xs text-gray-400 mt-1 font-medium">Teknisi Terdaftar</p>
         </div>
       </div>
       
@@ -316,8 +337,6 @@
     <!-- JADWAL HARIAN TAB -->
     <section id="tab-jadwal" class="tab-content">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        
-        <!-- KIRI: FORM INPUT -->
         <div class="glass p-6">
           <h3 class="font-display font-bold text-lg mb-4 text-white flex items-center gap-2"><i data-lucide="calendar-plus" style="width:18px;height:18px;color:var(--accent);"></i> Generate Jadwal Harian</h3>
           <form id="jadwalForm" class="space-y-4">
@@ -338,16 +357,19 @@
             </div>
             <div>
               <label class="label-field">Pilih Customer (Minimal 1)</label>
-              <input type="text" id="searchJadwalCust" class="input-field mb-3" placeholder="Pilih tanggal & base dahulu..." oninput="populateJadwalCustomers()" autocomplete="off" disabled>
+              <div class="search-wrapper mb-3">
+                <i data-lucide="search" class="search-icon" style="width:16px;height:16px;"></i>
+                <input type="text" id="searchJadwalCust" class="input-field" placeholder="Cari nama customer..." oninput="populateJadwalCustomers()" autocomplete="off" disabled>
+              </div>
               <div id="jadwalCustList" class="space-y-1 max-h-60 overflow-y-auto p-3 rounded-lg" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border);">
                 <p class="text-sm text-gray-500 text-center py-4">Pilih tanggal dan base dahulu...</p>
               </div>
+              <span class="helper-text">💡 Daftar akan otomatis menyembunyikan customer yang sudah dijadwalkan bulan ini.</span>
             </div>
             <button type="submit" class="btn btn-primary w-full"><i data-lucide="file-text" style="width:16px;height:16px;"></i> Generate & Simpan Jadwal</button>
           </form>
         </div>
         
-        <!-- KANAN: HASIL & WHATSAPP -->
         <div class="glass p-6">
           <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
             <h3 class="font-display font-bold text-lg text-white">Hasil Jadwal</h3>
@@ -360,7 +382,6 @@
         </div>
       </div>
 
-      <!-- HISTORI JADWAL -->
       <div class="glass p-6 mt-4">
         <div class="flex items-center justify-between mb-4">
           <h3 class="font-display font-bold text-lg text-white flex items-center gap-2"><i data-lucide="history" style="width:18px;height:18px;color:var(--accent);"></i> Histori Jadwal</h3>
@@ -413,6 +434,7 @@
                   <input type="hidden" id="customer" required>
                   <div id="customerDropdownList" class="cust-dropdown"></div>
                 </div>
+                <span class="helper-text">💡 Sistem hanya menampilkan customer yang satu base dengan teknisi pilihan.</span>
               </div>
               <div><label class="label-field">Lokasi / Base</label><input type="text" id="base" class="input-field" placeholder="Otomatis dari teknisi" readonly></div>
             </div>
@@ -464,7 +486,10 @@
         <div class="glass p-6 lg:col-span-2">
           <div class="flex items-center justify-between mb-4 gap-3 flex-col sm:flex-row">
             <h3 class="font-display font-bold text-lg text-white">Riwayat Corrective Maintenance</h3>
-            <input type="text" id="searchCM" class="input-field sm:w-64" placeholder="Cari customer atau masalah..." oninput="renderCMHistory()">
+            <div class="search-wrapper w-full sm:w-64">
+              <i data-lucide="search" class="search-icon" style="width:16px;height:16px;"></i>
+              <input type="text" id="searchCM" class="input-field" placeholder="Cari customer atau masalah..." oninput="renderCMHistory()">
+            </div>
           </div>
           <div class="overflow-x-auto -mx-6 px-6 max-h-[60vh] overflow-y-auto">
             <table class="data-table" id="cmTable">
@@ -483,9 +508,9 @@
     <section id="tab-riwayat" class="tab-content">
       <div class="glass p-6">
         <div class="flex flex-col lg:flex-row gap-3 mb-5">
-          <div class="flex-1 relative">
-            <i data-lucide="search" style="width:16px;height:16px;" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-            <input type="text" id="searchInput" class="input-field pl-11" placeholder="Cari customer atau teknisi...">
+          <div class="search-wrapper flex-1">
+            <i data-lucide="search" class="search-icon" style="width:16px;height:16px;"></i>
+            <input type="text" id="searchInput" class="input-field" placeholder="Cari customer atau teknisi...">
           </div>
           <select id="filterTeknisi" class="input-field lg:w-44"><option value="">Semua Teknisi</option></select>
           <button class="btn btn-ghost" onclick="exportCSV()"><i data-lucide="download" style="width:16px;height:16px;"></i><span class="hide-mobile">Export CSV</span></button>
@@ -548,7 +573,10 @@
           <div class="flex items-center justify-between mb-4 gap-3 flex-col sm:flex-row">
             <h3 class="font-display font-bold text-lg text-white">Daftar Customer</h3>
             <div class="flex gap-2 w-full sm:w-auto">
-              <input type="text" id="searchCustName" class="input-field flex-1" placeholder="Cari nama customer..." oninput="renderCustomers()" autocomplete="off">
+              <div class="search-wrapper flex-1">
+                <i data-lucide="search" class="search-icon" style="width:16px;height:16px;"></i>
+                <input type="text" id="searchCustName" class="input-field" placeholder="Cari nama customer..." oninput="renderCustomers()" autocomplete="off">
+              </div>
               <select id="filterCustBase" class="input-field sm:w-48" onchange="renderCustomers()">
                 <option value="">Semua Base</option>
               </select>
@@ -761,7 +789,7 @@ function populateSuratTeknisi() {
   const container = document.getElementById('suratTeknisiList');
   if(!container) return;
   if (technicians.length === 0) {
-    container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Belum ada teknisi.</p>';
+    container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Belum ada teknisi terdaftar.</p>';
     return;
   }
   container.innerHTML = technicians.map(t => `
@@ -824,7 +852,6 @@ function generateSurat(e) {
   renderSurat();
   showToast('Surat tugas berhasil dibuat & disimpan!', 'success');
   
-  // --- KOSONGKAN FORM SETELAH DISIMPAN ---
   document.getElementById('suratForm').reset();
   document.querySelectorAll('.surat-tech-checkbox').forEach(cb => cb.checked = false);
   document.getElementById('suratTanggal').value = new Date().toISOString().split('T')[0];
@@ -835,7 +862,7 @@ function renderSurat() {
   const container = document.getElementById('suratList');
   if (!container) return;
   if (suratTugas.length === 0) {
-    container.innerHTML = `<div class="empty-state py-8"><p class="text-sm">Belum ada histori surat tugas</p></div>`;
+    container.innerHTML = `<div class="empty-state py-8"><p class="text-sm">Belum ada riwayat surat tugas. Buat baru di form sebelah!</p></div>`;
     return;
   }
   container.innerHTML = suratTugas.map(s => `
@@ -994,7 +1021,7 @@ function renderSchedules() {
   const container = document.getElementById('schedList');
   if (!container) return;
   if (schedules.length === 0) {
-    container.innerHTML = `<div class="empty-state py-8"><p class="text-sm">Belum ada histori jadwal</p></div>`;
+    container.innerHTML = `<div class="empty-state py-8"><p class="text-sm">Belum ada riwayat jadwal. Buat baru di form sebelah!</p></div>`;
     return;
   }
   container.innerHTML = schedules.map(s => `
@@ -1238,7 +1265,10 @@ function renderRecentActivity() {
   const pmActs = visits.map(v => ({ ...v, type: 'PM' }));
   const cmActs = cmVisits.map(v => ({ ...v, type: 'CM', masalah: v.masalah }));
   const allActs = [...pmActs, ...cmActs].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 6);
-  if (allActs.length === 0) { container.innerHTML = '<div class="empty-state py-8"><p class="text-sm">Belum ada aktivitas</p></div>'; return; }
+  if (allActs.length === 0) { 
+    container.innerHTML = '<div class="empty-state py-8"><p class="text-sm">Belum ada aktivitas. Mulai catat PM atau CM sekarang!</p></div>'; 
+    return; 
+  }
   container.innerHTML = allActs.map(v => {
     const isCM = v.type === 'CM';
     const title = isCM ? v.masalah : v.customer;
@@ -1417,7 +1447,7 @@ function renderCMHistory() {
 }
 
 function renderTechnicians() {
-  const container = document.getElementById('techList'); if (technicians.length === 0) { container.innerHTML = '<div class="empty-state"><p>Belum ada teknisi</p></div>'; return; }
+  const container = document.getElementById('techList'); if (technicians.length === 0) { container.innerHTML = '<div class="empty-state"><p>Belum ada teknisi. Tambahkan baru di form sebelah!</p></div>'; return; }
   container.innerHTML = technicians.map(t => {
     const count = visits.filter(v => v.teknisi === t.name).length + cmVisits.filter(v => v.teknisi === t.name).length;
     return `<div class="glass p-4 flex items-center gap-4" style="background:rgba(255,255,255,0.02);"><div class="tech-avatar" style="background:rgba(139,92,246,0.15); color:#8b5cf6; border:1px solid rgba(139,92,246,0.3); width:44px; height:44px; font-size:15px;">${t.name.charAt(0)}</div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1"><p class="font-semibold text-white">${t.name}</p><span class="badge badge-info">${t.base}</span></div><p class="text-xs text-gray-400 truncate">${t.address || '-'}</p><p class="text-xs text-gray-500 mt-1">${t.phone || '-'}</p></div><div class="text-right hide-mobile"><p class="font-display font-bold text-2xl text-white">${count}</p><p class="text-xs text-gray-500">Tugas</p></div><button class="btn btn-danger !p-2" onclick="deleteTech('${t.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div>`;
@@ -1429,7 +1459,7 @@ function renderCustomers() {
   const filterBase = document.getElementById('filterCustBase')?.value || '';
   const searchName = document.getElementById('searchCustName')?.value.toLowerCase() || '';
   let displayedCustomers = customers.filter(c => { const matchBase = !filterBase || c.base === filterBase; const matchName = !searchName || c.name.toLowerCase().includes(searchName); return matchBase && matchName; });
-  if (displayedCustomers.length === 0) { container.innerHTML = `<div class="empty-state"><p>Customer tidak ditemukan</p></div>`; return; }
+  if (displayedCustomers.length === 0) { container.innerHTML = `<div class="empty-state"><p>Customer tidak ditemukan.</p></div>`; return; }
   container.innerHTML = displayedCustomers.map(c => {
     const count = visits.filter(v => v.customer === c.name).length + cmVisits.filter(v => v.customer === c.name).length;
     const lastVisit = visits.filter(v => v.customer === c.name).sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal))[0];
@@ -1622,6 +1652,7 @@ function clearAllData() {
     showToast('Semua data dihapus', 'info'); 
   }); 
 }
+
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeConfirm(); } });
 
 init();
