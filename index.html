@@ -211,7 +211,14 @@
           <h3 class="font-display font-bold text-lg mb-4 text-white flex items-center gap-2"><i data-lucide="file-signature" style="width:18px;height:18px;color:var(--accent);"></i> Form Surat Tugas</h3>
           <form id="suratForm" class="space-y-4">
             <div><label class="label-field">Monitoring Pemohon</label><input type="text" id="suratPemohon" class="input-field" placeholder="Nama pemohon/monitor" required></div>
-            <div><label class="label-field">Tujuan dan Alamat Surat Tugas</label><input type="text" id="suratTujuan" class="input-field" placeholder="Tujuan & Alamat" required></div>
+            <div>
+          <label class="label-field">Tujuan dan Alamat Surat Tugas (Pilih Customer)</label>
+            <div class="cust-search-container">
+            <input type="text" id="suratTujuanSearch" class="input-field" placeholder="Ketik nama customer..." onfocus="showSuratTujuanDropdown()" oninput="showSuratTujuanDropdown()" onblur="hideSuratTujuanDropdown()" autocomplete="off" required>
+            <input type="hidden" id="suratTujuan" required>
+            <div id="suratTujuanDropdownList" class="cust-dropdown"></div>
+            </div>
+            </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div><label class="label-field">Tanggal Kunjungan</label><input type="date" id="suratTanggal" class="input-field" required></div>
               <div><label class="label-field">Berlaku Berapa Lama</label><input type="text" id="suratBerlaku" class="input-field" placeholder="Cth: 1 Bulan / 3 Hari" required></div>
@@ -799,7 +806,29 @@ function populateSuratTeknisi() {
     </label>
   `).join('');
 }
+// SURAT TUGAS TUJUAN DROPDOWN
+function showSuratTujuanDropdown() {
+  const dropdown = document.getElementById('suratTujuanDropdownList');
+  const searchText = document.getElementById('suratTujuanSearch').value.toLowerCase();
+  const filteredCustomers = customers.filter(c => c.name.toLowerCase().includes(searchText));
+  
+  if (filteredCustomers.length === 0) { 
+    dropdown.innerHTML = '<div class="cust-option" style="color: var(--muted); cursor: default;">Customer tidak ditemukan</div>'; 
+  } else { 
+    dropdown.innerHTML = filteredCustomers.map(c => `<div class="cust-option" onmousedown="selectSuratTujuan('${c.name}')">${c.name}</div>`).join(''); 
+  }
+  dropdown.classList.add('show');
+}
 
+function hideSuratTujuanDropdown() { 
+  setTimeout(() => { document.getElementById('suratTujuanDropdownList').classList.remove('show'); }, 150); 
+}
+
+function selectSuratTujuan(name) { 
+  document.getElementById('suratTujuanSearch').value = name; 
+  document.getElementById('suratTujuan').value = name; 
+  document.getElementById('suratTujuanDropdownList').classList.remove('show'); 
+}
 function generateSurat(e) {
   if(e) e.preventDefault();
   const pemohon = document.getElementById('suratPemohon').value;
