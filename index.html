@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -563,7 +563,6 @@
             <div><label class="label-field">Nama Customer</label><input type="text" id="custName" class="input-field" placeholder="PT. Conton" required></div>
             <div><label class="label-field">Base Wilayah</label><input type="text" id="custBase" class="input-field" placeholder="Jakarta Selatan" required></div>
             <div><label class="label-field">Link Google Maps</label><input type="text" id="custMaps" class="input-field" placeholder="https://maps.app.goo.gl/..."></div>
-			<div><label class="label-field">Jarak dari Base (KM)</label><input type="number" id="custDistance" class="input-field" placeholder="Cth: 12.5" step="0.1"></div>
             <div><label class="label-field">Tanggal Mulai Jadwal PM</label><input type="date" id="custSchedule" class="input-field" required></div>
             <div>
               <label class="label-field">Frekuensi Kunjungan PM</label>
@@ -1013,16 +1012,11 @@ function generateJadwal(e) {
   let text = `📅 *JADWAL KUNJUNGAN PM*\n📍 *Base:* ${base}\n🗓️ *Tanggal:* ${dayName}, ${dateStr}\n👷 *Teknisi:* ${techName}\n\n`;
   const custNames = [];
   
-    checkboxes.forEach((cb, i) => {
+  checkboxes.forEach((cb, i) => {
     text += `${i + 1}. ${cb.value}\n`;
     const custData = customers.find(c => c.name === cb.value);
-    if (custData) {
-      if (custData.mapsLink) {
-        text += `   📍 Lokasi: ${custData.mapsLink}\n`;
-      }
-      if (custData.distance && custData.distance !== '-') {
-        text += `   📏 Jarak: ± ${custData.distance} KM\n`;
-      }
+    if (custData && custData.mapsLink) {
+      text += `   📍 Lokasi: ${custData.mapsLink}\n`;
     }
     custNames.push(cb.value);
   });
@@ -1442,15 +1436,10 @@ function handleAddTech(e) {
 
 function handleAddCust(e) {
   e.preventDefault(); 
-    const cust = { 
-    id: 'C' + String(customers.length + 1).padStart(3, '0'), 
-    name: document.getElementById('custName').value, 
-    base: document.getElementById('custBase').value, 
-    firstSchedule: document.getElementById('custSchedule').value, 
-    frequency: parseInt(document.getElementById('custFreq').value), 
-    mapsLink: document.getElementById('custMaps').value,
-    distance: document.getElementById('custDistance').value || '-' 
-  }
+  const cust = { id: 'C' + String(customers.length + 1).padStart(3, '0'), name: document.getElementById('custName').value, base: document.getElementById('custBase').value, firstSchedule: document.getElementById('custSchedule').value, frequency: parseInt(document.getElementById('custFreq').value), mapsLink: document.getElementById('custMaps').value };
+  customers.push(cust); saveData(); populateCustBaseFilter(); populateJadwalBase(); renderCustomers(); renderDashboard(); document.getElementById('custForm').reset();
+  if (isConnected) syncToSheet('customers', cust, 'create'); showToast('Customer ditambahkan', 'success');
+}
 
 function generateId(type) { const year = new Date().getFullYear(); const count = (type === 'CM' ? cmVisits : visits).filter(v => v.id.startsWith(`${type}-${year}`)).length + 1; return `${type}-${year}-${String(count).padStart(3, '0')}`; }
 
@@ -1513,8 +1502,7 @@ function renderCustomers() {
       nextSchedStr = formatDate(nextDate);
     }
     const mapsBtn = c.mapsLink ? `<a href="${c.mapsLink}" target="_blank" class="btn btn-ghost !p-2" onclick="event.stopPropagation()"><i data-lucide="map-pin" style="width:14px;height:14px;color:#06b6d4;"></i></a>` : '';
-    const distBadge = c.distance && c.distance !== '-' ? `<span class="badge badge-warning">📏 ${c.distance} KM</span>` : '';
-    return `<div class="glass p-4 flex items-center gap-4" style="background:rgba(255,255,255,0.02);"><div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.3);"><i data-lucide="building" style="width:20px;height:20px;color:#06b6d4;"></i></div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1 flex-wrap"><p class="font-semibold text-white">${c.name}</p><span class="badge badge-info">${c.base}</span>${distBadge}<span class="badge ${isOverdue ? 'badge-danger' : 'badge-success'}">${getFreqLabel(c.frequency)}</span></div><p class="text-xs text-gray-400 mt-1">Jadwal PM Berikutnya: <span class="${isOverdue ? 'text-rose-400 font-bold' : 'text-gray-300'}">${nextSchedStr} ${isOverdue ? '(Jatuh Tempo)' : ''}</span></p></div><div class="text-right hide-mobile"><p class="font-display font-bold text-2xl text-white">${count}</p><p class="text-xs text-gray-500">Kunjungan</p></div><div class="flex gap-1">${mapsBtn}<button class="btn btn-danger !p-2" onclick="deleteCust('${c.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div></div>`;
+    return `<div class="glass p-4 flex items-center gap-4" style="background:rgba(255,255,255,0.02);"><div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.3);"><i data-lucide="building" style="width:20px;height:20px;color:#06b6d4;"></i></div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1 flex-wrap"><p class="font-semibold text-white">${c.name}</p><span class="badge badge-info">${c.base}</span><span class="badge ${isOverdue ? 'badge-danger' : 'badge-success'}">${getFreqLabel(c.frequency)}</span></div><p class="text-xs text-gray-400 mt-1">Jadwal PM Berikutnya: <span class="${isOverdue ? 'text-rose-400 font-bold' : 'text-gray-300'}">${nextSchedStr} ${isOverdue ? '(Jatuh Tempo)' : ''}</span></p></div><div class="text-right hide-mobile"><p class="font-display font-bold text-2xl text-white">${count}</p><p class="text-xs text-gray-500">Kunjungan</p></div><div class="flex gap-1">${mapsBtn}<button class="btn btn-danger !p-2" onclick="deleteCust('${c.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div></div>`;
   }).join(''); lucide.createIcons();
 }
 
