@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -49,6 +49,7 @@
   .btn-ghost:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--border-hover); }
   .btn-accent { background: linear-gradient(135deg, #06b6d4, #0891b2); color: #fff; box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3); }
   .btn-success { background: linear-gradient(135deg, #10b981, #047857); color: #fff; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); }
+  .btn-telegram { background: linear-gradient(135deg, #2AABEE, #229ED9); color: #fff; box-shadow: 0 4px 14px rgba(42, 171, 238, 0.3); }
   .btn-danger { background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3); }
   .btn-danger:hover { background: rgba(244, 63, 94, 0.25); }
   
@@ -161,8 +162,8 @@
       <i data-lucide="wrench" class="text-white" style="width:20px;height:20px;"></i>
     </div>
     <div>
-      <h1 class="font-display font-bold text-lg leading-none text-white">AplikasiSukaSuka</h1>
-      <p class="text-xs text-violet-400 mt-0.5 font-medium">PM & CM System v12.0</p>
+      <h1 class="font-display font-bold text-lg leading-none text-white">ServiceTrack</h1>
+      <p class="text-xs text-violet-400 mt-0.5 font-medium">PM & CM System v13.0</p>
     </div>
   </div>
   
@@ -212,12 +213,12 @@
           <form id="suratForm" class="space-y-4">
             <div><label class="label-field">Monitoring Pemohon</label><input type="text" id="suratPemohon" class="input-field" placeholder="Nama pemohon/monitor" required></div>
             <div>
-          <label class="label-field">Tujuan dan Alamat Surat Tugas (Pilih Customer)</label>
-            <div class="cust-search-container">
-            <input type="text" id="suratTujuanSearch" class="input-field" placeholder="Ketik nama customer..." onfocus="showSuratTujuanDropdown()" oninput="showSuratTujuanDropdown()" onblur="hideSuratTujuanDropdown()" autocomplete="off" required>
-            <input type="hidden" id="suratTujuan" required>
-            <div id="suratTujuanDropdownList" class="cust-dropdown"></div>
-            </div>
+              <label class="label-field">Tujuan dan Alamat Surat Tugas (Pilih Customer)</label>
+              <div class="cust-search-container">
+                <input type="text" id="suratTujuanSearch" class="input-field" placeholder="Ketik nama customer..." onfocus="showSuratTujuanDropdown()" oninput="showSuratTujuanDropdown()" onblur="hideSuratTujuanDropdown()" autocomplete="off" required>
+                <input type="hidden" id="suratTujuan" required>
+                <div id="suratTujuanDropdownList" class="cust-dropdown"></div>
+              </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div><label class="label-field">Tanggal Kunjungan</label><input type="date" id="suratTanggal" class="input-field" required></div>
@@ -237,7 +238,8 @@
             <h3 class="font-display font-bold text-lg text-white">Hasil Surat Tugas</h3>
             <div class="flex gap-2">
               <button class="btn btn-ghost !py-2 !px-3 text-xs" onclick="copyText(document.getElementById('suratResult').value)"><i data-lucide="copy" style="width:14px;height:14px;"></i> Copy</button>
-              <a href="#" id="suratWaLink" target="_blank" class="btn btn-success !py-2 !px-3 text-xs hidden"><i data-lucide="send" style="width:14px;height:14px;"></i> Kirim WA</a>
+              <a href="#" id="suratWaLink" target="_blank" class="btn btn-success !py-2 !px-3 text-xs hidden"><i data-lucide="send" style="width:14px;height:14px;"></i> WA</a>
+              <a href="#" id="suratTgLink" target="_blank" class="btn btn-telegram !py-2 !px-3 text-xs hidden"><i data-lucide="send" style="width:14px;height:14px;"></i> Telegram</a>
             </div>
           </div>
           <textarea id="suratResult" class="input-field" rows="12" readonly style="font-family: monospace; white-space: pre-wrap; background: rgba(0,0,0,0.4); line-height: 1.6;" placeholder="Hasil surat tugas akan muncul di sini..."></textarea>
@@ -255,7 +257,6 @@
     <!-- DASHBOARD TAB -->
     <section id="tab-dashboard" class="tab-content active">
       
-      <!-- WELCOME BANNER -->
       <div class="glass p-6 mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(6, 182, 212, 0.05)); border-color: rgba(139, 92, 246, 0.2);">
         <div class="flex items-center gap-4">
           <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-violet-500/10 border border-violet-500/20">
@@ -373,7 +374,8 @@
               </div>
               <span class="helper-text">💡 Daftar akan otomatis menyembunyikan customer yang sudah dijadwalkan bulan ini.</span>
             </div>
-            <button type="submit" class="btn btn-primary w-full"><i data-lucide="file-text" style="width:16px;height:16px;"></i> Generate & Simpan Jadwal</button>
+            <button type="submit" class="btn btn-primary w-full"><i data-lucide="file-text" style="width:16px;height:16px;"></i> Generate & Simpan Jadwal (Manual)</button>
+            <button type="button" class="btn btn-accent w-full" onclick="generateAutoJadwal()"><i data-lucide="zap" style="width:16px;height:16px;"></i> Auto-Generate Semua Customer (Siap WA)</button>
           </form>
         </div>
         
@@ -382,7 +384,8 @@
             <h3 class="font-display font-bold text-lg text-white">Hasil Jadwal</h3>
             <div class="flex gap-2">
               <button class="btn btn-ghost !py-2 !px-3 text-xs" onclick="copyText(document.getElementById('jadwalResult').value)"><i data-lucide="copy" style="width:14px;height:14px;"></i> Copy</button>
-              <a href="#" id="waLinkBtn" target="_blank" class="btn btn-success !py-2 !px-3 text-xs hidden"><i data-lucide="send" style="width:14px;height:14px;"></i> Kirim WA</a>
+              <a href="#" id="waLinkBtn" target="_blank" class="btn btn-success !py-2 !px-3 text-xs hidden"><i data-lucide="send" style="width:14px;height:14px;"></i> WA</a>
+              <a href="#" id="tgLinkBtn" target="_blank" class="btn btn-telegram !py-2 !px-3 text-xs hidden"><i data-lucide="send" style="width:14px;height:14px;"></i> Telegram</a>
             </div>
           </div>
           <textarea id="jadwalResult" class="input-field" rows="12" readonly style="font-family: monospace; white-space: pre-wrap; background: rgba(0,0,0,0.4); line-height: 1.6;" placeholder="Hasil jadwal akan muncul di sini..."></textarea>
@@ -558,11 +561,13 @@
     <section id="tab-customer" class="tab-content">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div class="glass p-6 lg:col-span-1">
-          <h3 class="font-display font-bold text-lg mb-4 text-white">Tambah Customer</h3>
+          <h3 class="font-display font-bold text-lg mb-4 text-white">Tambah/Edit Customer</h3>
           <form id="custForm" class="space-y-4">
+            <input type="hidden" id="custId" value="">
             <div><label class="label-field">Nama Customer</label><input type="text" id="custName" class="input-field" placeholder="PT. Conton" required></div>
             <div><label class="label-field">Base Wilayah</label><input type="text" id="custBase" class="input-field" placeholder="Jakarta Selatan" required></div>
             <div><label class="label-field">Link Google Maps</label><input type="text" id="custMaps" class="input-field" placeholder="https://maps.app.goo.gl/..."></div>
+            <div><label class="label-field">Jarak dari Base (KM)</label><input type="number" id="custDistance" class="input-field" placeholder="Cth: 12.5" step="0.1"></div>
             <div><label class="label-field">Tanggal Mulai Jadwal PM</label><input type="date" id="custSchedule" class="input-field" required></div>
             <div>
               <label class="label-field">Frekuensi Kunjungan PM</label>
@@ -573,7 +578,8 @@
                 <option value="12">Tahunan (Setiap 1 Tahun)</option>
               </select>
             </div>
-            <button type="submit" class="btn btn-primary w-full"><i data-lucide="building-plus" style="width:16px;height:16px;"></i> Tambah Customer</button>
+            <button type="submit" class="btn btn-primary w-full" id="custSubmitBtn"><i data-lucide="building-plus" style="width:16px;height:16px;"></i> Tambah Customer</button>
+            <button type="button" id="cancelEditBtn" class="btn btn-ghost w-full hidden" onclick="resetCustForm()"><i data-lucide="x" style="width:16px;height:16px;"></i> Batal Edit</button>
           </form>
         </div>
         <div class="glass p-6 lg:col-span-2">
@@ -691,11 +697,11 @@ const SAMPLE_TECHNICIANS = [
   { id: 'T003', name: 'Cahyo Pratama', phone: '081234567892', address: 'Jl. Anggrek No. 8, Tangerang', base: 'Tangerang' }
 ];
 const SAMPLE_CUSTOMERS = [
-  { id: 'C001', name: 'PT Maju Jaya Abadi', base: 'Jakarta Selatan', firstSchedule: '2024-01-01', frequency: 3, mapsLink: 'https://maps.app.goo.gl/example1' },
-  { id: 'C002', name: 'CV Sumber Rejeki', base: 'Bekasi', firstSchedule: '2024-01-01', frequency: 1, mapsLink: '' },
-  { id: 'C003', name: 'PT Bintang Terang', base: 'Tangerang', firstSchedule: '2024-01-01', frequency: 12, mapsLink: 'https://maps.app.goo.gl/example3' },
-  { id: 'C004', name: 'Hotel Grand Permata', base: 'Jakarta Selatan', firstSchedule: '2024-01-01', frequency: 4, mapsLink: '' },
-  { id: 'C005', name: 'PT Sentosa Teknologi', base: 'Bekasi', firstSchedule: '2024-01-01', frequency: 3, mapsLink: '' }
+  { id: 'C001', name: 'PT Maju Jaya Abadi', base: 'Jakarta Selatan', firstSchedule: '2024-01-01', frequency: 3, mapsLink: 'https://maps.app.goo.gl/example1', distance: '12.5' },
+  { id: 'C002', name: 'CV Sumber Rejeki', base: 'Bekasi', firstSchedule: '2024-01-01', frequency: 1, mapsLink: '', distance: '5.2' },
+  { id: 'C003', name: 'PT Bintang Terang', base: 'Tangerang', firstSchedule: '2024-01-01', frequency: 12, mapsLink: 'https://maps.app.goo.gl/example3', distance: '28.0' },
+  { id: 'C004', name: 'Hotel Grand Permata', base: 'Jakarta Selatan', firstSchedule: '2024-01-01', frequency: 4, mapsLink: '', distance: '8.1' },
+  { id: 'C005', name: 'PT Sentosa Teknologi', base: 'Bekasi', firstSchedule: '2024-01-01', frequency: 3, mapsLink: '', distance: '15.4' }
 ];
 const SAMPLE_VISITS = [
   { id: 'PM-2024-001', tanggal: '2024-01-05', teknisi: 'Budi Santoso', base: 'Jakarta Selatan', customer: 'PT Maju Jaya Abadi', createdAt: '2024-01-05T10:30:00' },
@@ -709,10 +715,7 @@ const SAMPLE_CM = [
 // ============= INIT =============
 function init() {
   if (visits.length === 0 && technicians.length === 0) {
-    technicians = SAMPLE_TECHNICIANS;
-    visits = SAMPLE_VISITS;
-    cmVisits = SAMPLE_CM;
-    customers = SAMPLE_CUSTOMERS;
+    technicians = SAMPLE_TECHNICIANS; visits = SAMPLE_VISITS; cmVisits = SAMPLE_CM; customers = SAMPLE_CUSTOMERS;
     saveData();
   }
   
@@ -723,18 +726,8 @@ function init() {
   document.getElementById('reportMonth').value = new Date().toISOString().split('T')[0].substring(0, 7);
   document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   
-  populateSelects();
-  populateCustBaseFilter();
-  populateJadwalBase();
-  populateSuratTeknisi();
-  renderDashboard();
-  renderRiwayat();
-  renderCMHistory();
-  renderTechnicians();
-  renderCustomers();
-  renderSchedules();
-  renderSurat();
-  generateReport();
+  populateSelects(); populateCustBaseFilter(); populateJadwalBase(); populateSuratTeknisi();
+  renderDashboard(); renderRiwayat(); renderCMHistory(); renderTechnicians(); renderCustomers(); renderSchedules(); renderSurat(); generateReport();
   updateConnectionStatus();
   
   if (sheetUrl) document.getElementById('sheetUrl').value = sheetUrl;
@@ -742,9 +735,7 @@ function init() {
   
   lucide.createIcons();
   
-  document.querySelectorAll('.sidebar-link').forEach(link => {
-    link.addEventListener('click', () => switchTab(link.dataset.tab));
-  });
+  document.querySelectorAll('.sidebar-link').forEach(link => link.addEventListener('click', () => switchTab(link.dataset.tab)));
   document.getElementById('pmForm').addEventListener('submit', handleSubmit);
   document.getElementById('cmForm').addEventListener('submit', handleAddCM);
   document.getElementById('techForm').addEventListener('submit', handleAddTech);
@@ -756,12 +747,9 @@ function init() {
 }
 
 function saveData() {
-  localStorage.setItem('pm_visits', JSON.stringify(visits));
-  localStorage.setItem('pm_cm_visits', JSON.stringify(cmVisits));
-  localStorage.setItem('pm_schedules', JSON.stringify(schedules));
-  localStorage.setItem('pm_surat_tugas', JSON.stringify(suratTugas));
-  localStorage.setItem('pm_technicians', JSON.stringify(technicians));
-  localStorage.setItem('pm_customers', JSON.stringify(customers));
+  localStorage.setItem('pm_visits', JSON.stringify(visits)); localStorage.setItem('pm_cm_visits', JSON.stringify(cmVisits));
+  localStorage.setItem('pm_schedules', JSON.stringify(schedules)); localStorage.setItem('pm_surat_tugas', JSON.stringify(suratTugas));
+  localStorage.setItem('pm_technicians', JSON.stringify(technicians)); localStorage.setItem('pm_customers', JSON.stringify(customers));
 }
 
 function switchTab(tabName) {
@@ -771,16 +759,11 @@ function switchTab(tabName) {
   document.querySelector(`.sidebar-link[data-tab="${tabName}"]`)?.classList.add('active');
   
   const titles = {
-    dashboard: ['Dashboard', 'Ringkasan aktivitas maintenance'],
-    surat: ['Surat Tugas', 'Buat permintaan surat tugas kunjungan'],
-    jadwal: ['Jadwal Harian', 'Buat jadwal kunjungan harian per base'],
-    form: ['Kunjungan PM Baru', 'Catat kunjungan PM teknisi'],
-    cm: ['Input CM (Corrective)', 'Catat kerusakan/perbaikan corrective maintenance'],
-    laporan: ['Laporan Bulanan', 'Rekap data PM & CM untuk laporan atasan'],
-    riwayat: ['Riwayat PM', 'Daftar lengkap kunjungan PM'],
-    teknisi: ['Daftar Teknisi', 'Kelola data teknisi'],
-    customer: ['Daftar Customer', 'Kelola data customer'],
-    pengaturan: ['Integrasi Spreadsheet', 'Hubungkan dengan Google Spreadsheet']
+    dashboard: ['Dashboard', 'Ringkasan aktivitas maintenance'], surat: ['Surat Tugas', 'Buat permintaan surat tugas kunjungan'],
+    jadwal: ['Jadwal Harian', 'Buat jadwal kunjungan harian per base'], form: ['Kunjungan PM Baru', 'Catat kunjungan PM teknisi'],
+    cm: ['Input CM (Corrective)', 'Catat kerusakan/perbaikan corrective maintenance'], laporan: ['Laporan Bulanan', 'Rekap data PM & CM untuk laporan atasan'],
+    riwayat: ['Riwayat PM', 'Daftar lengkap kunjungan PM'], teknisi: ['Daftar Teknisi', 'Kelola data teknisi'],
+    customer: ['Daftar Customer', 'Kelola data customer'], pengaturan: ['Integrasi Spreadsheet', 'Hubungkan dengan Google Spreadsheet']
   };
   const [title, subtitle] = titles[tabName] || ['', ''];
   document.getElementById('pageTitle').textContent = title;
@@ -793,515 +776,288 @@ function toggleSidebar() { document.querySelector('.sidebar').classList.toggle('
 
 // ============= SURAT TUGAS LOGIC =============
 function populateSuratTeknisi() {
-  const container = document.getElementById('suratTeknisiList');
-  if(!container) return;
-  if (technicians.length === 0) {
-    container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Belum ada teknisi terdaftar.</p>';
-    return;
-  }
-  container.innerHTML = technicians.map(t => `
-    <label class="cust-checkbox-item">
-      <input type="checkbox" value="${t.id}" class="surat-tech-checkbox">
-      <span class="text-sm text-white">${t.name} (${t.id})</span>
-    </label>
-  `).join('');
+  const container = document.getElementById('suratTeknisiList'); if(!container) return;
+  if (technicians.length === 0) { container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Belum ada teknisi terdaftar.</p>'; return; }
+  container.innerHTML = technicians.map(t => `<label class="cust-checkbox-item"><input type="checkbox" value="${t.id}" class="surat-tech-checkbox"><span class="text-sm text-white">${t.name} (${t.id})</span></label>`).join('');
 }
-// SURAT TUGAS TUJUAN DROPDOWN
+
 function showSuratTujuanDropdown() {
   const dropdown = document.getElementById('suratTujuanDropdownList');
   const searchText = document.getElementById('suratTujuanSearch').value.toLowerCase();
   const filteredCustomers = customers.filter(c => c.name.toLowerCase().includes(searchText));
-  
-  if (filteredCustomers.length === 0) { 
-    dropdown.innerHTML = '<div class="cust-option" style="color: var(--muted); cursor: default;">Customer tidak ditemukan</div>'; 
-  } else { 
-    dropdown.innerHTML = filteredCustomers.map(c => `<div class="cust-option" onmousedown="selectSuratTujuan('${c.name}')">${c.name}</div>`).join(''); 
-  }
+  if (filteredCustomers.length === 0) { dropdown.innerHTML = '<div class="cust-option" style="color: var(--muted); cursor: default;">Customer tidak ditemukan</div>'; } 
+  else { dropdown.innerHTML = filteredCustomers.map(c => `<div class="cust-option" onmousedown="selectSuratTujuan('${c.name}')">${c.name}</div>`).join(''); }
   dropdown.classList.add('show');
 }
+function hideSuratTujuanDropdown() { setTimeout(() => { document.getElementById('suratTujuanDropdownList').classList.remove('show'); }, 150); }
+function selectSuratTujuan(name) { document.getElementById('suratTujuanSearch').value = name; document.getElementById('suratTujuan').value = name; document.getElementById('suratTujuanDropdownList').classList.remove('show'); }
 
-function hideSuratTujuanDropdown() { 
-  setTimeout(() => { document.getElementById('suratTujuanDropdownList').classList.remove('show'); }, 150); 
-}
-
-function selectSuratTujuan(name) { 
-  document.getElementById('suratTujuanSearch').value = name; 
-  document.getElementById('suratTujuan').value = name; 
-  document.getElementById('suratTujuanDropdownList').classList.remove('show'); 
-}
 function generateSurat(e) {
   if(e) e.preventDefault();
-  const pemohon = document.getElementById('suratPemohon').value;
-  const tujuan = document.getElementById('suratTujuan').value;
-  const tanggal = document.getElementById('suratTanggal').value;
-  const berlaku = document.getElementById('suratBerlaku').value;
-  const alasan = document.getElementById('suratAlasan').value;
-  const checkboxes = document.querySelectorAll('.surat-tech-checkbox:checked');
+  const pemohon = document.getElementById('suratPemohon').value; const tujuan = document.getElementById('suratTujuan').value;
+  const tanggal = document.getElementById('suratTanggal').value; const berlaku = document.getElementById('suratBerlaku').value;
+  const alasan = document.getElementById('suratAlasan').value; const checkboxes = document.querySelectorAll('.surat-tech-checkbox:checked');
   
   if(!pemohon || !tujuan || !tanggal || !berlaku || !alasan) return showToast('Lengkapi semua data', 'error');
   if(checkboxes.length === 0) return showToast('Pilih minimal 1 teknisi', 'error');
   
-  const dateObj = new Date(tanggal);
-  const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-  
-  let text = `📄 *PERMINTAAN SURAT TUGAS KUNJUNGAN MAINTENANCE*\n\n`;
-  text += `👤 *Monitoring Pemohon :* ${pemohon}\n`;
-  text += `🎯 *Tujuan & Alamat Surat :* ${tujuan}\n`;
-  text += `🗓️ *Tanggal Kunjungan :* ${dateStr}\n`;
-  text += `⏳ *Berlaku Selama :* ${berlaku}\n`;
-  text += `📍 *Lokasi/Alasan Kunjungan :* ${alasan}\n`;
-  text += `👷 *Teknisi Pelaksana :*\n`;
-  
+  const dateObj = new Date(tanggal); const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  let text = `📄 *PERMINTAAN SURAT TUGAS KUNJUNGAN MAINTENANCE*\n\n👤 *Monitoring Pemohon :* ${pemohon}\n🎯 *Tujuan & Alamat Surat :* ${tujuan}\n🗓️ *Tanggal Kunjungan :* ${dateStr}\n⏳ *Berlaku Selama :* ${berlaku}\n📍 *Lokasi/Alasan Kunjungan :* ${alasan}\n👷 *Teknisi Pelaksana :*\n`;
   const techIds = [];
-  checkboxes.forEach((cb, i) => {
-    const tech = technicians.find(t => t.id === cb.value);
-    if(tech) {
-      text += `${i + 1}. ${tech.name} (${tech.id})\n`;
-      techIds.push(`${tech.name} (${tech.id})`);
-    }
-  });
+  checkboxes.forEach((cb, i) => { const tech = technicians.find(t => t.id === cb.value); if(tech) { text += `${i + 1}. ${tech.name} (${tech.id})\n`; techIds.push(`${tech.name} (${tech.id})`); } });
   
   document.getElementById('suratResult').value = text;
   
   const waLink = `https://wa.me/?text=${encodeURIComponent(text)}`;
-  const waBtn = document.getElementById('suratWaLink');
-  waBtn.href = waLink;
-  waBtn.classList.remove('hidden');
+  const waBtn = document.getElementById('suratWaLink'); waBtn.href = waLink; waBtn.classList.remove('hidden');
+  const tgLink = `https://t.me/share/url?url=https://google.com&text=${encodeURIComponent(text)}`;
+  const tgBtn = document.getElementById('suratTgLink'); tgBtn.href = tgLink; tgBtn.classList.remove('hidden');
   
-  const newSurat = {
-    id: 'ST-' + Date.now(),
-    pemohon, tujuan, tanggalKunjungan: tanggal, berlakuLama: berlaku, alasan,
-    teknisi: techIds.join('|||'),
-    text: text,
-    createdAt: new Date().toISOString()
-  };
-  suratTugas.unshift(newSurat);
-  saveData();
+  const newSurat = { id: 'ST-' + Date.now(), pemohon, tujuan, tanggalKunjungan: tanggal, berlakuLama: berlaku, alasan, teknisi: techIds.join('|||'), text: text, createdAt: new Date().toISOString() };
+  suratTugas.unshift(newSurat); saveData();
   if (isConnected) syncToSheet('surat', newSurat, 'create');
-  renderSurat();
-  showToast('Surat tugas berhasil dibuat & disimpan!', 'success');
+  renderSurat(); showToast('Surat tugas berhasil dibuat & disimpan!', 'success');
   
   document.getElementById('suratForm').reset();
   document.querySelectorAll('.surat-tech-checkbox').forEach(cb => cb.checked = false);
   document.getElementById('suratTanggal').value = new Date().toISOString().split('T')[0];
   document.getElementById('suratWaLink').classList.add('hidden');
+  document.getElementById('suratTgLink').classList.add('hidden');
 }
 
 function renderSurat() {
-  const container = document.getElementById('suratList');
-  if (!container) return;
-  if (suratTugas.length === 0) {
-    container.innerHTML = `<div class="empty-state py-8"><p class="text-sm">Belum ada riwayat surat tugas. Buat baru di form sebelah!</p></div>`;
-    return;
-  }
+  const container = document.getElementById('suratList'); if (!container) return;
+  if (suratTugas.length === 0) { container.innerHTML = `<div class="empty-state py-8"><p class="text-sm">Belum ada riwayat surat tugas. Buat baru di form sebelah!</p></div>`; return; }
   container.innerHTML = suratTugas.map(s => `
     <div class="glass p-4 flex flex-col gap-3" style="background:rgba(255,255,255,0.02);">
       <div class="flex items-center justify-between gap-2 flex-wrap">
-        <div class="flex items-center gap-2">
-          <span class="badge badge-info">${s.id}</span>
-          <span class="text-sm text-gray-300">${formatDate(s.tanggalKunjungan)}</span>
-        </div>
+        <div class="flex items-center gap-2"><span class="badge badge-info">${s.id}</span><span class="text-sm text-gray-300">${formatDate(s.tanggalKunjungan)}</span></div>
         <div class="flex gap-2">
           <button class="btn btn-ghost !py-1.5 !px-3 text-xs" onclick="copyText('${s.id}')"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
           <a href="https://wa.me/?text=${encodeURIComponent(s.text)}" target="_blank" class="btn btn-success !py-1.5 !px-3 text-xs"><i data-lucide="send" style="width:12px;height:12px;"></i> WA</a>
+          <a href="https://t.me/share/url?url=https://google.com&text=${encodeURIComponent(s.text)}" target="_blank" class="btn btn-telegram !py-1.5 !px-3 text-xs"><i data-lucide="send" style="width:12px;height:12px;"></i> TG</a>
           <button class="btn btn-danger !py-1.5 !px-3 text-xs" onclick="deleteSurat('${s.id}')"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button>
         </div>
       </div>
       <pre class="text-xs text-gray-400 bg-black/30 p-3 rounded-md whitespace-pre-wrap font-mono">${s.text}</pre>
-    </div>
-  `).join('');
+    </div>`).join('');
   lucide.createIcons();
 }
 
 function deleteSurat(id) {
   showConfirm('Hapus Surat Tugas', 'Apakah Anda yakin ingin menghapus surat tugas ini?', () => {
-    suratTugas = suratTugas.filter(s => s.id !== id);
-    saveData();
-    if (isConnected) syncToSheet('surat', { id }, 'delete');
-    renderSurat();
-    showToast('Surat tugas dihapus', 'info');
+    suratTugas = suratTugas.filter(s => s.id !== id); saveData();
+    if (isConnected) syncToSheet('surat', { id }, 'delete'); renderSurat(); showToast('Surat tugas dihapus', 'info');
   });
 }
 
 // ============= JADWAL HARIAN LOGIC =============
 function populateJadwalBase() {
-  const select = document.getElementById('jadwalBase');
-  if(!select) return;
+  const select = document.getElementById('jadwalBase'); if(!select) return;
   const bases = [...new Set(customers.map(c => c.base))];
   select.innerHTML = '<option value="">Pilih Base...</option>';
   bases.forEach(b => select.innerHTML += `<option value="${b}">${b}</option>`);
 }
 
 function filterJadwalTeknisi() {
-  const base = document.getElementById('jadwalBase').value;
-  const select = document.getElementById('jadwalTeknisi');
+  const base = document.getElementById('jadwalBase').value; const select = document.getElementById('jadwalTeknisi');
   select.innerHTML = '<option value="">Pilih teknisi...</option>';
-  if (base) {
-    technicians.filter(t => t.base === base).forEach(t => {
-      select.innerHTML += `<option value="${t.name}">${t.name}</option>`;
-    });
-  }
+  if (base) { technicians.filter(t => t.base === base).forEach(t => { select.innerHTML += `<option value="${t.name}">${t.name}</option>`; }); }
 }
 
 function populateJadwalCustomers() {
-  const base = document.getElementById('jadwalBase').value;
-  const tanggal = document.getElementById('jadwalTanggal').value;
-  const container = document.getElementById('jadwalCustList');
-  const searchInput = document.getElementById('searchJadwalCust');
+  const base = document.getElementById('jadwalBase').value; const tanggal = document.getElementById('jadwalTanggal').value;
+  const container = document.getElementById('jadwalCustList'); const searchInput = document.getElementById('searchJadwalCust');
   const searchText = searchInput.value.toLowerCase();
   
-  if (!base || !tanggal) {
-    container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Pilih tanggal dan base dahulu...</p>';
-    searchInput.disabled = true;
-    searchInput.value = '';
-    searchInput.placeholder = "Pilih tanggal & base dahulu...";
-    return;
-  }
-  
-  searchInput.disabled = false;
-  searchInput.placeholder = "Cari nama customer...";
+  if (!base || !tanggal) { container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Pilih tanggal dan base dahulu...</p>'; searchInput.disabled = true; searchInput.value = ''; searchInput.placeholder = "Pilih tanggal & base dahulu..."; return; }
+  searchInput.disabled = false; searchInput.placeholder = "Cari nama customer...";
   
   const selectedMonth = tanggal.substring(0, 7);
   const baseCustomers = customers.filter(c => c.base === base);
-  if (baseCustomers.length === 0) {
-    container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Tidak ada customer di base ini.</p>';
-    return;
-  }
+  if (baseCustomers.length === 0) { container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Tidak ada customer di base ini.</p>'; return; }
   
   let scheduledThisMonth = [];
-  schedules.forEach(s => {
-    if (s.tanggal && s.tanggal.substring(0, 7) === selectedMonth && s.base === base) {
-      let custs = s.customers ? s.customers.split('|||').filter(Boolean) : [];
-      scheduledThisMonth.push(...custs);
-    }
-  });
+  schedules.forEach(s => { if (s.tanggal && s.tanggal.substring(0, 7) === selectedMonth && s.base === base) { let custs = s.customers ? s.customers.split('|||').filter(Boolean) : []; scheduledThisMonth.push(...custs); } });
+  const availableCustomers = baseCustomers.filter(c => !scheduledThisMonth.includes(c.name) && c.name.toLowerCase().includes(searchText));
   
-  const availableCustomers = baseCustomers.filter(c => 
-    !scheduledThisMonth.includes(c.name) && 
-    c.name.toLowerCase().includes(searchText)
-  );
-  
-  if (availableCustomers.length === 0) {
-    container.innerHTML = '<p class="text-sm text-yellow-500 text-center py-4">Customer tidak ditemukan atau sudah dijadwalkan bulan ini.</p>';
-    return;
-  }
-  
-  container.innerHTML = availableCustomers.map(c => `
-    <label class="cust-checkbox-item">
-      <input type="checkbox" value="${c.name}" class="jadwal-cust-checkbox">
-      <span class="text-sm text-white">${c.name}</span>
-    </label>
-  `).join('');
+  if (availableCustomers.length === 0) { container.innerHTML = '<p class="text-sm text-yellow-500 text-center py-4">Customer tidak ditemukan atau sudah dijadwalkan bulan ini.</p>'; return; }
+  container.innerHTML = availableCustomers.map(c => `<label class="cust-checkbox-item"><input type="checkbox" value="${c.name}" class="jadwal-cust-checkbox"><span class="text-sm text-white">${c.name}</span></label>`).join('');
 }
 
 function generateJadwal(e) {
   if (e) e.preventDefault();
-  const tanggal = document.getElementById('jadwalTanggal').value;
-  const base = document.getElementById('jadwalBase').value;
-  const techName = document.getElementById('jadwalTeknisi').value;
-  const checkboxes = document.querySelectorAll('.jadwal-cust-checkbox:checked');
+  const tanggal = document.getElementById('jadwalTanggal').value; const base = document.getElementById('jadwalBase').value;
+  const techName = document.getElementById('jadwalTeknisi').value; const checkboxes = document.querySelectorAll('.jadwal-cust-checkbox:checked');
   
   if (!tanggal || !base) return showToast('Lengkapi tanggal dan base', 'error');
   if (!techName) return showToast('Silakan pilih teknisi pelaksana', 'error');
   if (checkboxes.length < 1) return showToast('Minimal harus memilih 1 customer!', 'error');
   
-  const dateObj = new Date(tanggal);
-  const dayName = dateObj.toLocaleDateString('id-ID', { weekday: 'long' });
+  const dateObj = new Date(tanggal); const dayName = dateObj.toLocaleDateString('id-ID', { weekday: 'long' });
   const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-  
   let text = `📅 *JADWAL KUNJUNGAN PM*\n📍 *Base:* ${base}\n🗓️ *Tanggal:* ${dayName}, ${dateStr}\n👷 *Teknisi:* ${techName}\n\n`;
   const custNames = [];
-  
   checkboxes.forEach((cb, i) => {
-    text += `${i + 1}. ${cb.value}\n`;
-    const custData = customers.find(c => c.name === cb.value);
-    if (custData && custData.mapsLink) {
-      text += `   📍 Lokasi: ${custData.mapsLink}\n`;
-    }
+    text += `${i + 1}. ${cb.value}\n`; const custData = customers.find(c => c.name === cb.value);
+    if (custData) { if (custData.mapsLink) { text += `   📍 Lokasi: ${custData.mapsLink}\n`; } if (custData.distance && custData.distance !== '-') { text += `   📏 Jarak: ± ${custData.distance} KM\n`; } }
     custNames.push(cb.value);
   });
-  
   text += `\nMohon dilakukan pemeriksaan PM sesuai jadwal. Terima kasih.`;
   
   document.getElementById('jadwalResult').value = text;
+  const waLink = `https://wa.me/?text=${encodeURIComponent(text)}`; const waBtn = document.getElementById('waLinkBtn');
+  waBtn.href = waLink; waBtn.classList.remove('hidden');
+  const tgLink = `https://t.me/share/url?url=https://google.com&text=${encodeURIComponent(text)}`; const tgBtn = document.getElementById('tgLinkBtn');
+  tgBtn.href = tgLink; tgBtn.classList.remove('hidden');
   
-  const waLink = `https://wa.me/?text=${encodeURIComponent(text)}`;
-  const waBtn = document.getElementById('waLinkBtn');
-  waBtn.href = waLink;
-  waBtn.classList.remove('hidden');
+  const newSched = { id: 'SCH-' + Date.now(), tanggal: tanggal, base: base, text: text, customers: custNames.join('|||'), createdAt: new Date().toISOString() };
+  schedules.unshift(newSched); saveData(); if (isConnected) syncToSheet('schedules', newSched, 'create');
+  renderSchedules(); populateJadwalCustomers(); showToast('Jadwal berhasil digenerate & disimpan!', 'success');
+}
+
+function generateAutoJadwal() {
+  const tanggal = document.getElementById('jadwalTanggal').value; const base = document.getElementById('jadwalBase').value;
+  const techName = document.getElementById('jadwalTeknisi').value;
   
-  const newSched = {
-    id: 'SCH-' + Date.now(),
-    tanggal: tanggal,
-    base: base,
-    text: text,
-    customers: custNames.join('|||'),
-    createdAt: new Date().toISOString()
-  };
-  schedules.unshift(newSched);
-  saveData();
-  if (isConnected) syncToSheet('schedules', newSched, 'create');
-  renderSchedules();
-  populateJadwalCustomers();
-  showToast('Jadwal berhasil digenerate & disimpan!', 'success');
+  if (!tanggal || !base) return showToast('Lengkapi tanggal dan base', 'error');
+  if (!techName) return showToast('Silakan pilih teknisi pelaksana', 'error');
+  
+  const selectedMonth = tanggal.substring(0, 7);
+  let scheduledThisMonth = [];
+  schedules.forEach(s => { if (s.tanggal && s.tanggal.substring(0, 7) === selectedMonth && s.base === base) { let custs = s.customers ? s.customers.split('|||').filter(Boolean) : []; scheduledThisMonth.push(...custs); } });
+  const availableCustomers = customers.filter(c => c.base === base && !scheduledThisMonth.includes(c.name));
+  if (availableCustomers.length === 0) return showToast('Tidak ada customer lagi yang bisa dijadwalkan bulan ini.', 'error');
+
+  const dateObj = new Date(tanggal); const dayName = dateObj.toLocaleDateString('id-ID', { weekday: 'long' });
+  const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  let text = `📅 *JADWAL KUNJUNGAN PM OTOMATIS*\n📍 *Base:* ${base}\n🗓️ *Tanggal:* ${dayName}, ${dateStr}\n👷 *Teknisi:* ${techName}\n\n`;
+  const custNames = [];
+  availableCustomers.forEach((c, i) => {
+    text += `${i + 1}. ${c.name}\n`; if (c.mapsLink) { text += `   📍 Lokasi: ${c.mapsLink}\n`; } if (c.distance && c.distance !== '-') { text += `   📏 Jarak: ± ${c.distance} KM\n`; }
+    custNames.push(c.name);
+  });
+  text += `\nMohon dilakukan pemeriksaan PM sesuai jadwal. Terima kasih.`;
+  
+  document.getElementById('jadwalResult').value = text;
+  const waLink = `https://wa.me/?text=${encodeURIComponent(text)}`; const waBtn = document.getElementById('waLinkBtn');
+  waBtn.href = waLink; waBtn.classList.remove('hidden');
+  const tgLink = `https://t.me/share/url?url=https://google.com&text=${encodeURIComponent(text)}`; const tgBtn = document.getElementById('tgLinkBtn');
+  tgBtn.href = tgLink; tgBtn.classList.remove('hidden');
+  
+  const newSched = { id: 'SCH-AUTO-' + Date.now(), tanggal: tanggal, base: base, text: text, customers: custNames.join('|||'), createdAt: new Date().toISOString() };
+  schedules.unshift(newSched); saveData(); if (isConnected) syncToSheet('schedules', newSched, 'create');
+  renderSchedules(); populateJadwalCustomers(); showToast('Jadwal otomatis dibuat! Klik Kirim WA/Telegram untuk mengirim ke teknisi.', 'success');
 }
 
 function renderSchedules() {
-  const container = document.getElementById('schedList');
-  if (!container) return;
-  if (schedules.length === 0) {
-    container.innerHTML = `<div class="empty-state py-8"><p class="text-sm">Belum ada riwayat jadwal. Buat baru di form sebelah!</p></div>`;
-    return;
-  }
+  const container = document.getElementById('schedList'); if (!container) return;
+  if (schedules.length === 0) { container.innerHTML = `<div class="empty-state py-8"><p class="text-sm">Belum ada riwayat jadwal. Buat baru di form sebelah!</p></div>`; return; }
   container.innerHTML = schedules.map(s => `
     <div class="glass p-4 flex flex-col gap-3" style="background:rgba(255,255,255,0.02);">
       <div class="flex items-center justify-between gap-2 flex-wrap">
-        <div class="flex items-center gap-2">
-          <span class="badge badge-info">${s.base}</span>
-          <span class="text-sm text-gray-300">${formatDate(s.tanggal)}</span>
-        </div>
+        <div class="flex items-center gap-2"><span class="badge badge-info">${s.base}</span><span class="text-sm text-gray-300">${formatDate(s.tanggal)}</span></div>
         <div class="flex gap-2">
           <button class="btn btn-ghost !py-1.5 !px-3 text-xs" onclick="copyText('${s.id}')"><i data-lucide="copy" style="width:12px;height:12px;"></i> Copy</button>
           <a href="https://wa.me/?text=${encodeURIComponent(s.text)}" target="_blank" class="btn btn-success !py-1.5 !px-3 text-xs"><i data-lucide="send" style="width:12px;height:12px;"></i> WA</a>
+          <a href="https://t.me/share/url?url=https://google.com&text=${encodeURIComponent(s.text)}" target="_blank" class="btn btn-telegram !py-1.5 !px-3 text-xs"><i data-lucide="send" style="width:12px;height:12px;"></i> TG</a>
           <button class="btn btn-danger !py-1.5 !px-3 text-xs" onclick="deleteSched('${s.id}')"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button>
         </div>
       </div>
       <pre class="text-xs text-gray-400 bg-black/30 p-3 rounded-md whitespace-pre-wrap font-mono">${s.text}</pre>
-    </div>
-  `).join('');
+    </div>`).join('');
   lucide.createIcons();
 }
 
 function copyText(id) {
   let textToCopy = id;
-  if (id.length < 30) {
-    const s = schedules.find(x => x.id === id) || suratTugas.find(x => x.id === id);
-    if (!s) return showToast('Tidak ditemukan', 'error');
-    textToCopy = s.text;
-  }
+  if (id.length < 30) { const s = schedules.find(x => x.id === id) || suratTugas.find(x => x.id === id); if (!s) return showToast('Tidak ditemukan', 'error'); textToCopy = s.text; }
   navigator.clipboard.writeText(textToCopy).then(() => showToast('Teks berhasil disalin!', 'success')).catch(() => showToast('Gagal menyalin', 'error'));
 }
 
 function deleteSched(id) {
   showConfirm('Hapus Histori Jadwal', 'Apakah Anda yakin ingin menghapus jadwal ini?', () => {
-    schedules = schedules.filter(s => s.id !== id);
-    saveData();
-    if (isConnected) syncToSheet('schedules', { id }, 'delete');
-    renderSchedules();
-    populateJadwalCustomers();
-    showToast('Histori dihapus', 'info');
+    schedules = schedules.filter(s => s.id !== id); saveData(); if (isConnected) syncToSheet('schedules', { id }, 'delete');
+    renderSchedules(); populateJadwalCustomers(); showToast('Histori dihapus', 'info');
   });
 }
 
 // ============= LAPORAN LOGIC =============
 function generateReport() {
-  const monthVal = document.getElementById('reportMonth').value;
-  if (!monthVal) return;
+  const monthVal = document.getElementById('reportMonth').value; if (!monthVal) return;
   const [year, month] = monthVal.split('-');
-  
   const pmReports = visits.filter(v => v.tanggal && v.tanggal.startsWith(`${year}-${month}`));
   const cmReports = cmVisits.filter(v => v.tanggal && v.tanggal.startsWith(`${year}-${month}`));
   const cmOpen = cmReports.filter(v => v.status !== 'Closed');
-  
   const container = document.getElementById('reportContent');
-  
-  let html = `
-    <div class="mb-8">
-      <h2 class="text-2xl font-bold text-white mb-1">Laporan Maintenance Bulanan</h2>
-      <p class="text-gray-400">Periode: ${new Date(year, month - 1).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</p>
-    </div>
-    
-    <div class="grid grid-cols-3 gap-4 mb-8">
-      <div class="glass p-4 text-center">
-        <p class="text-3xl font-bold text-emerald-400">${pmReports.length}</p>
-        <p class="text-xs text-gray-400 mt-1">Total PM</p>
-      </div>
-      <div class="glass p-4 text-center">
-        <p class="text-3xl font-bold text-rose-400">${cmReports.length}</p>
-        <p class="text-xs text-gray-400 mt-1">Total CM</p>
-      </div>
-      <div class="glass p-4 text-center">
-        <p class="text-3xl font-bold text-yellow-400">${cmOpen.length}</p>
-        <p class="text-xs text-gray-400 mt-1">CM Belum Selesai</p>
-      </div>
-    </div>
-  `;
-  
-  if (pmReports.length > 0) {
-    html += `<h3 class="text-lg font-bold text-white mb-3 mt-6">Detail Preventive Maintenance (PM)</h3>
-    <table class="data-table mb-8">
-      <thead><tr><th>ID</th><th>Tanggal</th><th>Teknisi</th><th>Customer</th><th>Base</th></tr></thead>
-      <tbody>`;
-    pmReports.forEach(v => html += `<tr><td>${v.id}</td><td>${formatDate(v.tanggal)}</td><td>${v.teknisi}</td><td>${v.customer}</td><td>${v.base}</td></tr>`);
-    html += `</tbody></table>`;
-  }
-  
-  if (cmReports.length > 0) {
-    html += `<h3 class="text-lg font-bold text-white mb-3 mt-6">Detail Corrective Maintenance (CM)</h3>
-    <table class="data-table">
-      <thead><tr><th>ID</th><th>Tanggal</th><th>Customer</th><th>Masalah</th><th>Status</th></tr></thead>
-      <tbody>`;
-    cmReports.forEach(v => html += `<tr><td>${v.id}</td><td>${formatDate(v.tanggal)}</td><td>${v.customer}</td><td>${v.masalah}</td><td>${v.status}</td></tr>`);
-    html += `</tbody></table>`;
-  }
-  
-  if (pmReports.length === 0 && cmReports.length === 0) {
-    html += `<div class="empty-state py-12"><p class="text-gray-500">Tidak ada data maintenance pada bulan ini.</p></div>`;
-  }
-  
+  let html = `<div class="mb-8"><h2 class="text-2xl font-bold text-white mb-1">Laporan Maintenance Bulanan</h2><p class="text-gray-400">Periode: ${new Date(year, month - 1).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</p></div><div class="grid grid-cols-3 gap-4 mb-8"><div class="glass p-4 text-center"><p class="text-3xl font-bold text-emerald-400">${pmReports.length}</p><p class="text-xs text-gray-400 mt-1">Total PM</p></div><div class="glass p-4 text-center"><p class="text-3xl font-bold text-rose-400">${cmReports.length}</p><p class="text-xs text-gray-400 mt-1">Total CM</p></div><div class="glass p-4 text-center"><p class="text-3xl font-bold text-yellow-400">${cmOpen.length}</p><p class="text-xs text-gray-400 mt-1">CM Belum Selesai</p></div></div>`;
+  if (pmReports.length > 0) { html += `<h3 class="text-lg font-bold text-white mb-3 mt-6">Detail Preventive Maintenance (PM)</h3><table class="data-table mb-8"><thead><tr><th>ID</th><th>Tanggal</th><th>Teknisi</th><th>Customer</th><th>Base</th></tr></thead><tbody>`; pmReports.forEach(v => html += `<tr><td>${v.id}</td><td>${formatDate(v.tanggal)}</td><td>${v.teknisi}</td><td>${v.customer}</td><td>${v.base}</td></tr>`); html += `</tbody></table>`; }
+  if (cmReports.length > 0) { html += `<h3 class="text-lg font-bold text-white mb-3 mt-6">Detail Corrective Maintenance (CM)</h3><table class="data-table"><thead><tr><th>ID</th><th>Tanggal</th><th>Customer</th><th>Masalah</th><th>Status</th></tr></thead><tbody>`; cmReports.forEach(v => html += `<tr><td>${v.id}</td><td>${formatDate(v.tanggal)}</td><td>${v.customer}</td><td>${v.masalah}</td><td>${v.status}</td></tr>`); html += `</tbody></table>`; }
+  if (pmReports.length === 0 && cmReports.length === 0) { html += `<div class="empty-state py-12"><p class="text-gray-500">Tidak ada data maintenance pada bulan ini.</p></div>`; }
   container.innerHTML = html;
 }
 
 // ============= AUTO-SCHEDULE LOGIC =============
 function getTechNextSchedule(tech, cust) {
-  const freqMonths = parseInt(cust.frequency) || 1;
-  const techVisits = visits.filter(v => v.teknisi === tech.name && v.customer === cust.name);
-  if (techVisits.length > 0) {
-    const latestVisit = techVisits.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal))[0];
-    let nextDate = new Date(latestVisit.tanggal);
-    nextDate.setMonth(nextDate.getMonth() + freqMonths);
-    return nextDate;
-  } else {
-    return new Date(cust.firstSchedule || new Date().toISOString().split('T')[0]);
-  }
+  const freqMonths = parseInt(cust.frequency) || 1; const techVisits = visits.filter(v => v.teknisi === tech.name && v.customer === cust.name);
+  if (techVisits.length > 0) { const latestVisit = techVisits.sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal))[0]; let nextDate = new Date(latestVisit.tanggal); nextDate.setMonth(nextDate.getMonth() + freqMonths); return nextDate; } 
+  else { return new Date(cust.firstSchedule || new Date().toISOString().split('T')[0]); }
 }
-
-function getFreqLabel(freq) {
-  const f = parseInt(freq);
-  if (f === 1) return 'Bulanan';
-  if (f === 3) return '3 Bulanan';
-  if (f === 4) return '4 Bulanan';
-  if (f === 12) return 'Tahunan';
-  return 'Sekali';
-}
+function getFreqLabel(freq) { const f = parseInt(freq); if (f === 1) return 'Bulanan'; if (f === 3) return '3 Bulanan'; if (f === 4) return '4 Bulanan'; if (f === 12) return 'Tahunan'; return 'Sekali'; }
 
 // ============= DASHBOARD =============
 function renderDashboard() {
-  animateCounter('statTotalPM', visits.length);
-  animateCounter('statTotalCM', cmVisits.length);
-  
-  const pending = [];
-  const today = new Date(); today.setHours(23,59,59,999);
-  technicians.forEach(tech => {
-    customers.filter(c => c.base === tech.base).forEach(cust => {
-      const nextSched = getTechNextSchedule(tech, cust);
-      if (nextSched <= today) pending.push({ tech, cust, nextSched });
-    });
-  });
-  
-  animateCounter('statPending', pending.length);
-  animateCounter('statTeknisi', technicians.length);
-  
-  renderDonutChart();
-  renderPendingTasks(pending);
-  renderUnresolvedCM();
-  renderRecentActivity();
+  animateCounter('statTotalPM', visits.length); animateCounter('statTotalCM', cmVisits.length);
+  const pending = []; const today = new Date(); today.setHours(23,59,59,999);
+  technicians.forEach(tech => { customers.filter(c => c.base === tech.base).forEach(cust => { const nextSched = getTechNextSchedule(tech, cust); if (nextSched <= today) pending.push({ tech, cust, nextSched }); }); });
+  animateCounter('statPending', pending.length); animateCounter('statTeknisi', technicians.length);
+  renderDonutChart(); renderPendingTasks(pending); renderUnresolvedCM(); renderRecentActivity();
 }
-
-function animateCounter(id, target) {
-  const el = document.getElementById(id); const current = parseInt(el.textContent) || 0; const inc = (target - current) / 30; let i = 0;
-  const timer = setInterval(() => { i++; el.textContent = Math.round(current + inc * i); if (i >= 30) { el.textContent = target; clearInterval(timer); } }, 800 / 30);
-}
+function animateCounter(id, target) { const el = document.getElementById(id); const current = parseInt(el.textContent) || 0; const inc = (target - current) / 30; let i = 0; const timer = setInterval(() => { i++; el.textContent = Math.round(current + inc * i); if (i >= 30) { el.textContent = target; clearInterval(timer); } }, 800 / 30); }
 
 function renderUnresolvedCM() {
-  const container = document.getElementById('unresolvedCM');
-  if (!container) return;
+  const container = document.getElementById('unresolvedCM'); if (!container) return;
   const unresolved = cmVisits.filter(v => v.status !== 'Closed');
-  if (unresolved.length === 0) {
-    container.innerHTML = `<div class="empty-state py-4"><i data-lucide="check-circle" style="width:24px;height:24px;color:#10b981;margin:0 auto 8px;"></i><p class="text-sm text-gray-400">Semua CM sudah selesai!</p></div>`;
-    lucide.createIcons(); return;
-  }
-  container.innerHTML = unresolved.slice(0, 5).map(v => `
-    <div class="glass p-3 flex items-center gap-3 cursor-pointer" style="background:rgba(244,63,94,0.05); border-left: 2px solid #f43f5e;" onclick="showCMDetail('${v.id}')">
-      <div class="flex-1 min-w-0">
-        <p class="font-semibold text-sm text-white truncate">${v.customer}</p>
-        <p class="text-xs text-gray-400 truncate">${v.masalah}</p>
-      </div>
-      <span class="badge ${v.status === 'Open' ? 'badge-danger' : 'badge-warning'}">${v.status}</span>
-    </div>
-  `).join('');
+  if (unresolved.length === 0) { container.innerHTML = `<div class="empty-state py-4"><i data-lucide="check-circle" style="width:24px;height:24px;color:#10b981;margin:0 auto 8px;"></i><p class="text-sm text-gray-400">Semua CM sudah selesai!</p></div>`; lucide.createIcons(); return; }
+  container.innerHTML = unresolved.slice(0, 5).map(v => `<div class="glass p-3 flex items-center gap-3 cursor-pointer" style="background:rgba(244,63,94,0.05); border-left: 2px solid #f43f5e;" onclick="showCMDetail('${v.id}')"><div class="flex-1 min-w-0"><p class="font-semibold text-sm text-white truncate">${v.customer}</p><p class="text-xs text-gray-400 truncate">${v.masalah}</p></div><span class="badge ${v.status === 'Open' ? 'badge-danger' : 'badge-warning'}">${v.status}</span></div>`).join('');
   lucide.createIcons();
 }
 
 function renderPendingTasks(pending) {
   const container = document.getElementById('pendingTasks');
-  if (pending.length === 0) {
-    container.innerHTML = `<div class="empty-state py-8"><div class="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(139,92,246,0.1);"><i data-lucide="check-circle" style="width:24px;height:24px;color:#8b5cf6;"></i></div><p class="text-sm font-semibold text-gray-300">Semua jadwal PM sudah tercatat!</p></div>`;
-    lucide.createIcons(); return;
-  }
+  if (pending.length === 0) { container.innerHTML = `<div class="empty-state py-8"><div class="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(139,92,246,0.1);"><i data-lucide="check-circle" style="width:24px;height:24px;color:#8b5cf6;"></i></div><p class="text-sm font-semibold text-gray-300">Semua jadwal PM sudah tercatat!</p></div>`; lucide.createIcons(); return; }
   pending.sort((a, b) => new Date(a.nextSched) - new Date(b.nextSched));
   container.innerHTML = pending.map(({ tech, cust, nextSched }) => {
-    const today = new Date(); today.setHours(0,0,0,0);
-    const isOverdue = nextSched < today;
-    const diffTime = Math.abs(today - nextSched);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return `
-      <div class="glass p-4 pending-card flex items-center gap-4" style="background:rgba(245,158,11,0.05);">
-        <div class="tech-avatar" style="background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid rgba(245,158,11,0.3);">${tech.name.charAt(0)}</div>
-        <div class="flex-1 min-w-0">
-          <p class="font-semibold text-sm text-white">${tech.name} <span class="text-gray-500 font-normal">→ ${cust.name}</span></p>
-          <p class="text-xs text-gray-400 mt-1">Base: ${tech.base} • Frek: ${getFreqLabel(cust.frequency)} • Jatuh Tempo: ${formatDate(nextSched)} ${isOverdue ? `<span class="text-rose-400 font-bold">(Terlambat ${diffDays} Hari)</span>` : ''}</p>
-        </div>
-        <button class="btn btn-primary !py-2 !px-3 text-xs" onclick="quickAssign('${tech.name}','${cust.name}')">
-          <i data-lucide="plus" style="width:12px;height:12px;"></i> Catat PM
-        </button>
-      </div>
-    `;
+    const today = new Date(); today.setHours(0,0,0,0); const isOverdue = nextSched < today;
+    const diffTime = Math.abs(today - nextSched); const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return `<div class="glass p-4 pending-card flex items-center gap-4" style="background:rgba(245,158,11,0.05);"><div class="tech-avatar" style="background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid rgba(245,158,11,0.3);">${tech.name.charAt(0)}</div><div class="flex-1 min-w-0"><p class="font-semibold text-sm text-white">${tech.name} <span class="text-gray-500 font-normal">→ ${cust.name}</span></p><p class="text-xs text-gray-400 mt-1">Base: ${tech.base} • Frek: ${getFreqLabel(cust.frequency)} • Jatuh Tempo: ${formatDate(nextSched)} ${isOverdue ? `<span class="text-rose-400 font-bold">(Terlambat ${diffDays} Hari)</span>` : ''}</p></div><button class="btn btn-primary !py-2 !px-3 text-xs" onclick="quickAssign('${tech.name}','${cust.name}')"><i data-lucide="plus" style="width:12px;height:12px;"></i> Catat PM</button></div>`;
   }).join('');
   lucide.createIcons();
 }
 
 function quickAssign(techName, custName) {
-  switchTab('form');
-  document.getElementById('teknisi').value = techName;
-  filterCustomerByBase();
-  document.getElementById('customerSearch').value = custName;
-  document.getElementById('customer').value = custName;
+  switchTab('form'); document.getElementById('teknisi').value = techName; filterCustomerByBase();
+  document.getElementById('customerSearch').value = custName; document.getElementById('customer').value = custName;
 }
 
 function renderDonutChart() {
-  const ctx = document.getElementById('chartDonut');
-  if (!ctx) return;
-  
-  const bases = [...new Set(technicians.map(t => t.base))];
-  const baseCounts = bases.map(b => visits.filter(v => v.base === b).length);
+  const ctx = document.getElementById('chartDonut'); if (!ctx) return;
+  const bases = [...new Set(technicians.map(t => t.base))]; const baseCounts = bases.map(b => visits.filter(v => v.base === b).length);
   const colors = ['#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#f43f5e', '#ec4899'];
-  
   if (chartDonut) chartDonut.destroy();
-  
-  if (bases.length === 0) {
-    const legend = document.getElementById('donutLegend');
-    legend.innerHTML = '<p class="text-sm text-gray-500 text-center">Belum ada data base teknisi.</p>';
-    return;
-  }
-
-  chartDonut = new Chart(ctx.getContext('2d'), { 
-    type: 'doughnut', 
-    data: { labels: bases, datasets: [{ data: baseCounts, backgroundColor: colors.slice(0, bases.length), borderColor: 'rgba(8, 9, 13, 0.8)', borderWidth: 3, hoverOffset: 8 }] }, 
-    options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } } 
-  });
-  
-  const total = baseCounts.reduce((a, b) => a + b, 0) || 1; 
-  const legend = document.getElementById('donutLegend');
-  legend.innerHTML = bases.map((b, i) => {
-    const count = baseCounts[i]; const pct = Math.round(count/total*100);
-    return `<div class="flex items-center justify-between text-sm"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:${colors[i]}"></span><span class="text-gray-300">${b}</span></div><div class="flex items-center gap-2"><span class="text-gray-500 text-xs">${pct}%</span><span class="font-semibold text-white">${count}</span></div></div>`;
-  }).join('');
+  if (bases.length === 0) { const legend = document.getElementById('donutLegend'); legend.innerHTML = '<p class="text-sm text-gray-500 text-center">Belum ada data base teknisi.</p>'; return; }
+  chartDonut = new Chart(ctx.getContext('2d'), { type: 'doughnut', data: { labels: bases, datasets: [{ data: baseCounts, backgroundColor: colors.slice(0, bases.length), borderColor: 'rgba(8, 9, 13, 0.8)', borderWidth: 3, hoverOffset: 8 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } } });
+  const total = baseCounts.reduce((a, b) => a + b, 0) || 1; const legend = document.getElementById('donutLegend');
+  legend.innerHTML = bases.map((b, i) => { const count = baseCounts[i]; const pct = Math.round(count/total*100); return `<div class="flex items-center justify-between text-sm"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:${colors[i]}"></span><span class="text-gray-300">${b}</span></div><div class="flex items-center gap-2"><span class="text-gray-500 text-xs">${pct}%</span><span class="font-semibold text-white">${count}</span></div></div>`; }).join('');
 }
 
 function renderRecentActivity() {
   const container = document.getElementById('recentActivity');
-  const pmActs = visits.map(v => ({ ...v, type: 'PM' }));
-  const cmActs = cmVisits.map(v => ({ ...v, type: 'CM', masalah: v.masalah }));
+  const pmActs = visits.map(v => ({ ...v, type: 'PM' })); const cmActs = cmVisits.map(v => ({ ...v, type: 'CM', masalah: v.masalah }));
   const allActs = [...pmActs, ...cmActs].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 6);
-  if (allActs.length === 0) { 
-    container.innerHTML = '<div class="empty-state py-8"><p class="text-sm">Belum ada aktivitas. Mulai catat PM atau CM sekarang!</p></div>'; 
-    return; 
-  }
+  if (allActs.length === 0) { container.innerHTML = '<div class="empty-state py-8"><p class="text-sm">Belum ada aktivitas. Mulai catat PM atau CM sekarang!</p></div>'; return; }
   container.innerHTML = allActs.map(v => {
-    const isCM = v.type === 'CM';
-    const title = isCM ? v.masalah : v.customer;
-    const subtitle = isCM ? `CM: ${v.customer}` : `PM: ${v.teknisi}`;
+    const isCM = v.type === 'CM'; const title = isCM ? v.masalah : v.customer; const subtitle = isCM ? `CM: ${v.customer}` : `PM: ${v.teknisi}`;
     const badge = isCM ? `<span class="badge badge-danger flex-shrink-0">CM</span>` : `<span class="badge badge-success flex-shrink-0">PM</span>`;
     return `<div class="activity-item" onclick="${isCM ? `showCMDetail('${v.id}')` : `showDetail('${v.id}')`}"><div class="tech-avatar" style="background:${isCM ? 'linear-gradient(135deg, #f43f5e, #be123c)' : 'linear-gradient(135deg, #10b981, #047857)'}">${v.teknisi.charAt(0)}</div><div class="flex-1 min-w-0"><div class="flex items-center justify-between gap-2 mb-1"><p class="font-semibold text-sm truncate text-white">${title}</p>${badge}</div><p class="text-xs text-gray-400 truncate">${subtitle} • ${v.base}</p><p class="text-xs text-gray-500 mt-1">${formatDate(v.tanggal)}</p></div></div>`;
   }).join(''); 
@@ -1310,122 +1066,40 @@ function renderRecentActivity() {
 
 // ============= FORM LOGIC =============
 function populateSelects() {
-  const techSelect = document.getElementById('teknisi'); const techFilter = document.getElementById('filterTeknisi');
-  const cmTechSelect = document.getElementById('cmTeknisi');
-  techSelect.innerHTML = '<option value="">Pilih teknisi...</option>'; 
-  techFilter.innerHTML = '<option value="">Semua Teknisi</option>'; 
-  cmTechSelect.innerHTML = '<option value="">Pilih teknisi...</option>';
-  technicians.forEach(t => { 
-    techSelect.innerHTML += `<option value="${t.name}" data-base="${t.base}">${t.name} (${t.base})</option>`; 
-    techFilter.innerHTML += `<option value="${t.name}">${t.name}</option>`; 
-    cmTechSelect.innerHTML += `<option value="${t.name}" data-base="${t.base}">${t.name} (${t.base})</option>`;
-  });
+  const techSelect = document.getElementById('teknisi'); const techFilter = document.getElementById('filterTeknisi'); const cmTechSelect = document.getElementById('cmTeknisi');
+  techSelect.innerHTML = '<option value="">Pilih teknisi...</option>'; techFilter.innerHTML = '<option value="">Semua Teknisi</option>'; cmTechSelect.innerHTML = '<option value="">Pilih teknisi...</option>';
+  technicians.forEach(t => { techSelect.innerHTML += `<option value="${t.name}" data-base="${t.base}">${t.name} (${t.base})</option>`; techFilter.innerHTML += `<option value="${t.name}">${t.name}</option>`; cmTechSelect.innerHTML += `<option value="${t.name}" data-base="${t.base}">${t.name} (${t.base})</option>`; });
 }
-
-function populateCustBaseFilter() {
-  const filter = document.getElementById('filterCustBase');
-  if (!filter) return;
-  const currentValue = filter.value;
-  const bases = [...new Set(customers.map(c => c.base))];
-  filter.innerHTML = '<option value="">Semua Base</option>';
-  bases.forEach(b => filter.innerHTML += `<option value="${b}">${b}</option>`);
-  filter.value = currentValue;
-}
-
-function filterCustomerByBase() {
-  const techName = document.getElementById('teknisi').value;
-  const tech = technicians.find(t => t.name === techName);
-  const custSearch = document.getElementById('customerSearch');
-  const baseInput = document.getElementById('base');
-  custSearch.value = ''; document.getElementById('customer').value = '';
-  if (tech) { baseInput.value = tech.base; custSearch.disabled = false; custSearch.placeholder = "Ketik nama customer..."; } 
-  else { baseInput.value = ''; custSearch.disabled = true; custSearch.placeholder = "Pilih teknisi dahulu..."; document.getElementById('customerDropdownList').classList.remove('show'); }
-}
-
-function showCustomerDropdown() {
-  const techName = document.getElementById('teknisi').value;
-  const tech = technicians.find(t => t.name === techName);
-  if (!tech) return;
-  const dropdown = document.getElementById('customerDropdownList');
-  const searchText = document.getElementById('customerSearch').value.toLowerCase();
-  const baseCustomers = customers.filter(c => c.base === tech.base);
-  const filteredCustomers = baseCustomers.filter(c => c.name.toLowerCase().includes(searchText));
-  if (filteredCustomers.length === 0) { dropdown.innerHTML = '<div class="cust-option" style="color: var(--muted); cursor: default;">Customer tidak ditemukan</div>'; } 
-  else {
-    dropdown.innerHTML = filteredCustomers.map(c => {
-      const nextSched = getTechNextSchedule(tech, c);
-      return `<div class="cust-option" onmousedown="selectCustomer('${c.name}')" style="display: flex; justify-content: space-between; align-items: center;">
-                <span>${c.name}</span>
-                <span style="font-size: 11px; color: var(--muted);">Jadwal: ${formatDate(nextSched)}</span>
-              </div>`;
-    }).join('');
-  }
-  dropdown.classList.add('show');
-}
-
+function populateCustBaseFilter() { const filter = document.getElementById('filterCustBase'); if (!filter) return; const currentValue = filter.value; const bases = [...new Set(customers.map(c => c.base))]; filter.innerHTML = '<option value="">Semua Base</option>'; bases.forEach(b => filter.innerHTML += `<option value="${b}">${b}</option>`); filter.value = currentValue; }
+function filterCustomerByBase() { const techName = document.getElementById('teknisi').value; const tech = technicians.find(t => t.name === techName); const custSearch = document.getElementById('customerSearch'); const baseInput = document.getElementById('base'); custSearch.value = ''; document.getElementById('customer').value = ''; if (tech) { baseInput.value = tech.base; custSearch.disabled = false; custSearch.placeholder = "Ketik nama customer..."; } else { baseInput.value = ''; custSearch.disabled = true; custSearch.placeholder = "Pilih teknisi dahulu..."; document.getElementById('customerDropdownList').classList.remove('show'); } }
+function showCustomerDropdown() { const techName = document.getElementById('teknisi').value; const tech = technicians.find(t => t.name === techName); if (!tech) return; const dropdown = document.getElementById('customerDropdownList'); const searchText = document.getElementById('customerSearch').value.toLowerCase(); const baseCustomers = customers.filter(c => c.base === tech.base); const filteredCustomers = baseCustomers.filter(c => c.name.toLowerCase().includes(searchText)); if (filteredCustomers.length === 0) { dropdown.innerHTML = '<div class="cust-option" style="color: var(--muted); cursor: default;">Customer tidak ditemukan</div>'; } else { dropdown.innerHTML = filteredCustomers.map(c => { const nextSched = getTechNextSchedule(tech, c); return `<div class="cust-option" onmousedown="selectCustomer('${c.name}')" style="display: flex; justify-content: space-between; align-items: center;"><span>${c.name}</span><span style="font-size: 11px; color: var(--muted);">Jadwal: ${formatDate(nextSched)}</span></div>`; }).join(''); } dropdown.classList.add('show'); }
 function hideCustomerDropdown() { setTimeout(() => { document.getElementById('customerDropdownList').classList.remove('show'); }, 150); }
 function selectCustomer(name) { document.getElementById('customerSearch').value = name; document.getElementById('customer').value = name; document.getElementById('customerDropdownList').classList.remove('show'); }
-
-function filterCMCustomerByBase() {
-  const techName = document.getElementById('cmTeknisi').value;
-  const tech = technicians.find(t => t.name === techName);
-  const custSearch = document.getElementById('cmCustomerSearch');
-  custSearch.value = ''; document.getElementById('cmCustomer').value = '';
-  if (tech) { custSearch.disabled = false; custSearch.placeholder = "Ketik nama customer..."; } 
-  else { custSearch.disabled = true; custSearch.placeholder = "Pilih teknisi dahulu..."; document.getElementById('cmCustomerDropdownList').classList.remove('show'); }
-}
-
-function showCMCustomerDropdown() {
-  const techName = document.getElementById('cmTeknisi').value;
-  const tech = technicians.find(t => t.name === techName);
-  if (!tech) return;
-  const dropdown = document.getElementById('cmCustomerDropdownList');
-  const searchText = document.getElementById('cmCustomerSearch').value.toLowerCase();
-  const baseCustomers = customers.filter(c => c.base === tech.base);
-  const filteredCustomers = baseCustomers.filter(c => c.name.toLowerCase().includes(searchText));
-  if (filteredCustomers.length === 0) { dropdown.innerHTML = '<div class="cust-option" style="color: var(--muted); cursor: default;">Customer tidak ditemukan</div>'; } 
-  else { dropdown.innerHTML = filteredCustomers.map(c => `<div class="cust-option" onmousedown="selectCMCustomer('${c.name}')">${c.name}</div>`).join(''); }
-  dropdown.classList.add('show');
-}
-
+function filterCMCustomerByBase() { const techName = document.getElementById('cmTeknisi').value; const tech = technicians.find(t => t.name === techName); const custSearch = document.getElementById('cmCustomerSearch'); custSearch.value = ''; document.getElementById('cmCustomer').value = ''; if (tech) { custSearch.disabled = false; custSearch.placeholder = "Ketik nama customer..."; } else { custSearch.disabled = true; custSearch.placeholder = "Pilih teknisi dahulu..."; document.getElementById('cmCustomerDropdownList').classList.remove('show'); } }
+function showCMCustomerDropdown() { const techName = document.getElementById('cmTeknisi').value; const tech = technicians.find(t => t.name === techName); if (!tech) return; const dropdown = document.getElementById('cmCustomerDropdownList'); const searchText = document.getElementById('cmCustomerSearch').value.toLowerCase(); const baseCustomers = customers.filter(c => c.base === tech.base); const filteredCustomers = baseCustomers.filter(c => c.name.toLowerCase().includes(searchText)); if (filteredCustomers.length === 0) { dropdown.innerHTML = '<div class="cust-option" style="color: var(--muted); cursor: default;">Customer tidak ditemukan</div>'; } else { dropdown.innerHTML = filteredCustomers.map(c => `<div class="cust-option" onmousedown="selectCMCustomer('${c.name}')">${c.name}</div>`).join(''); } dropdown.classList.add('show'); }
 function hideCMCustomerDropdown() { setTimeout(() => { document.getElementById('cmCustomerDropdownList').classList.remove('show'); }, 150); }
 function selectCMCustomer(name) { document.getElementById('cmCustomerSearch').value = name; document.getElementById('cmCustomer').value = name; document.getElementById('cmCustomerDropdownList').classList.remove('show'); }
 
 function handleSubmit(e) {
-  e.preventDefault(); 
-  const id = document.getElementById('visitId').value || generateId('PM'); 
-  const isEdit = !!document.getElementById('visitId').value;
-  const techName = document.getElementById('teknisi').value;
-  const tech = technicians.find(t => t.name === techName);
-  const custName = document.getElementById('customer').value;
+  e.preventDefault(); const id = document.getElementById('visitId').value || generateId('PM'); const isEdit = !!document.getElementById('visitId').value;
+  const techName = document.getElementById('teknisi').value; const tech = technicians.find(t => t.name === techName); const custName = document.getElementById('customer').value;
   const tanggalInput = document.getElementById('tanggal').value;
   if (!custName) return showToast('Silakan pilih customer dari daftar', 'error');
   const inputDateStr = new Date(tanggalInput).toISOString().split('T')[0];
-  const isDuplicate = visits.some(v => {
-      const dbDateStr = new Date(v.tanggal).toISOString().split('T')[0];
-      return dbDateStr === inputDateStr && v.customer.trim().toLowerCase() === custName.trim().toLowerCase() && v.id !== id; 
-  });
+  const isDuplicate = visits.some(v => { const dbDateStr = new Date(v.tanggal).toISOString().split('T')[0]; return dbDateStr === inputDateStr && v.customer.trim().toLowerCase() === custName.trim().toLowerCase() && v.id !== id; });
   if (isDuplicate) return showToast('Gagal: Customer ini sudah ada kunjungan PM di tanggal yang sama!', 'error');
   const data = { id, tanggal: tanggalInput, teknisi: techName, base: tech?.base || '', customer: custName, createdAt: isEdit ? visits.find(v => v.id === id).createdAt : new Date().toISOString() };
-  if (isEdit) { const idx = visits.findIndex(v => v.id === id); visits[idx] = data; showToast('Data PM berhasil diperbarui!', 'success'); } 
-  else { visits.unshift(data); showToast('Kunjungan PM berhasil dicatat!', 'success'); }
-  saveData(); if (isConnected) syncToSheet('visits', data, isEdit ? 'update' : 'create'); 
-  resetForm(); renderDashboard(); renderRiwayat(); 
+  if (isEdit) { const idx = visits.findIndex(v => v.id === id); visits[idx] = data; showToast('Data PM berhasil diperbarui!', 'success'); } else { visits.unshift(data); showToast('Kunjungan PM berhasil dicatat!', 'success'); }
+  saveData(); if (isConnected) syncToSheet('visits', data, isEdit ? 'update' : 'create'); resetForm(); renderDashboard(); renderRiwayat(); 
 }
 
 function handleAddCM(e) {
-  e.preventDefault(); 
-  const id = document.getElementById('cmVisitId').value || generateId('CM'); 
-  const isEdit = !!document.getElementById('cmVisitId').value;
-  const techName = document.getElementById('cmTeknisi').value;
-  const tech = technicians.find(t => t.name === techName);
-  const custName = document.getElementById('cmCustomer').value;
+  e.preventDefault(); const id = document.getElementById('cmVisitId').value || generateId('CM'); const isEdit = !!document.getElementById('cmVisitId').value;
+  const techName = document.getElementById('cmTeknisi').value; const tech = technicians.find(t => t.name === techName); const custName = document.getElementById('cmCustomer').value;
   if (!custName) return showToast('Silakan pilih customer dari daftar', 'error');
   const data = { id, tanggal: document.getElementById('cmTanggal').value, teknisi: techName, base: tech?.base || '', customer: custName, masalah: document.getElementById('cmMasalah').value, tindakan: document.getElementById('cmTindakan').value, status: document.getElementById('cmStatus').value, createdAt: isEdit ? cmVisits.find(v => v.id === id).createdAt : new Date().toISOString() };
-  if (isEdit) { const idx = cmVisits.findIndex(v => v.id === id); cmVisits[idx] = data; showToast('Data CM berhasil diperbarui!', 'success'); } 
-  else { cmVisits.unshift(data); showToast('Data CM berhasil dicatat!', 'success'); }
-  saveData(); if (isConnected) syncToSheet('cm_visits', data, isEdit ? 'update' : 'create'); 
-  resetCMForm(); renderDashboard(); renderCMHistory(); 
+  if (isEdit) { const idx = cmVisits.findIndex(v => v.id === id); cmVisits[idx] = data; showToast('Data CM berhasil diperbarui!', 'success'); } else { cmVisits.unshift(data); showToast('Data CM berhasil dicatat!', 'success'); }
+  saveData(); if (isConnected) syncToSheet('cm_visits', data, isEdit ? 'update' : 'create'); resetCMForm(); renderDashboard(); renderCMHistory(); 
 }
 
 function handleAddTech(e) {
@@ -1435,11 +1109,20 @@ function handleAddTech(e) {
 }
 
 function handleAddCust(e) {
-  e.preventDefault(); 
-  const cust = { id: 'C' + String(customers.length + 1).padStart(3, '0'), name: document.getElementById('custName').value, base: document.getElementById('custBase').value, firstSchedule: document.getElementById('custSchedule').value, frequency: parseInt(document.getElementById('custFreq').value), mapsLink: document.getElementById('custMaps').value };
-  customers.push(cust); saveData(); populateCustBaseFilter(); populateJadwalBase(); renderCustomers(); renderDashboard(); document.getElementById('custForm').reset();
-  if (isConnected) syncToSheet('customers', cust, 'create'); showToast('Customer ditambahkan', 'success');
+  e.preventDefault(); const id = document.getElementById('custId').value || ('C' + String(customers.length + 1).padStart(3, '0')); const isEdit = !!document.getElementById('custId').value;
+  const cust = { id: id, name: document.getElementById('custName').value, base: document.getElementById('custBase').value, firstSchedule: document.getElementById('custSchedule').value, frequency: parseInt(document.getElementById('custFreq').value), mapsLink: document.getElementById('custMaps').value, distance: document.getElementById('custDistance').value || '-' };
+  if (isEdit) { const idx = customers.findIndex(c => c.id === id); customers[idx] = cust; showToast('Data customer berhasil diperbarui!', 'success'); } else { customers.push(cust); showToast('Customer ditambahkan', 'success'); }
+  saveData(); if (isConnected) syncToSheet('customers', cust, isEdit ? 'update' : 'create'); resetCustForm(); populateCustBaseFilter(); populateJadwalBase(); renderCustomers(); renderDashboard(); 
 }
+
+function editCust(id) {
+  const c = customers.find(x => x.id === id); if (!c) return;
+  document.getElementById('custId').value = c.id; document.getElementById('custName').value = c.name; document.getElementById('custBase').value = c.base; document.getElementById('custSchedule').value = c.firstSchedule; document.getElementById('custFreq').value = c.frequency; document.getElementById('custMaps').value = c.mapsLink || ''; document.getElementById('custDistance').value = c.distance !== '-' ? c.distance : '';
+  document.getElementById('custSubmitBtn').innerHTML = '<i data-lucide="save" style="width:16px;height:16px;"></i> Update Customer'; document.getElementById('cancelEditBtn').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' }); lucide.createIcons();
+}
+
+function resetCustForm() { document.getElementById('custForm').reset(); document.getElementById('custId').value = ''; document.getElementById('custSubmitBtn').innerHTML = '<i data-lucide="building-plus" style="width:16px;height:16px;"></i> Tambah Customer'; document.getElementById('cancelEditBtn').classList.add('hidden'); lucide.createIcons(); }
 
 function generateId(type) { const year = new Date().getFullYear(); const count = (type === 'CM' ? cmVisits : visits).filter(v => v.id.startsWith(`${type}-${year}`)).length + 1; return `${type}-${year}-${String(count).padStart(3, '0')}`; }
 
@@ -1469,40 +1152,26 @@ function renderCMHistory() {
   const tbody = document.getElementById('cmBody'); const empty = document.getElementById('emptyCM');
   if (filtered.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); document.getElementById('cmTable').classList.add('hidden'); return; }
   empty.classList.add('hidden'); document.getElementById('cmTable').classList.remove('hidden');
-  tbody.innerHTML = filtered.map(v => {
-    let statusClass = 'badge-warning'; if (v.status === 'Closed') statusClass = 'badge-success'; if (v.status === 'In Progress') statusClass = 'badge-info';
-    return `<tr onclick="showCMDetail('${v.id}')"><td><span class="font-mono text-xs text-gray-400">${v.id}</span></td><td class="whitespace-nowrap">${formatDate(v.tanggal)}</td><td class="font-medium text-white">${v.teknisi}</td><td><div class="font-medium text-white">${v.customer}</div></td><td class="max-w-xs truncate text-gray-300">${v.masalah}</td><td><span class="badge ${statusClass}">${v.status}</span></td><td class="text-right" onclick="event.stopPropagation()"><div class="flex justify-end gap-1"><button class="btn btn-ghost !p-2" onclick="editCMVisit('${v.id}')"><i data-lucide="edit" style="width:14px;height:14px;"></i></button><button class="btn btn-danger !p-2" onclick="deleteCMVisit('${v.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div></td></tr>`;
-  }).join(''); lucide.createIcons();
+  tbody.innerHTML = filtered.map(v => { let statusClass = 'badge-warning'; if (v.status === 'Closed') statusClass = 'badge-success'; if (v.status === 'In Progress') statusClass = 'badge-info'; return `<tr onclick="showCMDetail('${v.id}')"><td><span class="font-mono text-xs text-gray-400">${v.id}</span></td><td class="whitespace-nowrap">${formatDate(v.tanggal)}</td><td class="font-medium text-white">${v.teknisi}</td><td><div class="font-medium text-white">${v.customer}</div></td><td class="max-w-xs truncate text-gray-300">${v.masalah}</td><td><span class="badge ${statusClass}">${v.status}</span></td><td class="text-right" onclick="event.stopPropagation()"><div class="flex justify-end gap-1"><button class="btn btn-ghost !p-2" onclick="editCMVisit('${v.id}')"><i data-lucide="edit" style="width:14px;height:14px;"></i></button><button class="btn btn-danger !p-2" onclick="deleteCMVisit('${v.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div></td></tr>`; }).join(''); lucide.createIcons();
 }
 
 function renderTechnicians() {
   const container = document.getElementById('techList'); if (technicians.length === 0) { container.innerHTML = '<div class="empty-state"><p>Belum ada teknisi. Tambahkan baru di form sebelah!</p></div>'; return; }
-  container.innerHTML = technicians.map(t => {
-    const count = visits.filter(v => v.teknisi === t.name).length + cmVisits.filter(v => v.teknisi === t.name).length;
-    return `<div class="glass p-4 flex items-center gap-4" style="background:rgba(255,255,255,0.02);"><div class="tech-avatar" style="background:rgba(139,92,246,0.15); color:#8b5cf6; border:1px solid rgba(139,92,246,0.3); width:44px; height:44px; font-size:15px;">${t.name.charAt(0)}</div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1"><p class="font-semibold text-white">${t.name}</p><span class="badge badge-info">${t.base}</span></div><p class="text-xs text-gray-400 truncate">${t.address || '-'}</p><p class="text-xs text-gray-500 mt-1">${t.phone || '-'}</p></div><div class="text-right hide-mobile"><p class="font-display font-bold text-2xl text-white">${count}</p><p class="text-xs text-gray-500">Tugas</p></div><button class="btn btn-danger !p-2" onclick="deleteTech('${t.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div>`;
-  }).join(''); lucide.createIcons();
+  container.innerHTML = technicians.map(t => { const count = visits.filter(v => v.teknisi === t.name).length + cmVisits.filter(v => v.teknisi === t.name).length; return `<div class="glass p-4 flex items-center gap-4" style="background:rgba(255,255,255,0.02);"><div class="tech-avatar" style="background:rgba(139,92,246,0.15); color:#8b5cf6; border:1px solid rgba(139,92,246,0.3); width:44px; height:44px; font-size:15px;">${t.name.charAt(0)}</div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1"><p class="font-semibold text-white">${t.name}</p><span class="badge badge-info">${t.base}</span></div><p class="text-xs text-gray-400 truncate">${t.address || '-'}</p><p class="text-xs text-gray-500 mt-1">${t.phone || '-'}</p></div><div class="text-right hide-mobile"><p class="font-display font-bold text-2xl text-white">${count}</p><p class="text-xs text-gray-500">Tugas</p></div><button class="btn btn-danger !p-2" onclick="deleteTech('${t.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div>`; }).join(''); lucide.createIcons();
 }
 
 function renderCustomers() {
-  const container = document.getElementById('custList'); 
-  const filterBase = document.getElementById('filterCustBase')?.value || '';
-  const searchName = document.getElementById('searchCustName')?.value.toLowerCase() || '';
+  const container = document.getElementById('custList'); const filterBase = document.getElementById('filterCustBase')?.value || ''; const searchName = document.getElementById('searchCustName')?.value.toLowerCase() || '';
   let displayedCustomers = customers.filter(c => { const matchBase = !filterBase || c.base === filterBase; const matchName = !searchName || c.name.toLowerCase().includes(searchName); return matchBase && matchName; });
   if (displayedCustomers.length === 0) { container.innerHTML = `<div class="empty-state"><p>Customer tidak ditemukan.</p></div>`; return; }
   container.innerHTML = displayedCustomers.map(c => {
-    const count = visits.filter(v => v.customer === c.name).length + cmVisits.filter(v => v.customer === c.name).length;
-    const lastVisit = visits.filter(v => v.customer === c.name).sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal))[0];
+    const count = visits.filter(v => v.customer === c.name).length + cmVisits.filter(v => v.customer === c.name).length; const lastVisit = visits.filter(v => v.customer === c.name).sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal))[0];
     let nextSchedStr = '-'; let isOverdue = false;
-    if (c.firstSchedule) {
-      let nextDate;
-      if (lastVisit) { nextDate = new Date(lastVisit.tanggal); nextDate.setMonth(nextDate.getMonth() + (parseInt(c.frequency) || 1)); } 
-      else { nextDate = new Date(c.firstSchedule); }
-      const today = new Date(); today.setHours(0,0,0,0);
-      if (nextDate <= today) isOverdue = true;
-      nextSchedStr = formatDate(nextDate);
-    }
+    if (c.firstSchedule) { let nextDate; if (lastVisit) { nextDate = new Date(lastVisit.tanggal); nextDate.setMonth(nextDate.getMonth() + (parseInt(c.frequency) || 1)); } else { nextDate = new Date(c.firstSchedule); } const today = new Date(); today.setHours(0,0,0,0); if (nextDate <= today) isOverdue = true; nextSchedStr = formatDate(nextDate); }
     const mapsBtn = c.mapsLink ? `<a href="${c.mapsLink}" target="_blank" class="btn btn-ghost !p-2" onclick="event.stopPropagation()"><i data-lucide="map-pin" style="width:14px;height:14px;color:#06b6d4;"></i></a>` : '';
-    return `<div class="glass p-4 flex items-center gap-4" style="background:rgba(255,255,255,0.02);"><div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.3);"><i data-lucide="building" style="width:20px;height:20px;color:#06b6d4;"></i></div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1 flex-wrap"><p class="font-semibold text-white">${c.name}</p><span class="badge badge-info">${c.base}</span><span class="badge ${isOverdue ? 'badge-danger' : 'badge-success'}">${getFreqLabel(c.frequency)}</span></div><p class="text-xs text-gray-400 mt-1">Jadwal PM Berikutnya: <span class="${isOverdue ? 'text-rose-400 font-bold' : 'text-gray-300'}">${nextSchedStr} ${isOverdue ? '(Jatuh Tempo)' : ''}</span></p></div><div class="text-right hide-mobile"><p class="font-display font-bold text-2xl text-white">${count}</p><p class="text-xs text-gray-500">Kunjungan</p></div><div class="flex gap-1">${mapsBtn}<button class="btn btn-danger !p-2" onclick="deleteCust('${c.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div></div>`;
+    const distBadge = c.distance && c.distance !== '-' ? `<span class="badge badge-warning">📏 ${c.distance} KM</span>` : '';
+    const editBtn = `<button class="btn btn-ghost !p-2" onclick="event.stopPropagation(); editCust('${c.id}')" title="Edit Customer"><i data-lucide="edit" style="width:14px;height:14px;color:#f59e0b;"></i></button>`;
+    return `<div class="glass p-4 flex items-center gap-4" style="background:rgba(255,255,255,0.02);"><div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(6,182,212,0.15); border:1px solid rgba(6,182,212,0.3);"><i data-lucide="building" style="width:20px;height:20px;color:#06b6d4;"></i></div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1 flex-wrap"><p class="font-semibold text-white">${c.name}</p><span class="badge badge-info">${c.base}</span>${distBadge}<span class="badge ${isOverdue ? 'badge-danger' : 'badge-success'}">${getFreqLabel(c.frequency)}</span></div><p class="text-xs text-gray-400 mt-1">Jadwal PM Berikutnya: <span class="${isOverdue ? 'text-rose-400 font-bold' : 'text-gray-300'}">${nextSchedStr} ${isOverdue ? '(Jatuh Tempo)' : ''}</span></p></div><div class="text-right hide-mobile"><p class="font-display font-bold text-2xl text-white">${count}</p><p class="text-xs text-gray-500">Kunjungan</p></div><div class="flex gap-1">${mapsBtn}${editBtn}<button class="btn btn-danger !p-2" onclick="deleteCust('${c.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div></div>`;
   }).join(''); lucide.createIcons();
 }
 
@@ -1515,14 +1184,7 @@ function showDetail(id) {
 function showCMDetail(id) {
   const v = cmVisits.find(x => x.id === id); if (!v) return; currentDetailId = id; document.getElementById('detailId').textContent = v.id;
   let statusClass = 'badge-warning'; if (v.status === 'Closed') statusClass = 'badge-success'; if (v.status === 'In Progress') statusClass = 'badge-info';
-  document.getElementById('detailContent').innerHTML = `
-    <div class="detail-row"><div class="detail-label">Tanggal</div><div class="detail-value">${formatDate(v.tanggal)}</div></div>
-    <div class="detail-row"><div class="detail-label">Teknisi</div><div class="detail-value">${v.teknisi}</div></div>
-    <div class="detail-row"><div class="detail-label">Customer</div><div class="detail-value">${v.customer}</div></div>
-    <div class="detail-row"><div class="detail-label">Masalah</div><div class="detail-value">${v.masalah}</div></div>
-    <div class="detail-row"><div class="detail-label">Tindakan</div><div class="detail-value">${v.tindakan || '-'}</div></div>
-    <div class="detail-row"><div class="detail-label">Status</div><div class="detail-value"><span class="badge ${statusClass}">${v.status}</span></div></div>
-  `;
+  document.getElementById('detailContent').innerHTML = `<div class="detail-row"><div class="detail-label">Tanggal</div><div class="detail-value">${formatDate(v.tanggal)}</div></div><div class="detail-row"><div class="detail-label">Teknisi</div><div class="detail-value">${v.teknisi}</div></div><div class="detail-row"><div class="detail-label">Customer</div><div class="detail-value">${v.customer}</div></div><div class="detail-row"><div class="detail-label">Masalah</div><div class="detail-value">${v.masalah}</div></div><div class="detail-row"><div class="detail-label">Tindakan</div><div class="detail-value">${v.tindakan || '-'}</div></div><div class="detail-row"><div class="detail-label">Status</div><div class="detail-value"><span class="badge ${statusClass}">${v.status}</span></div></div>`;
   document.getElementById('modalDetail').classList.add('show'); lucide.createIcons();
 }
 
@@ -1556,12 +1218,9 @@ async function loadFromSheet(forceLoad = false) {
   if (!isConnected || !sheetUrl) return;
   try {
     const [visitsRes, cmRes, techsRes, custRes, schedRes, suratRes] = await Promise.all([
-      fetch(`${sheetUrl}?action=read&type=visits`).then(r => r.json()),
-      fetch(`${sheetUrl}?action=read&type=cm_visits`).then(r => r.json()),
-      fetch(`${sheetUrl}?action=read&type=techs`).then(r => r.json()),
-      fetch(`${sheetUrl}?action=read&type=customers`).then(r => r.json()),
-      fetch(`${sheetUrl}?action=read&type=schedules`).then(r => r.json()),
-      fetch(`${sheetUrl}?action=read&type=surat`).then(r => r.json())
+      fetch(`${sheetUrl}?action=read&type=visits`).then(r => r.json()), fetch(`${sheetUrl}?action=read&type=cm_visits`).then(r => r.json()),
+      fetch(`${sheetUrl}?action=read&type=techs`).then(r => r.json()), fetch(`${sheetUrl}?action=read&type=customers`).then(r => r.json()),
+      fetch(`${sheetUrl}?action=read&type=schedules`).then(r => r.json()), fetch(`${sheetUrl}?action=read&type=surat`).then(r => r.json())
     ]);
     let needsRender = false;
     if (visitsRes.success && JSON.stringify(visitsRes.data) !== JSON.stringify(visits)) { visits = visitsRes.data || []; needsRender = true; }
@@ -1614,77 +1273,29 @@ function updateConnectionStatus() {
 function formatDate(dateStr) { if(!dateStr) return '-'; const d = new Date(dateStr); if (isNaN(d)) return '-'; return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); }
 function showToast(msg, type = 'success') {
   const toast = document.getElementById('toast'); const icon = document.getElementById('toastIcon'); const msgEl = document.getElementById('toastMsg');
-  toast.className = 'toast ' + type; 
-  msgEl.textContent = msg; 
+  toast.className = 'toast ' + type; msgEl.textContent = msg; 
   icon.setAttribute('data-lucide', type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info'); 
-  lucide.createIcons();
-  setTimeout(() => toast.classList.add('show'), 50); 
-  setTimeout(() => toast.classList.remove('show'), 3500);
+  lucide.createIcons(); setTimeout(() => toast.classList.add('show'), 50); setTimeout(() => toast.classList.remove('show'), 3500);
 }
 function exportCSV() {
   if (visits.length === 0) return showToast('Tidak ada data', 'error'); 
   const headers = ['ID','Tanggal','Teknisi','Base','Customer'];
-  let csv = headers.join(',') + '\n'; 
-  visits.forEach(v => { 
-    csv += [v.id, v.tanggal, v.teknisi, v.base, v.customer].map(c => `"${String(c).replace(/"/g, '""')}"`).join(',') + '\n'; 
-  });
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); 
-  const url = URL.createObjectURL(blob); 
-  const a = document.createElement('a'); 
-  a.href = url; 
-  a.download = `PM_Visits_${new Date().toISOString().split('T')[0]}.csv`; 
-  a.click();
+  let csv = headers.join(',') + '\n'; visits.forEach(v => { csv += [v.id, v.tanggal, v.teknisi, v.base, v.customer].map(c => `"${String(c).replace(/"/g, '""')}"`).join(',') + '\n'; });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `PM_Visits_${new Date().toISOString().split('T')[0]}.csv`; a.click();
 }
 function loadSampleData() { 
   showConfirm('Muat Data Contoh', 'Data saat ini akan ditimpa. Lanjutkan?', () => { 
-    technicians = SAMPLE_TECHNICIANS; 
-    customers = SAMPLE_CUSTOMERS; 
-    visits = SAMPLE_VISITS; 
-    cmVisits = SAMPLE_CM; 
-    schedules = []; 
-    suratTugas = []; 
-    saveData(); 
-    populateSelects(); 
-    populateCustBaseFilter(); 
-    populateJadwalBase(); 
-    populateSuratTeknisi(); 
-    renderDashboard(); 
-    renderRiwayat(); 
-    renderCMHistory(); 
-    renderTechnicians(); 
-    renderCustomers(); 
-    renderSchedules(); 
-    renderSurat(); 
-    showToast('Data contoh dimuat', 'success'); 
+    technicians = SAMPLE_TECHNICIANS; customers = SAMPLE_CUSTOMERS; visits = SAMPLE_VISITS; cmVisits = SAMPLE_CM; schedules = []; suratTugas = []; 
+    saveData(); populateSelects(); populateCustBaseFilter(); populateJadwalBase(); populateSuratTeknisi(); renderDashboard(); renderRiwayat(); renderCMHistory(); renderTechnicians(); renderCustomers(); renderSchedules(); renderSurat(); showToast('Data contoh dimuat', 'success'); 
   }); 
 }
 function clearAllData() { 
   showConfirm('Hapus Semua Data', 'Semua data akan dihapus permanen. Lanjutkan?', () => { 
-    visits = []; 
-    cmVisits = []; 
-    schedules = []; 
-    suratTugas = []; 
-    technicians = []; 
-    customers = []; 
-    saveData(); 
-    populateSelects(); 
-    populateCustBaseFilter(); 
-    populateJadwalBase(); 
-    populateSuratTeknisi(); 
-    renderDashboard(); 
-    renderRiwayat(); 
-    renderCMHistory(); 
-    renderTechnicians(); 
-    renderCustomers(); 
-    renderSchedules(); 
-    renderSurat(); 
-    showToast('Semua data dihapus', 'info'); 
+    visits = []; cmVisits = []; schedules = []; suratTugas = []; technicians = []; customers = []; 
+    saveData(); populateSelects(); populateCustBaseFilter(); populateJadwalBase(); populateSuratTeknisi(); renderDashboard(); renderRiwayat(); renderCMHistory(); renderTechnicians(); renderCustomers(); renderSchedules(); renderSurat(); showToast('Semua data dihapus', 'info'); 
   }); 
 }
-
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeConfirm(); } });
 
 init();
 </script>
-</body>
-</html>
