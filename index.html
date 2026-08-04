@@ -202,6 +202,18 @@
 </main>
 <div id="modalDetail" class="modal-backdrop" onclick="if(event.target===this) closeModal()"><div class="modal-content"><div class="p-6 border-b border-white/5 flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3);"><i data-lucide="file-text" style="width:20px;height:20px;color:#8b5cf6;"></i></div><div><h3 class="font-display font-bold text-lg text-white">Detail Kunjungan PM</h3><p id="detailId" class="text-xs text-gray-400 font-mono"></p></div></div><button class="btn btn-ghost !p-2" onclick="closeModal()"><i data-lucide="x" style="width:18px;height:18px;"></i></button></div><div class="p-6" id="detailContent"></div><div class="p-6 border-t border-white/5 flex gap-3"><button class="btn btn-primary flex-1" onclick="editFromDetail()"><i data-lucide="edit" style="width:16px;height:16px;"></i> Edit Data</button><button class="btn btn-danger" onclick="deleteFromDetail()"><i data-lucide="trash-2" style="width:16px;height:16px;"></i> Hapus</button></div></div></div>
 <div id="modalConfirm" class="modal-backdrop" onclick="if(event.target===this) closeConfirm()"><div class="modal-content max-w-md"><div class="p-6"><h3 id="confirmTitle" class="font-display font-bold text-lg mb-2 text-white">Konfirmasi</h3><p id="confirmMsg" class="text-sm text-gray-400 mb-6">Apakah Anda yakin?</p><div class="flex gap-3"><button class="btn btn-ghost flex-1" onclick="closeConfirm()">Batal</button><button class="btn btn-danger flex-1" id="confirmBtn">Hapus</button></div></div></div></div>
+<div id="modalCalendarDetail" class="modal-backdrop" onclick="if(event.target===this) closeCalModal()">
+  <div class="modal-content">
+    <div class="p-6 border-b border-white/5 flex items-center justify-between">
+      <div>
+        <h3 class="font-display font-bold text-lg text-white">Detail Jadwal PM</h3>
+        <p id="calModalDate" class="text-xs text-gray-400 mt-1"></p>
+      </div>
+      <button class="btn btn-ghost !p-2" onclick="closeCalModal()"><i data-lucide="x" style="width:18px;height:18px;"></i></button>
+    </div>
+    <div class="p-6" id="calModalContent"></div>
+  </div>
+</div>
 <div id="toast" class="toast"><i id="toastIcon" data-lucide="check-circle" style="width:20px;height:20px;"></i><span id="toastMsg"></span></div>
 
 <script>
@@ -241,12 +253,124 @@ function renderDashboard(){animateCounter('statTotalPM',visits.length);animateCo
 function animateCounter(id,t){const el=document.getElementById(id);const c=parseInt(el.textContent)||0;const inc=(t-c)/30;let i=0;const tm=setInterval(()=>{i++;el.textContent=Math.round(c+inc*i);if(i>=30){el.textContent=t;clearInterval(tm);}},800/30);}
 function renderUnresolvedCM(){const c=document.getElementById('unresolvedCM');if(!c)return;const u=cmVisits.filter(v=>v.status!=='Closed');if(u.length===0){c.innerHTML=`<div class="empty-state py-4"><i data-lucide="check-circle" style="width:24px;height:24px;color:#10b981;margin:0 auto 8px;"></i><p class="text-sm text-gray-400">Semua CM sudah selesai!</p></div>`;lucide.createIcons();return;}c.innerHTML=u.slice(0,5).map(v=>`<div class="glass p-3 flex items-center gap-3 cursor-pointer" style="background:rgba(244,63,94,0.05);border-left:2px solid #f43f5e;" onclick="showCMDetail('${v.id}')"><div class="flex-1 min-w-0"><p class="font-semibold text-sm text-white truncate">${v.customer}</p><p class="text-xs text-gray-400 truncate">${v.masalah}</p></div><span class="badge ${v.status==='Open'?'badge-danger':'badge-warning'}">${v.status}</span></div>`).join('');lucide.createIcons();}
 function renderPendingTasks(p){const c=document.getElementById('pendingTasks');if(p.length===0){c.innerHTML=`<div class="empty-state py-8"><div class="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(139,92,246,0.1);"><i data-lucide="check-circle" style="width:24px;height:24px;color:#8b5cf6;"></i></div><p class="text-sm font-semibold text-gray-300">Semua jadwal PM sudah tercatat!</p></div>`;lucide.createIcons();return;}p.sort((a,b)=>new Date(a.ns)-new Date(b.ns));c.innerHTML=p.map(({tech,cust,ns})=>{const t=new Date();t.setHours(0,0,0,0);const io=ns<t;const dt=Math.abs(t-ns);const dd=Math.ceil(dt/(1000*60*60*24));return`<div class="glass p-4 pending-card flex items-center gap-4" style="background:rgba(245,158,11,0.05);"><div class="tech-avatar" style="background:rgba(245,158,11,0.2);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);">${tech.name.charAt(0)}</div><div class="flex-1 min-w-0"><p class="font-semibold text-sm text-white">${tech.name} <span class="text-gray-500 font-normal">→ ${cust.name}</span></p><p class="text-xs text-gray-400 mt-1">Base: ${tech.base} • Frek: ${getFreqLabel(cust.frequency)} • Jatuh Tempo: ${formatDate(ns)} ${io?`<span class="text-rose-400 font-bold">(Terlambat ${dd} Hari)</span>`:''}</p></div><button class="btn btn-primary !py-2 !px-3 text-xs" onclick="quickAssign('${tech.name}','${cust.name}')"><i data-lucide="plus" style="width:12px;height:12px;"></i> Catat PM</button></div>`;}).join('');lucide.createIcons();}
-function quickAssign(tn,cn){switchTab('form');document.getElementById('teknisi').value=tn;filterCustomerByBase();document.getElementById('customerSearch').value=cn;document.getElementById('customer').value=cn;}
+function quickAssign(tn,cn) {
+  switchTab('form'); 
+  document.getElementById('teknisi').value=tn; 
+  filterCustomerByBase(); 
+  document.getElementById('customerSearch').value=cn; 
+  document.getElementById('customer').value=cn; 
+  closeCalModal(); // <--- Tambahan agar modal kalender tertutup
+}
 function renderDonutChart(){const ctx=document.getElementById('chartDonut');if(!ctx)return;const b=[...new Set(technicians.map(t=>t.base))];const bc=b.map(x=>visits.filter(v=>v.base===x).length);const cl=['#8b5cf6','#06b6d4','#f59e0b','#10b981','#f43f5e','#ec4899'];if(chartDonut)chartDonut.destroy();if(b.length===0){document.getElementById('donutLegend').innerHTML='<p class="text-sm text-gray-500 text-center">Belum ada data base teknisi.</p>';return;}chartDonut=new Chart(ctx.getContext('2d'),{type:'doughnut',data:{labels:b,datasets:[{data:bc,backgroundColor:cl.slice(0,b.length),borderColor:'rgba(8,9,13,0.8)',borderWidth:3,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}});const t=bc.reduce((a,b)=>a+b,0)||1;document.getElementById('donutLegend').innerHTML=b.map((x,i)=>{const c=bc[i];const p=Math.round(c/t*100);return`<div class="flex items-center justify-between text-sm"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:${cl[i]}"></span><span class="text-gray-300">${x}</span></div><div class="flex items-center gap-2"><span class="text-gray-500 text-xs">${p}%</span><span class="font-semibold text-white">${c}</span></div></div>`;}).join('');}
 function renderRecentActivity(){const c=document.getElementById('recentActivity');const pa=visits.map(v=>({...v,type:'PM'}));const ca=cmVisits.map(v=>({...v,type:'CM',masalah:v.masalah}));const aa=[...pa,...ca].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,6);if(aa.length===0){c.innerHTML='<div class="empty-state py-8"><p class="text-sm">Belum ada aktivitas.</p></div>';return;}c.innerHTML=aa.map(v=>{const ic=v.type==='CM';const ti=ic?v.masalah:v.customer;const st=ic?`CM: ${v.customer}`:`PM: ${v.teknisi}`;const bd=ic?`<span class="badge badge-danger flex-shrink-0">CM</span>`:`<span class="badge badge-success flex-shrink-0">PM</span>`;return`<div class="activity-item" onclick="${ic?`showCMDetail('${v.id}')`:`showDetail('${v.id}')`}"><div class="tech-avatar" style="background:${ic?'linear-gradient(135deg,#f43f5e,#be123c)':'linear-gradient(135deg,#10b981,#047857)'}">${v.teknisi.charAt(0)}</div><div class="flex-1 min-w-0"><div class="flex items-center justify-between gap-2 mb-1"><p class="font-semibold text-sm truncate text-white">${ti}</p>${bd}</div><p class="text-xs text-gray-400 truncate">${st} • ${v.base}</p><p class="text-xs text-gray-500 mt-1">${formatDate(v.tanggal)}</p></div></div>`;}).join('');lucide.createIcons();}
-function renderCalendar(){const g=document.getElementById('calendarGrid');const my=document.getElementById('calMonthYear');const y=calDate.getFullYear();const m=calDate.getMonth();my.textContent=calDate.toLocaleDateString('id-ID',{month:'long',year:'numeric'});g.innerHTML='';const fd=new Date(y,m,1).getDay();const dm=new Date(y,m+1,0).getDate();const sd={};technicians.forEach(t=>{customers.filter(c=>c.base===t.base).forEach(c=>{const ns=getTechNextSchedule(t,c);const ny=ns.getFullYear();const nm=ns.getMonth();if(ny===y&&nm===m){const s=ns.toISOString().split('T')[0];if(!sd[s])sd[s]={p:0,d:0};const dn=visits.some(v=>v.tanggal===s&&v.teknisi===t.name&&v.customer===c.name);if(!dn)sd[s].p++;}});});visits.forEach(v=>{const d=new Date(v.tanggal);if(d.getFullYear()===y&&d.getMonth()===m){const s=v.tanggal;if(!sd[s])sd[s]={p:0,d:0};sd[s].d++;}});const ts=new Date().toISOString().split('T')[0];for(let i=0;i<fd;i++){g.innerHTML+=`<div class="h-14 rounded-lg bg-black/10"></div>`;}for(let i=1;i<=dm;i++){const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;const it=ds===ts;const sc=sd[ds]||{p:0,d:0};let dt='';if(sc.p>0)dt+=`<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>`;if(sc.d>0)dt+=`<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>`;g.innerHTML+=`<div class="h-14 rounded-lg flex flex-col items-center justify-center text-xs ${it?'bg-violet-500/20 border border-violet-500/30 text-white':'bg-black/20 text-gray-400'}"><span>${i}</span><div class="flex gap-0.5 mt-1">${dt}</div></div>`;}}
+function renderCalendar(){
+  const g=document.getElementById('calendarGrid');
+  const my=document.getElementById('calMonthYear');
+  const y=calDate.getFullYear();
+  const m=calDate.getMonth();
+  my.textContent=calDate.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+  g.innerHTML='';
+  const fd=new Date(y,m,1).getDay();
+  const dm=new Date(y,m+1,0).getDate();
+  const sd={};
+  technicians.forEach(t=>{
+    customers.filter(c=>c.base===t.base).forEach(c=>{
+      const ns=getTechNextSchedule(t,c);
+      const ny=ns.getFullYear();
+      const nm=ns.getMonth();
+      if(ny===y&&nm===m){
+        const s=ns.toISOString().split('T')[0];
+        if(!sd[s])sd[s]={p:0,d:0};
+        const dn=visits.some(v=>v.tanggal===s&&v.teknisi===t.name&&v.customer===c.name);
+        if(!dn)sd[s].p++;
+      }
+    });
+  });
+  visits.forEach(v=>{
+    const d=new Date(v.tanggal);
+    if(d.getFullYear()===y&&d.getMonth()===m){
+      const s=v.tanggal;
+      if(!sd[s])sd[s]={p:0,d:0};
+      sd[s].d++;
+    }
+  });
+  const ts=new Date().toISOString().split('T')[0];
+  for(let i=0;i<fd;i++){
+    g.innerHTML+=`<div class="h-14 rounded-lg bg-black/10"></div>`;
+  }
+  for(let i=1;i<=dm;i++){
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+    const it=ds===ts;
+    const sc=sd[ds]||{p:0,d:0};
+    let dt='';
+    if(sc.p>0)dt+=`<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>`;
+    if(sc.d>0)dt+=`<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>`;
+    
+    // Tambahan dari Langkah 4: Membuat tanggal bisa diklik jika ada jadwal/kunjungan
+    const clickAction = (sc.p > 0 || sc.d > 0) ? `onclick="showCalDayDetails('${ds}')"` : '';
+    const hoverStyle = (sc.p > 0 || sc.d > 0) ? 'cursor-pointer hover:bg-white/5' : '';
+    
+    g.innerHTML+=`<div class="h-14 rounded-lg flex flex-col items-center justify-center text-xs ${it?'bg-violet-500/20 border border-violet-500/30 text-white':'bg-black/20 text-gray-400'} ${hoverStyle}" ${clickAction}><span>${i}</span><div class="flex gap-0.5 mt-1">${dt}</div></div>`;
+  }
+}
 function prevMonth(){calDate.setMonth(calDate.getMonth()-1);renderCalendar();}
 function nextMonth(){calDate.setMonth(calDate.getMonth()+1);renderCalendar();}
+function showCalDayDetails(dateStr) {
+  const pending = [];
+  const done = [];
+  
+  // Cek jadwal jatuh tempo dan kunjungan selesai berdasarkan tanggal yang diklik
+  technicians.forEach(tech => {
+    customers.filter(c => c.base === tech.base).forEach(cust => {
+      const ns = getTechNextSchedule(tech, cust);
+      const nss = ns.toISOString().split('T')[0];
+      if (nss === dateStr) {
+        const isDone = visits.some(v => v.tanggal === dateStr && v.teknisi === tech.name && v.customer === cust.name);
+        if (isDone) {
+          done.push({ tech: tech.name, cust: cust.name, base: tech.base });
+        } else {
+          pending.push({ tech: tech.name, cust: cust.name, base: tech.base });
+        }
+      }
+    });
+  });
+
+  const d = new Date(dateStr);
+  const formattedDate = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  
+  let html = '';
+  
+  if (pending.length > 0) {
+    html += `<h4 class="text-sm font-bold text-amber-400 mb-2 flex items-center gap-1"><i data-lucide="alert-triangle" style="width:14px;height:14px;"></i> Perlu Kunjungan (${pending.length})</h4>`;
+    html += '<div class="space-y-2 mb-4">';
+    pending.forEach(p => {
+      html += `<div class="glass p-3 flex items-center justify-between" style="background:rgba(245,158,11,0.05);">
+        <div><p class="font-semibold text-sm text-white">${p.cust}</p><p class="text-xs text-gray-400">${p.tech} • Base: ${p.base}</p></div>
+        <button class="btn btn-primary !py-1.5 !px-3 text-xs" onclick="quickAssign('${p.tech}','${p.cust}')"><i data-lucide="plus" style="width:12px;height:12px;"></i> Catat PM</button>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  if (done.length > 0) {
+    html += `<h4 class="text-sm font-bold text-emerald-400 mb-2 flex items-center gap-1"><i data-lucide="check-circle" style="width:14px;height:14px;"></i> Selesai Dikerjakan (${done.length})</h4>`;
+    html += '<div class="space-y-2">';
+    done.forEach(d => {
+      html += `<div class="glass p-3" style="background:rgba(16,185,129,0.05);"><p class="font-semibold text-sm text-white">${d.cust}</p><p class="text-xs text-gray-400">${d.tech} • Base: ${d.base}</p></div>`;
+    });
+    html += '</div>';
+  }
+
+  if (pending.length === 0 && done.length === 0) {
+    html += '<div class="empty-state py-8"><p class="text-sm">Tidak ada jadwal PM pada tanggal ini.</p></div>';
+  }
+
+  document.getElementById('calModalDate').textContent = formattedDate;
+  document.getElementById('calModalContent').innerHTML = html;
+  document.getElementById('modalCalendarDetail').classList.add('show');
+  lucide.createIcons();
+}
+function closeCalModal() { document.getElementById('modalCalendarDetail').classList.remove('show'); }
 function checkPmReminders(){const t=new Date();const ts=t.toISOString().split('T')[0];let r=[];technicians.forEach(tech=>{customers.filter(c=>c.base===tech.base).forEach(cust=>{const ns=getTechNextSchedule(tech,cust);const nss=ns.toISOString().split('T')[0];if(nss===ts){const vt=visits.some(v=>v.tanggal===ts&&v.teknisi===tech.name&&v.customer===cust.name);if(!vt){r.push({tech:tech.name,cust:cust.name});}}});});if(r.length>0){if(r.length===1){showToast(`🔔 Pengingat PM: Jadwal kunjungan ${r[0].cust} oleh ${r[0].tech} jatuh tempo hari ini!`,'info');}else{showToast(`🔔 Pengingat PM: Ada ${r.length} jadwal kunjungan PM yang jatuh tempo hari ini. Cek Dashboard!`,'info');}}}
 function populateSelects(){const ts=document.getElementById('teknisi'),tf=document.getElementById('filterTeknisi'),ct=document.getElementById('cmTeknisi');ts.innerHTML='<option value="">Pilih teknisi...</option>';tf.innerHTML='<option value="">Semua Teknisi</option>';ct.innerHTML='<option value="">Pilih teknisi...</option>';technicians.forEach(t=>{ts.innerHTML+=`<option value="${t.name}" data-base="${t.base}">${t.name} (${t.base})</option>`;tf.innerHTML+=`<option value="${t.name}">${t.name}</option>`;ct.innerHTML+=`<option value="${t.name}" data-base="${t.base}">${t.name} (${t.base})</option>`;});}
 function populateCustBaseFilter(){const f=document.getElementById('filterCustBase');if(!f)return;const cv=f.value;const b=[...new Set(customers.map(c=>c.base))];f.innerHTML='<option value="">Semua Base</option>';b.forEach(x=>f.innerHTML+=`<option value="${x}">${x}</option>`);f.value=cv;}
