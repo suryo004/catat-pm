@@ -82,7 +82,32 @@ function showCMDetail(id,type){window.currentDetailType=type;const v=cmVisits.fi
 function closeModal(){document.getElementById('modalDetail').classList.remove('show');currentDetailId=null;}
 function editFromDetail(){if(currentDetailId){if(window.currentDetailType==='cm'){closeModal();editCMVisit(currentDetailId);}else{closeModal();editVisit(currentDetailId);}}}
 function deleteFromDetail(){if(currentDetailId){if(window.currentDetailType==='cm'){const id=currentDetailId;closeModal();deleteCMVisit(id);}else{const id=currentDetailId;closeModal();deleteVisit(id);}}}
-function openCSMessage(id,type){const v=(type==='cm'?cmVisits:visits).find(x=>x.id===id);if(!v)return;let text=`Selamat Sore Bapak/Ibu\nPerkenalkan saya Suryo dari Norxel\nTerima kasih atas kepercayaan Anda kepada kami, Bapak/Ibu!\n\nKami sangat menghargai kesediaan Bapak/Ibu untuk berbagi pengalaman terkait kunjungan Maintenance di ${v.customer}  yang dilakukan oleh teknisi kami atas nama ${v.teknisi}, Untuk terus meningkatkan layanan kami, mohon luangkan waktu sejenak untuk mengisi survei singkat di: supportnorxel.id\n\nPendapat Bapak/Ibu sangat berarti bagi kami untuk memberikan pengalaman terbaik di setiap kunjungan.\nTerima kasih atas dukungan dan waktunya!\n\nSelamat Sore 😊\nSuryo\nNORXEL`;document.getElementById('csText').value=text;document.getElementById('csWaLink').href=`https://wa.me/?text=${encodeURIComponent(text)}`;document.getElementById('modalCS').classList.add('show');lucide.createIcons();}
+function openCSMessage(id,type){
+  const v=(type==='cm'?cmVisits:visits).find(x=>x.id===id);
+  if(!v)return;
+  
+  // Cek waktu otomatis untuk sapaan
+  const hr=new Date().getHours();
+  let greeting='Selamat Sore';
+  if(hr>=0&&hr<11)greeting='Selamat Pagi';
+  else if(hr>=11&&hr<15)greeting='Selamat Siang';
+  else if(hr>=15&&hr<19)greeting='Selamat Sore';
+  else greeting='Selamat Malam';
+  
+  let text=`Kepada Yth. Bapak/Ibu,\n`;
+  text+=`${greeting},\n\n`;
+  text+=`Terima kasih atas kunjungan maintenance yang telah dilakukan oleh teknisi kami, ${v.teknisi}, di ${v.customer}. Kami dari NORXEL sangat menghargai kepercayaan yang Bapak/Ibu berikan.\n\n`;
+  text+=`Sebagai komitmen kami untuk terus memberikan layanan terbaik, mohon kesediaan Bapak/Ibu untuk mengisi formulir survei kepuasan pelanggan melalui tautan berikut: supportnorxel.id\n\n`;
+  text+=`Penilaian dan saran Bapak/Ibu menjadi acuan utama bagi kami. Terima kasih atas waktu dan kerjasamanya.\n\n`;
+  text+=`Hormat kami,\n`;
+  text+=`Suryo\n`;
+  text+=`NORXEL`;
+
+  document.getElementById('csText').value=text;
+  document.getElementById('csWaLink').href=`https://wa.me/?text=${encodeURIComponent(text)}`;
+  document.getElementById('modalCS').classList.add('show');
+  lucide.createIcons();
+}
 function closeCSModal(){document.getElementById('modalCS').classList.remove('show');}
 function showConfirm(t,m,cb){document.getElementById('confirmTitle').textContent=t;document.getElementById('confirmMsg').textContent=m;document.getElementById('modalConfirm').classList.add('show');document.getElementById('confirmBtn').onclick=()=>{cb();closeConfirm();};}
 function closeConfirm(){document.getElementById('modalConfirm').classList.remove('show');}
