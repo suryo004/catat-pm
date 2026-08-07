@@ -13,9 +13,101 @@ function saveData(){localStorage.setItem('pm_visits',JSON.stringify(visits));loc
 function switchTab(t){document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.sidebar-link').forEach(x=>x.classList.remove('active'));document.getElementById('tab-'+t).classList.add('active');document.querySelector(`.sidebar-link[data-tab="${t}"]`)?.classList.add('active');const tt={dashboard:['Dashboard','Ringkasan aktivitas maintenance'],surat:['Surat Tugas','Buat permintaan surat tugas'],jadwal:['Jadwal Harian','Buat jadwal kunjungan harian per base'],form:['Kunjungan PM Baru','Catat kunjungan PM teknisi'],cm:['Input CM','Catat kerusakan/perbaikan corrective'],laporan:['Laporan Bulanan','Rekap data PM & CM'],riwayat:['Riwayat PM','Daftar lengkap kunjungan PM'],teknisi:['Daftar Teknisi','Kelola data teknisi'],customer:['Daftar Customer','Kelola data customer'],pengaturan:['Integrasi Spreadsheet','Hubungkan dengan Google Spreadsheet']};const[ti,su]=tt[t]||['',''];document.getElementById('pageTitle').textContent=ti;document.getElementById('pageSubtitle').textContent=su;if(window.innerWidth<=1024)document.querySelector('.sidebar').classList.remove('open');lucide.createIcons();}
 function toggleSidebar(){document.querySelector('.sidebar').classList.toggle('open');}
 function toggleNotif(e){e.stopPropagation();const d=document.getElementById('notifDropdown');d.classList.toggle('hidden');if(!d.classList.contains('hidden'))renderNotif();}
-function renderNotif(){const list=document.getElementById('notifList');const badge=document.getElementById('notifBadge');const btn=document.getElementById('bellIcon');const today=new Date().toISOString().split('T')[0];let notifs=[];technicians.forEach(tech=>{customers.filter(c=>c.base===tech.base).forEach(cust=>{const ns=getTechNextSchedule(tech,cust);const nss=ns.toISOString().split('T')[0];if(nss===today){const vt=visits.some(v=>v.tanggal===today&&v.teknisi===tech.name&&v.customer===cust.name);if(!vt){notifs.push({type:'pm',msg:`Jadwal PM ${cust.name} oleh ${tech.name}`,time:'Hari ini'});}}});});cmVisits.filter(v=>v.status!=='Closed').forEach(v=>{notifs.push({type:'cm',msg:`Tiket CM Open: ${v.customer} - ${v.masalah}`,time:formatDate(v.tanggal)});});const t3=new Date();t3.setDate(t3.getDate()-3);customers.filter(c=>new Date(c.firstSchedule)>=t3).forEach(c=>{notifs.push({type:'cust',msg:`Customer baru terdaftar: ${c.name} (${c.base})`,time:formatDate(c.firstSchedule)});});if(notifs.length===0){list.innerHTML='<div class="empty-state py-8"><p class="text-sm">Tidak ada notifikasi.</p></div>';badge.classList.add('hidden');btn.classList.remove('bell-anim');return;}badge.textContent=notifs.length>9?'9+':notifs.length;badge.classList.remove('hidden');btn.classList.add('bell-anim');list.innerHTML=notifs.map(n=>{let ic=n.type==='pm'?'bell-ring':n.type==='cm'?'alert-octagon':'building';let cl=n.type==='pm'?'text-amber-400':n.type==='cm'?'text-rose-400':'text-cyan-400';return`<div class="flex items-start gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer"><i data-lucide="${ic}" class="${cl}" style="width:16px;height:16px;margin-top:2px"></i><div class="flex-1"><p class="text-xs text-gray-200">${n.msg}</p><p class="text-[10px] text-gray-500 mt-0.5">${n.time}</p></div></div>`;}).join('');lucide.createIcons();}
-function markAllRead(){document.getElementById('bellIcon').classList.remove('bell-anim');document.getElementById('notifBadge').classList.add('hidden');showToast('Notifikasi ditandai dibaca','info');}
-document.addEventListener('click',e=>{const d=document.getElementById('notifDropdown');const b=document.querySelector('[onclick="toggleNotif(event)"]');if(d&&!d.classList.contains('hidden')&&!b.contains(e.target)&&!d.contains(e.target))d.classList.add('hidden');});
+function renderNotif(){
+  const list=document.getElementById('notifList');
+  const badge=document.getElementById('notifBadge');
+  const btn=document.getElementById('bellIcon');
+  const today=new Date().toISOString().split('T')[0];
+  let notifs=[];
+  
+  // 1. Cek PM Jatuh Tempo Hari Ini
+  technicians.forEach(tech=>{
+    customers.filter(c=>c.base===tech.base).forEach(cust=>{
+      const ns=getTechNextSchedule(tech,cust);
+      const nss=ns.toISOString().split('T')[0];
+      if(nss===today){
+        const vt=visits.some(v=>v.tanggal===today&&v.teknisi===tech.name&&v.customer===cust.name);
+        if(!vt){
+          notifs.push({type:'pm',msg:`Jadwal PM ${cust.name} oleh ${tech.name}`,time:'Hari ini',key:`pm_${today}_${tech.name}_${cust.name}`});
+        }
+      }
+    });
+  });
+  
+  // 2. Cek CM Open
+  cmVisits.filter(v=>v.status!=='Closed').forEach(v=>{
+    notifs.push({type:'cm',msg:`Tiket CM Open: ${v.customer} - ${v.masalah}`,time:formatDate(v.tanggal),key:`cm_${v.id}`});
+  });
+  
+  // 3. Cek Customer Baru (Dibuat dalam 3 hari terakhir)
+  const t3=new Date();t3.setDate(t3.getDate()-3);
+  customers.filter(c=>new Date(c.firstSchedule)>=t3).forEach(c=>{
+    notifs.push({type:'cust',msg:`Customer baru terdaftar: ${c.name} (${c.base})`,time:formatDate(c.firstSchedule),key:`cust_${c.id}`});
+  });
+  
+  // Ambil daftar notifikasi yang sudah dibaca dari memori browser
+  let seenNotifs = JSON.parse(localStorage.getItem('pm_seen_notifs') || '[]');
+  let unread = notifs.filter(n => !seenNotifs.includes(n.key));
+  
+  if(notifs.length===0){
+    list.innerHTML='<div class="empty-state py-8"><p class="text-sm">Tidak ada notifikasi.</p></div>';
+    badge.classList.add('hidden');
+    btn.classList.remove('bell-anim');
+    return;
+  }
+  
+  // Tampilkan angka merah HANYA untuk notifikasi yang belum dibaca
+  if(unread.length === 0){
+    badge.classList.add('hidden');
+    btn.classList.remove('bell-anim');
+  } else {
+    badge.textContent = unread.length>9?'9+':unread.length;
+    badge.classList.remove('hidden');
+    btn.classList.add('bell-anim');
+  }
+  
+  // Tampilkan daftar notifikasi (beri titik biru jika belum dibaca)
+  list.innerHTML = notifs.map(n => {
+    let ic = n.type==='pm'?'bell-ring':n.type==='cm'?'alert-octagon':'building';
+    let cl = n.type==='pm'?'text-amber-400':n.type==='cm'?'text-rose-400':'text-cyan-400';
+    let isUnread = !seenNotifs.includes(n.key);
+    let dot = isUnread ? '<span class="w-2 h-2 rounded-full bg-blue-500 mr-2 flex-shrink-0 mt-1.5"></span>' : '<span class="w-2 h-2 mr-2 flex-shrink-0 mt-1.5"></span>';
+    return `<div class="flex items-start gap-2 p-2 rounded-lg hover:bg-white/5 cursor-pointer">${dot}<i data-lucide="${ic}" class="${cl}" style="width:16px;height:16px;margin-top:2px"></i><div class="flex-1"><p class="text-xs text-gray-200">${n.msg}</p><p class="text-[10px] text-gray-500 mt-0.5">${n.time}</p></div></div>`;
+  }).join('');
+  
+  lucide.createIcons();
+}
+
+function markAllRead(){
+  const today=new Date().toISOString().split('T')[0];
+  let keysToMark = [];
+  
+  // Kumpulkan semua key notifikasi yang aktif saat ini
+  technicians.forEach(tech=>{
+    customers.filter(c=>c.base===tech.base).forEach(cust=>{
+      const ns=getTechNextSchedule(tech,cust);
+      const nss=ns.toISOString().split('T')[0];
+      if(nss===today){
+        const vt=visits.some(v=>v.tanggal===today&&v.teknisi===tech.name&&v.customer===cust.name);
+        if(!vt){ keysToMark.push(`pm_${today}_${tech.name}_${cust.name}`); }
+      }
+    });
+  });
+  cmVisits.filter(v=>v.status!=='Closed').forEach(v=>{ keysToMark.push(`cm_${v.id}`); });
+  const t3=new Date();t3.setDate(t3.getDate()-3);
+  customers.filter(c=>new Date(c.firstSchedule)>=t3).forEach(c=>{ keysToMark.push(`cust_${c.id}`); });
+  
+  // Simpan key tersebut ke memori browser agar dianggap "sudah dibaca"
+  let seenNotifs = JSON.parse(localStorage.getItem('pm_seen_notifs') || '[]');
+  keysToMark.forEach(key => { if(!seenNotifs.includes(key)) seenNotifs.push(key); });
+  localStorage.setItem('pm_seen_notifs', JSON.stringify(seenNotifs));
+  
+  // Update tampilan
+  document.getElementById('bellIcon').classList.remove('bell-anim');
+  document.getElementById('notifBadge').classList.add('hidden');
+  showToast('Notifikasi ditandai dibaca','info');
+  renderNotif(); // Render ulang untuk menghilangkan titik biru
+}
 function populateSuratTeknisi(){const c=document.getElementById('suratTeknisiList');if(!c)return;if(technicians.length===0){c.innerHTML='<p class="text-sm text-gray-500 text-center py-4">Belum ada teknisi.</p>';return;}c.innerHTML=technicians.map(t=>`<label class="cust-checkbox-item"><input type="checkbox" value="${t.id}" class="surat-tech-checkbox"><span class="text-sm text-white">${t.name} (${t.id})</span></label>`).join('');}
 function showSuratTujuanDropdown(){const d=document.getElementById('suratTujuanDropdownList');const s=document.getElementById('suratTujuanSearch').value.toLowerCase();const f=customers.filter(c=>c.name.toLowerCase().includes(s));if(f.length===0){d.innerHTML='<div class="cust-option" style="color:var(--muted);cursor:default">Customer tidak ditemukan</div>';}else{d.innerHTML=f.map(c=>`<div class="cust-option" onmousedown="selectSuratTujuan('${c.name}')">${c.name}</div>`).join('');}d.classList.add('show');}
 function hideSuratTujuanDropdown(){setTimeout(()=>{document.getElementById('suratTujuanDropdownList').classList.remove('show');},150);}
