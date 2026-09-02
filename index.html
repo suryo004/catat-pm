@@ -319,7 +319,7 @@ function openCSMessage(id,type){
   else if(hr>=15&&hr<19)greeting='Selamat Sore';
   else greeting='Selamat Malam';
   
-  let text=`Kepada Yth. Bapak/Ibu,\n${greeting},\n\nTerima kasih atas kunjungan maintenance yang telah kami lakukan, yang ditangani oleh teknisi kami, ${v.teknisi}, di ${v.customer}. Kami dari NORXEL sangat menghargai kepercayaan yang Bapak/Ibu berikan.\n\nSebagai komitmen kami untuk terus memberikan layanan terbaik, mohon kesediaan Bapak/Ibu untuk mengisi formulir survei kepuasan pelanggan melalui tautan berikut: supportnorxel.id\n\nPenilaian dan saran Bapak/Ibu menjadi acuan utama bagi kami. Terima kasih atas waktu dan kerjasamanya.\n\nHormat kami,\nSuryo\nNORXEL`;
+  let text=`Kepada Yth. Bapak/Ibu,\n${greeting},\n\nTerima kasih atas kunjungan maintenance yang telah kami lakukan, yang ditangani oleh teknisi kami, ${v.teknisi}, di ${v.customer}. Kami dari NORXEL sangat menghargai kepercayaan yang Bapak/Ibu berikan.\n\nSebagai komitmen kami untuk terus memberikan layanan terbaik, mohon kesediaan Bapak/Ibu untuk mengisi formulir survei kepuasan pelanggan melalui tautan berikut: supportnorxel.id\n\nPenilaian dan saran Bapak/Ibu menjadi acuan utama bagi kami. Terima kasih atas waktu dan kerjasamanya.\n\nHormat kami,\n${v.teknisi}\nNORXEL`;
 
   document.getElementById('csText').value=text;
   document.getElementById('csWaLink').href=`https://wa.me/?text=${encodeURIComponent(text)}`;
